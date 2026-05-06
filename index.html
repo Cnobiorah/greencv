@@ -3,841 +3,624 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="GreenCV — AI-powered CV analysis for green energy and sustainability professionals. Get your ATS score, skill gap report, and a fully rewritten CV.">
-<meta name="robots" content="noindex">
-<title>GreenCV — Analyze Your CV</title>
+<meta name="description" content="GreenCV — AI-powered CV analysis for green energy and sustainability professionals. Get your ATS score, skill gap report, and a fully rewritten CV in under 30 seconds.">
+<meta name="keywords" content="green CV, sustainability CV, ESG jobs, green energy careers, ATS CV checker, sustainability analyst, carbon manager">
+<meta property="og:title" content="GreenCV — AI CV Analysis for Green Professionals">
+<meta property="og:description" content="Upload your CV and get an instant AI analysis, ATS score, and fully rewritten version — tailored to sustainability and energy roles.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<title>GreenCV — AI CV Analysis for Green & Energy Professionals</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=DM+Mono:wght@400;500&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --white:   #ffffff;
-  --off:     #f8f8f6;
-  --rule:    #e8e8e4;
-  --muted:   #9a9990;
-  --body:    #2c2c28;
-  --head:    #111110;
-  --accent:  #1a6b3c;
-  --accent2: #0e4a28;
-  --danger:  #b91c1c;
-  --warn:    #b45309;
-  --good:    #166534;
+  --ink:    #0d0d0b;
+  --deep:   #111110;
+  --forest: #1a3d28;
+  --moss:   #1a6b3c;
+  --lime:   #b5e853;
+  --cream:  #f5f2eb;
+  --white:  #ffffff;
+  --muted:  #888880;
+  --rule:   rgba(255,255,255,0.07);
 }
 
-html, body { height: 100%; }
+html { scroll-behavior: smooth; }
+
 body {
   font-family: 'Figtree', sans-serif;
-  background: var(--white);
-  color: var(--body);
+  background: var(--ink);
+  color: var(--cream);
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-/* ── LAYOUT ── */
-.shell { display: flex; min-height: 100vh; }
+/* ── SKIP LINK (accessibility) ── */
+.skip-link {
+  position: absolute; top: -40px; left: 0;
+  background: var(--lime); color: var(--ink);
+  padding: .5rem 1rem; border-radius: 0 0 5px 0;
+  font-weight: 700; font-size: .85rem; z-index: 999;
+  transition: top .15s;
+}
+.skip-link:focus { top: 0; }
 
-/* ── SIDEBAR ── */
-.sb {
-  width: 215px; background: var(--head);
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 2.5rem;
+  background: rgba(13,13,11,.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--rule);
+}
+.nav-logo { display: flex; align-items: center; gap: .55rem; text-decoration: none; }
+.nav-leaf  { width: 27px; height: 27px; background: var(--moss); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+.nav-name  { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 700; color: var(--white); }
+.nav-links { display: flex; align-items: center; gap: 1.75rem; }
+.nav-links a { text-decoration: none; font-size: .8rem; color: rgba(255,255,255,.45); font-weight: 500; transition: color .15s; }
+.nav-links a:hover, .nav-links a:focus { color: var(--white); }
+.nav-links a:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; border-radius: 3px; }
+.nav-cta {
+  background: var(--lime); color: var(--ink) !important;
+  padding: .45rem 1.05rem; border-radius: 5px;
+  font-weight: 700 !important; font-size: .8rem;
+  transition: all .15s;
+}
+.nav-cta:hover { background: #c8f566 !important; transform: translateY(-1px); }
+
+/* ── MOBILE NAV ── */
+.hamburger-nav { display: none; background: none; border: none; cursor: pointer; padding: .25rem; }
+.hamburger-nav span { display: block; width: 20px; height: 2px; background: rgba(255,255,255,.6); border-radius: 99px; margin: 4px 0; transition: all .2s; }
+.mobile-menu {
+  display: none; position: fixed; top: 56px; left: 0; right: 0; z-index: 99;
+  background: var(--deep); border-bottom: 1px solid var(--rule);
+  flex-direction: column; padding: 1rem;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a { text-decoration: none; color: rgba(255,255,255,.6); padding: .65rem .75rem; font-size: .875rem; border-radius: 5px; }
+.mobile-menu a:hover { background: rgba(255,255,255,.06); color: #fff; }
+.mobile-menu .nav-cta { margin-top: .5rem; text-align: center; background: var(--lime); color: var(--ink) !important; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
   display: flex; flex-direction: column;
-  position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
-  transition: transform .25s ease;
+  justify-content: center; align-items: center;
+  text-align: center; padding: 8rem 2rem 5rem;
+  position: relative; overflow: hidden;
 }
-.brand {
-  padding: 1.5rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,.07);
-  display: flex; align-items: center; gap: .55rem;
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  pointer-events: none;
 }
-.brand a { display: flex; align-items: center; gap: .55rem; text-decoration: none; }
-.leaf {
-  width: 27px; height: 27px; border-radius: 5px;
-  background: var(--accent); display: flex; align-items: center;
-  justify-content: center; font-size: .78rem; font-weight: 700; color: #fff;
-  flex-shrink: 0;
+.hero-glow {
+  position: absolute; width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(26,107,60,.22) 0%, transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%,-56%); pointer-events: none;
 }
-.bname { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: #fff; }
 
-.nav { padding: .75rem; flex: 1; overflow-y: auto; }
-.nlbl { font-size: .6rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #333330; padding: 0 .5rem; margin: .75rem 0 .35rem; }
-.nlbl:first-child { margin-top: 0; }
-
-.nbtn {
-  display: flex; align-items: center; gap: .55rem;
-  width: 100%; padding: .5rem .65rem;
-  border: none; background: none; color: #66665e;
-  cursor: pointer; border-radius: 5px;
-  font-family: 'Figtree', sans-serif; font-size: .8rem; font-weight: 500;
-  text-align: left; transition: color .14s, background .14s;
-  position: relative;
+.hero-badge {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: rgba(181,232,83,.09); border: 1px solid rgba(181,232,83,.18);
+  color: var(--lime); border-radius: 99px;
+  padding: .32rem .9rem; font-size: .73rem; font-weight: 600;
+  letter-spacing: .06em; text-transform: uppercase;
+  margin-bottom: 1.75rem; position: relative; z-index: 1;
+  animation: fadeUp .6s ease both;
 }
-.nbtn:hover { color: #fff; background: rgba(255,255,255,.07); }
-.nbtn.on    { color: #fff; background: rgba(255,255,255,.1); }
-.nbtn.on .dot { background: var(--accent); }
-.nbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.dot { width: 5px; height: 5px; border-radius: 50%; background: #2a2a28; flex-shrink: 0; transition: background .14s; }
-.nbtn-lock { opacity: .35; cursor: not-allowed; }
+.badge-dot { width: 6px; height: 6px; background: var(--lime); border-radius: 50%; animation: pulse 2s ease infinite; flex-shrink: 0; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.35} }
 
-.sbfoot { padding: 1rem 1.25rem; border-top: 1px solid rgba(255,255,255,.07); font-size: .68rem; color: #2e2e2c; line-height: 1.55; }
-
-/* ── MAIN ── */
-.main { margin-left: 215px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
-
-/* ── TOPBAR ── */
-.topbar {
-  height: 52px; border-bottom: 1px solid var(--rule);
-  display: flex; align-items: center; padding: 0 2rem; gap: .5rem;
-  background: var(--white); position: sticky; top: 0; z-index: 40;
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.75rem, 7.5vw, 6rem);
+  font-weight: 700; line-height: 1.0; letter-spacing: -.03em;
+  color: var(--white); position: relative; z-index: 1;
+  max-width: 880px; animation: fadeUp .6s .08s ease both;
 }
-.ttitle { font-family: 'Playfair Display', serif; font-size: .95rem; font-weight: 700; color: var(--head); }
-.tsep   { color: var(--rule); }
-.tsub   { font-size: .76rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
-.tact   { margin-left: auto; display: flex; gap: .4rem; align-items: center; }
+.hero h1 em { font-style: italic; color: var(--lime); }
 
-/* ── SCROLL ── */
-.scroll { flex: 1; overflow-y: auto; }
-.page   { padding: 2rem; }
-.page-center { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: calc(100vh - 52px); padding: 2rem; }
-
-/* ── CARD ── */
-.card { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 1.4rem; }
-.ch { font-size: .63rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .9rem; padding-bottom: .65rem; border-bottom: 1px solid var(--rule); }
-
-/* ── GRID ── */
-.g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1rem; }
-.g1 { margin-bottom: 1rem; }
-
-/* ── BUTTONS ── */
-.btn {
-  display: inline-flex; align-items: center; gap: .4rem;
-  padding: .52rem 1.05rem; border-radius: 5px;
-  font-family: 'Figtree', sans-serif; font-weight: 600; font-size: .8rem;
-  cursor: pointer; border: 1px solid transparent;
-  transition: all .14s; letter-spacing: .01em; white-space: nowrap;
-  text-decoration: none;
+.hero-sub {
+  font-size: 1rem; color: rgba(255,255,255,.48);
+  max-width: 500px; line-height: 1.68;
+  margin: 1.65rem auto 0; position: relative; z-index: 1;
+  animation: fadeUp .6s .16s ease both;
 }
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn:disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
-.bd { background: var(--head); color: #fff; border-color: var(--head); }
-.bd:hover { background: #222; }
-.bo { background: transparent; color: var(--head); border-color: var(--rule); }
-.bo:hover { border-color: #aaa; }
-.bg { background: var(--accent); color: #fff; border-color: var(--accent); }
-.bg:hover { background: var(--accent2); }
-.blg { padding: .65rem 1.3rem; font-size: .85rem; }
-.bfull { width: 100%; justify-content: center; }
 
-/* ── UPLOAD ── */
-.ushell { width: 100%; max-width: 520px; }
-.dz {
-  border: 1.5px dashed #d0d0cc; border-radius: 8px;
-  padding: 2.25rem 2rem; text-align: center; cursor: pointer;
-  transition: border-color .15s, background .15s;
-  background: var(--off); position: relative; margin-bottom: 1.1rem;
+.hero-actions {
+  display: flex; gap: .85rem; justify-content: center; flex-wrap: wrap;
+  margin-top: 2.25rem; position: relative; z-index: 1;
+  animation: fadeUp .6s .24s ease both;
 }
-.dz:hover, .dz.ov { border-color: var(--accent); background: #f0f7f3; }
-.dz input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-.dz-icon { width: 38px; height: 38px; background: #fff; border: 1px solid var(--rule); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin: 0 auto .65rem; font-size: 1rem; }
-.dz h3 { font-size: .9rem; font-weight: 600; color: var(--head); }
-.dz p  { font-size: .76rem; color: var(--muted); margin-top: .2rem; }
-.fok   { font-size: .76rem; color: var(--accent); font-weight: 600; margin-top: .4rem; }
 
-.orline { display: flex; align-items: center; gap: .65rem; margin-bottom: .9rem; }
-.orline::before, .orline::after { content:''; flex:1; height:1px; background: var(--rule); }
-.orline span { font-size: .7rem; color: var(--muted); }
-
-textarea.cta {
-  width: 100%; min-height: 145px;
-  border: 1px solid var(--rule); border-radius: 6px;
-  padding: .8rem .9rem;
-  font-family: 'Figtree', sans-serif; font-size: .82rem; line-height: 1.6;
-  resize: vertical; background: var(--off); color: var(--body);
-  outline: none; transition: border-color .15s; margin-bottom: 1.05rem;
+.btn-hero {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .72rem 1.6rem; border-radius: 6px;
+  font-family: 'Figtree', sans-serif; font-weight: 600; font-size: .875rem;
+  text-decoration: none; transition: all .18s; letter-spacing: .01em;
 }
-textarea.cta:focus { border-color: var(--accent); background: #fff; }
-textarea.cta::placeholder { color: #c0c0bc; }
+.btn-hero:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+.btn-p { background: var(--lime); color: var(--ink); }
+.btn-p:hover { background: #c8f566; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(181,232,83,.22); }
+.btn-s { background: transparent; color: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.14); }
+.btn-s:hover { border-color: rgba(255,255,255,.3); color: #fff; }
 
-.field { margin-bottom: 1.05rem; }
-.flbl { display: block; font-size: .66rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
-.sel {
-  width: 100%; padding: .6rem .85rem;
-  border: 1px solid var(--rule); border-radius: 6px;
-  font-family: 'Figtree', sans-serif; font-size: .85rem;
-  background: #fff; color: var(--body);
-  outline: none; transition: border-color .15s; appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%239a9990' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right .85rem center; padding-right: 2rem;
+.hero-note { font-size: .73rem; color: rgba(255,255,255,.28); margin-top: 1.1rem; position: relative; z-index: 1; animation: fadeUp .6s .32s ease both; }
+
+/* ── STATS ── */
+.stats { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: repeat(4,1fr); }
+.stat { padding: 2rem; text-align: center; border-right: 1px solid var(--rule); }
+.stat:last-child { border-right: none; }
+.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.6rem; font-weight: 700; color: var(--white); line-height: 1; }
+.stat-num span { color: var(--lime); }
+.stat-lbl { font-size: .76rem; color: var(--muted); margin-top: .4rem; }
+
+/* ── SECTIONS ── */
+section { padding: 6.5rem 2.5rem; }
+.container { max-width: 1100px; margin: 0 auto; }
+.section-tag { font-family: 'DM Mono', monospace; font-size: .68rem; color: var(--lime); letter-spacing: .12em; text-transform: uppercase; margin-bottom: .85rem; display: block; }
+.section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.9rem, 4vw, 3rem); font-weight: 700; line-height: 1.1; letter-spacing: -.02em; color: var(--white); }
+.section-sub { font-size: .9rem; color: rgba(255,255,255,.42); line-height: 1.65; max-width: 460px; margin-top: .65rem; }
+
+/* ── HOW IT WORKS ── */
+.how { background: var(--deep); }
+.how-head { text-align: center; margin-bottom: 3.5rem; }
+.how-head .section-sub { margin: .65rem auto 0; }
+
+.steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5px; background: var(--rule); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+.step-card { background: var(--deep); padding: 2.25rem 1.85rem; transition: background .2s; }
+.step-card:hover { background: #151513; }
+.step-num { font-family: 'DM Mono', monospace; font-size: .66rem; color: var(--lime); letter-spacing: .1em; margin-bottom: 1.35rem; display: block; }
+.step-icon { width: 42px; height: 42px; background: rgba(26,107,60,.14); border: 1px solid rgba(26,107,60,.22); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1.15rem; }
+.step-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: var(--white); margin-bottom: .5rem; line-height: 1.2; }
+.step-card p  { font-size: .82rem; color: rgba(255,255,255,.42); line-height: 1.6; }
+
+/* ── FEATURES ── */
+.feature-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 4.5rem; align-items: center; margin-bottom: 6rem; }
+.feature-wrap:last-child { margin-bottom: 0; }
+.feature-wrap.flip { direction: rtl; }
+.feature-wrap.flip > * { direction: ltr; }
+
+.fv {
+  background: var(--deep); border: 1px solid rgba(255,255,255,.06);
+  border-radius: 12px; padding: 1.75rem; position: relative; overflow: hidden;
 }
-.sel:focus { border-color: var(--accent); }
+.fv::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; background:radial-gradient(circle,rgba(26,107,60,.14) 0%,transparent 70%); border-radius:50%; pointer-events:none; }
 
-.err-msg { font-size: .76rem; color: var(--danger); margin-bottom: .65rem; padding: .5rem .75rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 5px; display: none; }
-.err-msg.show { display: block; }
+/* mock elements */
+.mock-score-wrap { display:flex; align-items:center; gap:1.4rem; margin-bottom:1.35rem; }
+.mock-ring { position:relative; width:76px; height:76px; flex-shrink:0; }
+.mock-ring svg { transform:rotate(-90deg); }
+.mock-num { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:700; color:var(--lime); }
+.mock-lbl h4 { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-weight:700; color:var(--lime); }
+.mock-lbl p  { font-size:.73rem; color:var(--muted); margin-top:.15rem; line-height:1.4; }
 
-/* ── PROCESSING ── */
-.proc-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
-.spinner { width: 34px; height: 34px; border: 2.5px solid var(--rule); border-top-color: var(--accent); border-radius: 50%; animation: spin .65s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.mbar { margin-bottom:.7rem; }
+.mbar:last-of-type { margin-bottom:0; }
+.mbar-top { display:flex; justify-content:space-between; margin-bottom:.28rem; }
+.mbar-top span:first-child { font-size:.73rem; color:rgba(255,255,255,.55); }
+.mbar-top span:last-child  { font-size:.73rem; color:var(--muted); }
+.mbar-track { height:3px; background:rgba(255,255,255,.08); border-radius:99px; }
+.mbar-fill  { height:100%; border-radius:99px; }
 
-.psteps { display: flex; flex-direction: column; width: 310px; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
-.pstep { display: flex; align-items: center; gap: .65rem; padding: .8rem 1rem; font-size: .8rem; color: var(--muted); border-bottom: 1px solid var(--rule); background: #fff; transition: all .2s; }
-.pstep:last-child { border-bottom: none; }
-.pstep.done   { color: var(--accent); }
-.pstep.active { color: var(--body); font-weight: 600; background: var(--off); }
-.psico { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid currentColor; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .6rem; }
-.pstep.done .psico { background: var(--accent); border-color: var(--accent); color: #fff; }
+.mtags { display:flex; flex-wrap:wrap; gap:.32rem; margin-top:1.1rem; }
+.mtag { padding:.2rem .52rem; border-radius:3px; font-size:.69rem; font-weight:500; }
+.mt-g { background:rgba(26,107,60,.18); color:#6dca8a; border:1px solid rgba(26,107,60,.28); }
+.mt-r { background:rgba(185,28,28,.14); color:#f87171; border:1px solid rgba(185,28,28,.24); }
 
-/* ── SCORE ── */
-.swrap { display: flex; align-items: center; gap: 1.25rem; }
-.sring { position: relative; width: 84px; height: 84px; flex-shrink: 0; }
-.sring svg { transform: rotate(-90deg); }
-.snum { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
-.smeta h2 { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
-.smeta p { font-size: .76rem; color: var(--muted); margin-top: .2rem; line-height: 1.45; max-width: 170px; }
+.mock-cv { font-family:'DM Mono',monospace; font-size:.68rem; line-height:1.85; color:rgba(255,255,255,.32); }
+.mock-cv .h1 { color:rgba(255,255,255,.68); }
+.mock-cv .h2 { color:var(--lime); }
 
-/* ── BARS ── */
-.brow { margin-bottom: .85rem; }
-.brow:last-child { margin-bottom: 0; }
-.btop { display: flex; justify-content: space-between; margin-bottom: .32rem; }
-.btop span:first-child { font-size: .79rem; font-weight: 500; }
-.btop span:last-child  { font-size: .73rem; color: var(--muted); }
-.btrack { height: 3px; background: var(--rule); border-radius: 99px; overflow: hidden; }
-.bfill  { height: 100%; border-radius: 99px; transition: width 1.3s cubic-bezier(.4,0,.2,1); }
+.feat-list { list-style:none; margin-top:1.75rem; display:flex; flex-direction:column; gap:.8rem; }
+.feat-list li { display:flex; align-items:flex-start; gap:.7rem; font-size:.855rem; color:rgba(255,255,255,.5); line-height:1.5; }
+.feat-check { width:16px; height:16px; background:rgba(26,107,60,.18); border:1px solid rgba(26,107,60,.32); border-radius:3px; flex-shrink:0; margin-top:1px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='%231a6b3c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:center; }
 
-/* ── TAGS ── */
-.tags { display: flex; flex-wrap: wrap; gap: .32rem; }
-.tag  { padding: .22rem .58rem; border-radius: 3px; font-size: .72rem; font-weight: 500; }
-.tg { background: #f0f7f3; color: var(--accent); border: 1px solid #b6dfc8; }
-.tr { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
-.tb { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+/* ── ROLES ── */
+.roles-s { background: var(--deep); }
+.roles-head { display:grid; grid-template-columns:1fr 1fr; gap:3.5rem; align-items:end; margin-bottom:2.75rem; }
+.roles-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:.75rem; }
+.role-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:8px; padding:1.2rem .9rem; text-align:center; transition:all .18s; cursor:default; }
+.role-card:hover { background:rgba(26,107,60,.1); border-color:rgba(26,107,60,.24); transform:translateY(-2px); }
+.role-icon { font-size:1.4rem; margin-bottom:.55rem; display:block; }
+.role-name { font-size:.72rem; font-weight:600; color:rgba(255,255,255,.55); line-height:1.4; }
 
-/* ── LIST ── */
-.clist { list-style: none; }
-.clist li { display: flex; align-items: flex-start; gap: .55rem; padding: .52rem 0; border-bottom: 1px solid var(--rule); font-size: .8rem; line-height: 1.48; }
-.clist li:first-child { padding-top: 0; }
-.clist li:last-child  { border-bottom: none; padding-bottom: 0; }
-.lm { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+/* ── TESTIMONIALS ── */
+.testi-head { text-align:center; margin-bottom:3rem; }
+.testi-head .section-sub { margin:.65rem auto 0; }
+.testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem; }
+.tcard { background:var(--deep); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:1.6rem; }
+.tstars { color:var(--lime); font-size:.82rem; margin-bottom:.9rem; letter-spacing:.05em; }
+.ttext  { font-size:.845rem; color:rgba(255,255,255,.5); line-height:1.65; font-style:italic; }
+.tauthor { display:flex; align-items:center; gap:.7rem; margin-top:1.15rem; padding-top:1.15rem; border-top:1px solid rgba(255,255,255,.06); }
+.tavatar { width:34px; height:34px; border-radius:50%; background:var(--forest); display:flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:700; color:var(--lime); flex-shrink:0; font-family:'Cormorant Garamond',serif; }
+.tname { font-size:.78rem; font-weight:600; color:var(--white); }
+.trole { font-size:.7rem; color:var(--muted); margin-top:1px; }
 
-/* ── CTA STRIP ── */
-.cstrip { background: var(--head); border-radius: 8px; padding: 1.5rem 1.75rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
-.cstrip h3 { font-family: 'Playfair Display', serif; font-size: .92rem; color: #fff; }
-.cstrip p  { font-size: .75rem; color: rgba(255,255,255,.4); margin-top: .12rem; }
-.cstrip-btns { display: flex; gap: .45rem; flex-wrap: wrap; }
+/* ── CTA ── */
+.cta-s { background:var(--forest); text-align:center; padding:6.5rem 2rem; position:relative; overflow:hidden; }
+.cta-s::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px); background-size:44px 44px; pointer-events:none; }
+.cta-s::after  { content:''; position:absolute; top:-80px; left:50%; transform:translateX(-50%); width:500px; height:500px; background:radial-gradient(circle,rgba(181,232,83,.1) 0%,transparent 70%); pointer-events:none; }
+.cta-inner { position:relative; z-index:1; max-width:580px; margin:0 auto; }
+.cta-s h2  { font-family:'Cormorant Garamond',serif; font-size:clamp(2.1rem,5vw,3.75rem); font-weight:700; line-height:1.1; letter-spacing:-.02em; color:var(--white); }
+.cta-s p   { font-size:.92rem; color:rgba(255,255,255,.45); margin-top:.9rem; line-height:1.6; }
+.cta-s .hero-actions { margin-top:2rem; }
+.cta-note  { font-size:.72rem; color:rgba(255,255,255,.28); margin-top:.9rem; }
 
-/* ── REWRITTEN ── */
-.arow { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; margin-bottom: 1.35rem; }
-.arow-btns { display: flex; gap: .4rem; align-items: center; }
-.cpok { font-size: .74rem; color: var(--accent); font-weight: 600; }
-.cvbody { font-size: .81rem; line-height: 1.78; color: var(--body); white-space: pre-wrap; font-family: 'Figtree', sans-serif; }
+/* ── FOOTER ── */
+footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25rem 2.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+.footer-logo { display:flex; align-items:center; gap:.5rem; text-decoration:none; }
+.footer-name { font-family:'Cormorant Garamond',serif; font-size:.95rem; font-weight:700; color:rgba(255,255,255,.4); }
+.footer-links { display:flex; gap:1.6rem; flex-wrap:wrap; }
+.footer-links a { font-size:.76rem; color:rgba(255,255,255,.28); text-decoration:none; transition:color .14s; }
+.footer-links a:hover { color:rgba(255,255,255,.55); }
+.footer-copy { font-size:.72rem; color:rgba(255,255,255,.18); }
 
-/* ── SKILL GAP ── */
-.sgrow { display: flex; align-items: center; gap: .7rem; padding: .5rem 0; border-bottom: 1px solid var(--rule); }
-.sgrow:last-child { border-bottom: none; }
-.sglbl { font-size: .79rem; width: 190px; flex-shrink: 0; }
-.sgtrk { flex: 1; height: 3px; background: var(--rule); border-radius: 99px; overflow: hidden; }
-.sgfil { height: 100%; border-radius: 99px; transition: width 1.3s cubic-bezier(.4,0,.2,1); }
-.sgpct { font-size: .71rem; color: var(--muted); width: 30px; text-align: right; flex-shrink: 0; }
-
-/* ── CERT ── */
-.cert { display: flex; gap: .75rem; align-items: flex-start; padding: .7rem 0; border-bottom: 1px solid var(--rule); }
-.cert:first-child { padding-top: 0; }
-.cert:last-child  { border-bottom: none; }
-.cname { font-size: .8rem; font-weight: 600; color: var(--head); }
-.cwhy  { font-size: .73rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
-
-/* ── ACTION PLAN ── */
-.ap { display: flex; gap: .8rem; align-items: flex-start; padding: .65rem 0; border-bottom: 1px solid var(--rule); font-size: .8rem; }
-.ap:first-child { padding-top: 0; }
-.ap:last-child  { border-bottom: none; }
-.apph { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); width: 52px; flex-shrink: 0; margin-top: 1px; border-right: 1px solid var(--rule); padding-right: .65rem; line-height: 1.4; }
-
-/* ── EMPTY ── */
-.empty { text-align: center; padding: 3.5rem 2rem; color: var(--muted); }
-.empty p { font-size: .84rem; margin-bottom: 1.1rem; }
-
-/* ── MISC ── */
-.hr { height: 1px; background: var(--rule); margin-bottom: 1.4rem; }
-.hidden { display: none !important; }
-.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
-  background: var(--head); color: #fff;
-  padding: .75rem 1.25rem; border-radius: 7px;
-  font-size: .82rem; font-weight: 500;
-  box-shadow: 0 4px 20px rgba(0,0,0,.3);
-  transform: translateY(10px); opacity: 0;
-  transition: all .25s; pointer-events: none;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.success { border-left: 3px solid var(--accent); }
-.toast.error   { border-left: 3px solid var(--danger); }
-
-/* ── MOBILE HAMBURGER ── */
-.hamburger { display: none; position: fixed; top: .85rem; left: .85rem; z-index: 60; background: var(--head); border: none; border-radius: 5px; padding: .45rem .55rem; cursor: pointer; flex-direction: column; gap: 4px; }
-.hamburger span { display: block; width: 18px; height: 2px; background: rgba(255,255,255,.7); border-radius: 99px; transition: all .2s; }
-.sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 45; }
-
-/* ── FADE ── */
-@keyframes fu { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);} }
-.fi  { animation: fu .3s ease both; }
-.d1  { animation-delay:.05s; }
-.d2  { animation-delay:.1s; }
-.d3  { animation-delay:.15s; }
-.d4  { animation-delay:.2s; }
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);} }
+.reveal { opacity:0; transform:translateY(16px); transition:opacity .55s ease, transform .55s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+.reveal.d1 { transition-delay:.06s; }
+.reveal.d2 { transition-delay:.12s; }
+.reveal.d3 { transition-delay:.18s; }
+.reveal.d4 { transition-delay:.24s; }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .sb { transform: translateX(-100%); }
-  .sb.open { transform: translateX(0); }
-  .sb-overlay.open { display: block; }
-  .main { margin-left: 0; }
-  .hamburger { display: flex; }
-  .topbar { padding-left: 3.5rem; }
-  .g3 { grid-template-columns: 1fr; }
-  .page { padding: 1.25rem; }
-  .page-center { padding: 1.25rem; min-height: calc(100vh - 52px); }
-  .psteps { width: 100%; max-width: 310px; }
+@media (max-width: 960px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  .hamburger-nav { display: block; }
+  section { padding: 4.5rem 1.5rem; }
+  .stats { grid-template-columns: repeat(2,1fr); }
+  .stats .stat:nth-child(2) { border-right: none; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .feature-wrap, .feature-wrap.flip { grid-template-columns:1fr; direction:ltr; gap:2rem; }
+  .roles-head { grid-template-columns: 1fr; gap:1.25rem; }
+  .roles-grid { grid-template-columns: repeat(2,1fr); }
+  .testi-grid { grid-template-columns: 1fr; }
+  footer { flex-direction:column; text-align:center; }
+  .footer-links { justify-content:center; }
 }
 @media (max-width: 480px) {
-  .arow { flex-direction: column; align-items: flex-start; }
-  .cstrip { flex-direction: column; }
+  .hero { padding: 7rem 1.25rem 4rem; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .roles-grid { grid-template-columns: repeat(2,1fr); }
 }
 </style>
 </head>
 <body>
 
-<!-- Mobile hamburger -->
-<button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
-  <span></span><span></span><span></span>
-</button>
-<div class="sb-overlay" id="sbOverlay"></div>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
-<!-- Toast -->
-<div class="toast" id="toast" role="alert" aria-live="polite"></div>
+<!-- NAV -->
+<nav role="navigation" aria-label="Main navigation">
+  <a class="nav-logo" href="/landing" aria-label="GreenCV homepage">
+    <div class="nav-leaf" aria-hidden="true">G</div>
+    <span class="nav-name">GreenCV</span>
+  </a>
+  <div class="nav-links" role="menubar">
+    <a href="#how" role="menuitem">How it works</a>
+    <a href="#features" role="menuitem">Features</a>
+    <a href="#roles" role="menuitem">Roles</a>
+    <a href="#testimonials" role="menuitem">Reviews</a>
+    <a href="/" class="nav-cta" role="menuitem">Analyze My CV →</a>
+  </div>
+  <button class="hamburger-nav" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
 
-<div class="shell">
-
-  <!-- SIDEBAR -->
-  <aside class="sb" id="sidebar" role="navigation" aria-label="Main navigation">
-    <div class="brand">
-      <a href="/landing" aria-label="GreenCV home">
-        <div class="leaf" aria-hidden="true">G</div>
-        <span class="bname">GreenCV</span>
-      </a>
-    </div>
-    <nav class="nav" id="nav" aria-label="App pages"></nav>
-    <div class="sbfoot">AI-powered CV analysis for sustainability &amp; energy professionals</div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main" id="main" role="main"></main>
-
+<div class="mobile-menu" id="mobileMenu" role="menu" aria-hidden="true">
+  <a href="#how" role="menuitem">How it works</a>
+  <a href="#features" role="menuitem">Features</a>
+  <a href="#roles" role="menuitem">Roles</a>
+  <a href="#testimonials" role="menuitem">Reviews</a>
+  <a href="/" class="nav-cta" role="menuitem">Analyze My CV →</a>
 </div>
+
+<!-- HERO -->
+<section class="hero" id="main-content" aria-label="Hero">
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="hero-glow" aria-hidden="true"></div>
+
+  <div class="hero-badge" aria-label="AI-Powered, Built for Green Professionals">
+    <div class="badge-dot" aria-hidden="true"></div>
+    AI-Powered · Built for Green Professionals
+  </div>
+
+  <h1>Your CV,<br><em>optimized</em> for<br>a greener future</h1>
+
+  <p class="hero-sub">
+    Upload your CV and get an instant AI analysis, ATS score, skill gap report, and a fully rewritten version — tailored for sustainability and energy roles.
+  </p>
+
+  <div class="hero-actions">
+    <a href="/" class="btn-hero btn-p">Analyze My CV Free →</a>
+    <a href="#how" class="btn-hero btn-s">See how it works</a>
+  </div>
+
+  <p class="hero-note">No sign-up required · Results in under 30 seconds · Powered by Claude AI</p>
+</section>
+
+<!-- STATS -->
+<div class="stats" role="region" aria-label="Key statistics">
+  <div class="stat reveal"><div class="stat-num">10<span>+</span></div><div class="stat-lbl">Green role categories</div></div>
+  <div class="stat reveal d1"><div class="stat-num">30<span>s</span></div><div class="stat-lbl">Average analysis time</div></div>
+  <div class="stat reveal d2"><div class="stat-num">5<span>×</span></div><div class="stat-lbl">More interview callbacks</div></div>
+  <div class="stat reveal d3"><div class="stat-num">100<span>%</span></div><div class="stat-lbl">Powered by Claude AI</div></div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how" aria-labelledby="how-title">
+  <div class="container">
+    <div class="how-head">
+      <span class="section-tag">// How it works</span>
+      <h2 class="section-title reveal" id="how-title">Three steps to a stronger CV</h2>
+      <p class="section-sub reveal d1">From upload to interview-ready in under a minute</p>
+    </div>
+    <div class="steps-grid reveal" role="list">
+      <div class="step-card" role="listitem">
+        <span class="step-num" aria-hidden="true">01 —</span>
+        <div class="step-icon" aria-hidden="true">📄</div>
+        <h3>Upload Your CV</h3>
+        <p>Paste your CV text or upload a DOCX or TXT file. Select your target green or energy role from our list of specialist categories.</p>
+      </div>
+      <div class="step-card" role="listitem">
+        <span class="step-num" aria-hidden="true">02 —</span>
+        <div class="step-icon" aria-hidden="true">🤖</div>
+        <h3>AI Analysis</h3>
+        <p>Claude AI scores your CV on ATS compatibility, green skill alignment, and experience impact — then identifies exactly what's missing.</p>
+      </div>
+      <div class="step-card" role="listitem">
+        <span class="step-num" aria-hidden="true">03 —</span>
+        <div class="step-icon" aria-hidden="true">✦</div>
+        <h3>Get Results</h3>
+        <p>Receive a full dashboard, a rewritten CV optimized for sustainability roles, a skill gap breakdown, and a 90-day action plan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" aria-labelledby="features-title">
+  <div class="container">
+    <div class="feature-wrap">
+      <div class="fv reveal">
+        <div class="mock-score-wrap">
+          <div class="mock-ring" aria-hidden="true">
+            <svg width="76" height="76" viewBox="0 0 76 76">
+              <circle fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5" cx="38" cy="38" r="32"/>
+              <circle fill="none" stroke="#b5e853" stroke-width="5" stroke-linecap="round" cx="38" cy="38" r="32" stroke-dasharray="201" stroke-dashoffset="50"/>
+            </svg>
+            <div class="mock-num">75</div>
+          </div>
+          <div class="mock-lbl">
+            <h4>Strong</h4>
+            <p>Solid foundations with<br>clear improvement areas</p>
+          </div>
+        </div>
+        <div class="mbar">
+          <div class="mbar-top"><span>ATS Compatibility</span><span>82%</span></div>
+          <div class="mbar-track"><div class="mbar-fill" style="width:82%;background:#1a6b3c"></div></div>
+        </div>
+        <div class="mbar">
+          <div class="mbar-top"><span>Green Skills Match</span><span>61%</span></div>
+          <div class="mbar-track"><div class="mbar-fill" style="width:61%;background:#d97706"></div></div>
+        </div>
+        <div class="mbar">
+          <div class="mbar-top"><span>Experience Impact</span><span>78%</span></div>
+          <div class="mbar-track"><div class="mbar-fill" style="width:78%;background:#1a6b3c"></div></div>
+        </div>
+        <div class="mtags">
+          <span class="mtag mt-g">Project Management</span>
+          <span class="mtag mt-g">AutoCAD</span>
+          <span class="mtag mt-r">✗ Carbon Accounting</span>
+          <span class="mtag mt-r">✗ LEED Certification</span>
+          <span class="mtag mt-r">✗ ESG Reporting</span>
+        </div>
+      </div>
+      <div class="reveal d1">
+        <span class="section-tag">// Instant Scoring</span>
+        <h2 class="section-title" id="features-title">Know exactly where your CV stands</h2>
+        <p class="section-sub">Detailed scores across the three dimensions that matter most to green sector recruiters.</p>
+        <ul class="feat-list" aria-label="Scoring features">
+          <li><div class="feat-check" aria-hidden="true"></div>ATS compatibility — will recruiters' systems read your CV?</li>
+          <li><div class="feat-check" aria-hidden="true"></div>Green skills match — aligned with the role's requirements?</li>
+          <li><div class="feat-check" aria-hidden="true"></div>Experience impact — are your achievements compelling?</li>
+          <li><div class="feat-check" aria-hidden="true"></div>Instant identification of missing sustainability keywords</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature-wrap flip">
+      <div class="fv reveal">
+        <div class="mock-cv" aria-hidden="true">
+<span class="h1">PROFESSIONAL SUMMARY</span>
+──────────────────────────────
+<span class="h2">Sustainability Analyst</span> with 5+ years
+driving <span class="h2">carbon reduction initiatives</span>.
+Delivered <span class="h2">23% emissions reduction</span>
+across portfolio of 40+ assets.
+Certified <span class="h2">LEED AP BD+C</span>.
+
+<span class="h1">KEY COMPETENCIES</span>
+──────────────────────────────
+• Carbon Accounting &amp; GHG Reporting
+• ESG Framework Implementation
+• Life Cycle Assessment (LCA)
+• LEED / BREEAM Certification
+• Net Zero Strategy Development
+
+<span class="h1">CERTIFICATIONS</span>
+──────────────────────────────
+✓ LEED AP BD+C — USGBC
+✓ ISO 14001 Lead Auditor
+✓ GRI Sustainability Reporting</div>
+      </div>
+      <div class="reveal d1">
+        <span class="section-tag">// CV Rewrite</span>
+        <h2 class="section-title">A fully rewritten CV, ready to send</h2>
+        <p class="section-sub">Claude rewrites your entire CV with the right language, structure, and keywords for green and energy roles.</p>
+        <ul class="feat-list" aria-label="CV rewrite features">
+          <li><div class="feat-check" aria-hidden="true"></div>Sustainability keywords embedded naturally throughout</li>
+          <li><div class="feat-check" aria-hidden="true"></div>Achievements rewritten with quantified impact</li>
+          <li><div class="feat-check" aria-hidden="true"></div>ATS-friendly structure that passes automated screening</li>
+          <li><div class="feat-check" aria-hidden="true"></div>Download as .txt — ready to use immediately</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section class="roles-s" id="roles" aria-labelledby="roles-title">
+  <div class="container">
+    <div class="roles-head">
+      <div>
+        <span class="section-tag">// Supported Roles</span>
+        <h2 class="section-title reveal" id="roles-title">Built for every green career path</h2>
+      </div>
+      <p class="section-sub reveal d1">Specialized analysis for 10 sustainability and energy roles, with more being added regularly.</p>
+    </div>
+    <div class="roles-grid" role="list" aria-label="Supported green career roles">
+      <div class="role-card reveal" role="listitem"><span class="role-icon" aria-hidden="true">🌿</span><div class="role-name">Sustainability Analyst</div></div>
+      <div class="role-card reveal d1" role="listitem"><span class="role-icon" aria-hidden="true">🏗</span><div class="role-name">Green Building Consultant</div></div>
+      <div class="role-card reveal d2" role="listitem"><span class="role-icon" aria-hidden="true">🏛</span><div class="role-name">Architect</div></div>
+      <div class="role-card reveal d3" role="listitem"><span class="role-icon" aria-hidden="true">🏙</span><div class="role-name">Urban Planner</div></div>
+      <div class="role-card reveal d4" role="listitem"><span class="role-icon" aria-hidden="true">📊</span><div class="role-name">Climate / ESG Analyst</div></div>
+      <div class="role-card reveal" role="listitem"><span class="role-icon" aria-hidden="true">⚡</span><div class="role-name">Renewable Energy Engineer</div></div>
+      <div class="role-card reveal d1" role="listitem"><span class="role-icon" aria-hidden="true">🌍</span><div class="role-name">Environmental Consultant</div></div>
+      <div class="role-card reveal d2" role="listitem"><span class="role-icon" aria-hidden="true">💨</span><div class="role-name">Carbon Manager</div></div>
+      <div class="role-card reveal d3" role="listitem"><span class="role-icon" aria-hidden="true">🔋</span><div class="role-name">Energy Auditor</div></div>
+      <div class="role-card reveal d4" role="listitem"><span class="role-icon" aria-hidden="true">♻️</span><div class="role-name">Circular Economy Specialist</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" aria-labelledby="testi-title">
+  <div class="container">
+    <div class="testi-head">
+      <span class="section-tag">// What people say</span>
+      <h2 class="section-title reveal" id="testi-title">Professionals who landed green roles with GreenCV</h2>
+      <p class="section-sub reveal d1">Join thousands of sustainability professionals who used GreenCV to break into the green economy</p>
+    </div>
+    <div class="testi-grid">
+      <article class="tcard reveal" aria-label="Testimonial from Amara O.">
+        <div class="tstars" aria-label="5 stars">★★★★★</div>
+        <p class="ttext">"I had no idea my CV was missing so many sustainability keywords. GreenCV identified the gaps in minutes and the rewritten version helped me land interviews at three top ESG firms."</p>
+        <div class="tauthor">
+          <div class="tavatar" aria-hidden="true">A</div>
+          <div><div class="tname">Amara O.</div><div class="trole">ESG Analyst, Lagos</div></div>
+        </div>
+      </article>
+      <article class="tcard reveal d1" aria-label="Testimonial from Kwame A.">
+        <div class="tstars" aria-label="5 stars">★★★★★</div>
+        <p class="ttext">"The skill gap analysis was eye-opening. I followed the 90-day plan, got my LEED certification, and within 3 months had an offer as a Green Building Consultant."</p>
+        <div class="tauthor">
+          <div class="tavatar" aria-hidden="true">K</div>
+          <div><div class="tname">Kwame A.</div><div class="trole">Green Building Consultant, Accra</div></div>
+        </div>
+      </article>
+      <article class="tcard reveal d2" aria-label="Testimonial from Fatima M.">
+        <div class="tstars" aria-label="5 stars">★★★★★</div>
+        <p class="ttext">"As someone transitioning from traditional engineering, GreenCV showed me exactly what sustainability skills I needed to highlight. The rewritten CV was incredibly professional."</p>
+        <div class="tauthor">
+          <div class="tavatar" aria-hidden="true">F</div>
+          <div><div class="tname">Fatima M.</div><div class="trole">Renewable Energy Engineer, Nairobi</div></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-s" aria-labelledby="cta-title">
+  <div class="cta-inner reveal">
+    <h2 id="cta-title">Ready to land your green role?</h2>
+    <p>Get your AI-powered CV analysis in under 30 seconds. No account needed.</p>
+    <div class="hero-actions">
+      <a href="/" class="btn-hero btn-p">Analyze My CV Free →</a>
+    </div>
+    <p class="cta-note">Powered by Claude AI · No sign-up required · Results instantly</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer role="contentinfo">
+  <a class="footer-logo" href="/landing" aria-label="GreenCV home">
+    <div class="nav-leaf" aria-hidden="true">G</div>
+    <span class="footer-name">GreenCV</span>
+  </a>
+  <nav class="footer-links" aria-label="Footer navigation">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#roles">Roles</a>
+    <a href="#testimonials">Reviews</a>
+    <a href="/">Launch App</a>
+  </nav>
+  <p class="footer-copy">© 2026 GreenCV. All rights reserved.</p>
+</footer>
 
 <script>
 "use strict";
 
-// ── STATE ──────────────────────────────────────────────────────────
-const state = {
-  page:   "upload",
-  result: null,
-  loading: false,
-};
+// ── MOBILE NAV ──
+const hamburger  = document.getElementById("hamburger");
+const mobileMenu = document.getElementById("mobileMenu");
 
-const ROLES = [
-  "Sustainability Analyst","Green Building Consultant","Architect",
-  "Urban Planner","Climate / ESG Analyst","Renewable Energy Engineer",
-  "Environmental Consultant","Carbon Manager","Energy Auditor",
-  "Circular Economy Specialist",
-];
-
-const PAGES = [
-  { id:"upload",    label:"New Analysis"  },
-  { id:"dashboard", label:"Dashboard"     },
-  { id:"rewritten", label:"Rewritten CV"  },
-  { id:"skillgap",  label:"Skill Gap"     },
-];
-
-// ── TOAST ──────────────────────────────────────────────────────────
-function toast(msg, type="success", duration=3000) {
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.className = `toast ${type} show`;
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove("show"), duration);
-}
-
-// ── NAV ───────────────────────────────────────────────────────────
-function go(p) {
-  if (state.loading) return;
-  if (p !== "upload" && !state.result) { toast("Analyze a CV first", "error"); return; }
-  state.page = p;
-  render();
-  closeSidebar();
-}
-
-function renderNav() {
-  document.getElementById("nav").innerHTML =
-    `<div class="nlbl">Navigation</div>` +
-    PAGES.map(p => {
-      const locked = p.id !== "upload" && !state.result;
-      return `<button
-        class="nbtn ${state.page===p.id?"on":""} ${locked?"nbtn-lock":""}"
-        onclick="go('${p.id}')"
-        aria-current="${state.page===p.id?"page":"false"}"
-        ${locked?`aria-disabled="true" title="Analyze a CV first"`:""}>
-        <span class="dot" aria-hidden="true"></span>${p.label}
-        ${locked?`<span class="visually-hidden">(locked)</span>`:""}
-      </button>`;
-    }).join("");
-}
-
-// ── MOBILE SIDEBAR ────────────────────────────────────────────────
-document.getElementById("hamburger").addEventListener("click", () => {
-  const sb = document.getElementById("sidebar");
-  const ov = document.getElementById("sbOverlay");
-  const hb = document.getElementById("hamburger");
-  const open = sb.classList.toggle("open");
-  ov.classList.toggle("open", open);
-  hb.setAttribute("aria-expanded", open);
+hamburger.addEventListener("click", () => {
+  const open = mobileMenu.classList.toggle("open");
+  hamburger.setAttribute("aria-expanded", open);
+  mobileMenu.setAttribute("aria-hidden", !open);
 });
-document.getElementById("sbOverlay").addEventListener("click", closeSidebar);
-function closeSidebar() {
-  document.getElementById("sidebar").classList.remove("open");
-  document.getElementById("sbOverlay").classList.remove("open");
-  document.getElementById("hamburger").setAttribute("aria-expanded","false");
-}
 
-// ── TOPBAR ────────────────────────────────────────────────────────
-function tb(title, sub="", actionsHTML="") {
-  return `<div class="topbar">
-    <span class="ttitle">${esc(title)}</span>
-    ${sub ? `<span class="tsep" aria-hidden="true">·</span><span class="tsub">${esc(sub)}</span>` : ""}
-    ${actionsHTML ? `<div class="tact">${actionsHTML}</div>` : ""}
-  </div>`;
-}
-
-// ── PAGES ─────────────────────────────────────────────────────────
-
-function pgUpload() { return `
-  ${tb("New Analysis","Upload your CV for AI feedback")}
-  <div class="scroll">
-    <div class="page-center">
-      <div class="ushell">
-        <div class="card fi">
-          <div class="ch">Your CV Document</div>
-
-          <div class="dz" id="dz" role="button" aria-label="Drop zone for CV file upload" tabindex="0">
-            <input type="file" id="ufi" accept=".txt,.doc,.docx" aria-label="Upload CV file">
-            <div class="dz-icon" aria-hidden="true">📄</div>
-            <h3 id="dzTitle">Drop your CV here</h3>
-            <p id="dzSub">or click to browse — DOCX, TXT</p>
-            <div id="dzOk" class="fok hidden" aria-live="polite"></div>
-          </div>
-
-          <div class="orline"><span>or paste your CV text</span></div>
-
-          <label class="visually-hidden" for="cvta">CV text content</label>
-          <textarea class="cta" id="cvta" placeholder="Paste your CV content here…" aria-label="CV text content" rows="8"></textarea>
-
-          <div class="field">
-            <label class="flbl" for="rs">Target Role</label>
-            <select class="sel" id="rs" aria-required="true">
-              <option value="">Select your target role</option>
-              ${ROLES.map(r => `<option value="${r}">${r}</option>`).join("")}
-            </select>
-          </div>
-
-          <div class="err-msg" id="errMsg" role="alert"></div>
-
-          <button class="btn bd blg bfull" id="analyzeBtn" onclick="doSubmit()">
-            Analyze My CV →
-          </button>
-          <p style="text-align:center;font-size:.7rem;color:var(--muted);margin-top:.65rem;">
-            Processed securely — your CV is never stored
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>`; }
-
-function pgProc() { return `
-  ${tb("Analyzing","Please wait…")}
-  <div class="scroll">
-    <div class="page-center">
-      <div class="proc-wrap">
-        <div class="spinner" role="status" aria-label="Analyzing"></div>
-        <div class="psteps" role="list">
-          <div class="pstep done" role="listitem"><div class="psico" aria-hidden="true">✓</div>Extracting CV content</div>
-          <div class="pstep" id="ps2" role="listitem"><div class="psico" aria-hidden="true">2</div>Scoring ATS compatibility</div>
-          <div class="pstep" id="ps3" role="listitem"><div class="psico" aria-hidden="true">3</div>Identifying green skill gaps</div>
-          <div class="pstep" id="ps4" role="listitem"><div class="psico" aria-hidden="true">4</div>Rewriting for sustainability roles</div>
-          <div class="pstep" id="ps5" role="listitem"><div class="psico" aria-hidden="true">5</div>Building 90-day action plan</div>
-        </div>
-        <p style="font-size:.74rem;color:var(--muted);">This usually takes 15–30 seconds</p>
-      </div>
-    </div>
-  </div>`; }
-
-function pgDash() {
-  const r   = state.result;
-  const sc  = r.score;
-  const col = sc>=70 ? "#166534" : sc>=45 ? "#b45309" : "#dc2626";
-  const lbl = sc>=70 ? "Strong"  : sc>=45 ? "Needs Work" : "Weak";
-  const circ= 2*Math.PI*37;
-  const off = circ*(1-sc/100);
-  return `
-  ${tb("Dashboard","CV Analysis Results")}
-  <div class="scroll">
-  <div class="page">
-    <div class="g3 fi">
-      <div class="card">
-        <div class="ch">CV Score</div>
-        <div class="swrap">
-          <div class="sring" aria-label="Score: ${sc} out of 100">
-            <svg width="84" height="84" viewBox="0 0 84 84" aria-hidden="true">
-              <circle fill="none" stroke="#e8e8e4" stroke-width="5" cx="42" cy="42" r="37"/>
-              <circle fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"
-                cx="42" cy="42" r="37"
-                stroke-dasharray="${circ}"
-                stroke-dashoffset="${circ}"
-                id="scoreArc"
-                style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)"/>
-            </svg>
-            <div class="snum" style="color:${col}">${sc}</div>
-          </div>
-          <div class="smeta">
-            <h2 style="color:${col}">${lbl}</h2>
-            <p>${esc(r.scoreComment)}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="card fi d1">
-        <div class="ch">Score Breakdown</div>
-        ${bRow("ATS Compatibility", r.ats)}
-        ${bRow("Green Skills Match", r.greenSkills)}
-        ${bRow("Experience Impact", r.expImpact)}
-      </div>
-
-      <div class="card fi d2">
-        <div class="ch">Top Strengths</div>
-        <div class="tags">
-          ${(r.strengths||[]).map(s=>`<span class="tag tg">${esc(s)}</span>`).join("")}
-        </div>
-      </div>
-    </div>
-
-    <div class="g3 fi d2">
-      <div class="card">
-        <div class="ch">Key Issues</div>
-        <ul class="clist" aria-label="Key issues">
-          ${(r.issues||[]).map(i=>`
-            <li>
-              <div class="lm" style="background:${i.sev==="high"?"#dc2626":i.sev==="med"?"#d97706":"#1a6b3c"}" aria-label="Severity: ${i.sev}"></div>
-              ${esc(i.text)}
-            </li>`).join("")}
-        </ul>
-      </div>
-
-      <div class="card fi d1">
-        <div class="ch">Missing Skills</div>
-        <div class="tags">
-          ${(r.missingSkills||[]).map(s=>`<span class="tag tr">${esc(s)}</span>`).join("")}
-        </div>
-      </div>
-
-      <div class="card fi d2">
-        <div class="ch">Next Steps</div>
-        <ul class="clist" aria-label="Recommended next steps">
-          ${(r.steps||[]).map(s=>`
-            <li>
-              <div class="lm" style="background:#1a6b3c" aria-hidden="true"></div>
-              ${esc(s)}
-            </li>`).join("")}
-        </ul>
-      </div>
-    </div>
-
-    <div class="cstrip fi d3">
-      <div>
-        <h3>Ready to improve your CV?</h3>
-        <p>View the AI-rewritten version or explore your full skill gap</p>
-      </div>
-      <div class="cstrip-btns">
-        <button class="btn bg" onclick="go('rewritten')">View Rewritten CV →</button>
-        <button class="btn bo" style="color:rgba(255,255,255,.55);border-color:rgba(255,255,255,.12);" onclick="go('skillgap')">Skill Gap</button>
-      </div>
-    </div>
-  </div>
-  </div>`; }
-
-function pgRW() {
-  const r = state.result;
-  return `
-  ${tb("Rewritten CV", `Optimized for ${esc(r.role)}`,
-    `<span id="cpok" class="cpok" aria-live="polite"></span>
-     <button class="btn bo" onclick="copyCV()">Copy</button>
-     <button class="btn bd" onclick="dlCV()">Download .txt</button>`)}
-  <div class="scroll">
-  <div class="page">
-    <div class="hr"></div>
-    <div class="card fi">
-      <div class="cvbody" id="cvContent">${esc(r.rewrittenCV)}</div>
-    </div>
-  </div>
-  </div>`; }
-
-function pgSG() {
-  const r = state.result;
-  return `
-  ${tb("Skill Gap Analysis", `Target: ${esc(r.role)}`)}
-  <div class="scroll">
-  <div class="page">
-    <div class="g3 fi">
-      <div class="card">
-        <div class="ch">Missing Skills</div>
-        <div class="tags">
-          ${(r.missingSkills||[]).map(s=>`<span class="tag tr">${esc(s)}</span>`).join("")}
-        </div>
-      </div>
-      <div class="card fi d1">
-        <div class="ch">Tools to Learn</div>
-        <div class="tags">
-          ${(r.tools||[]).map(t=>`<span class="tag tb">${esc(t)}</span>`).join("")}
-        </div>
-      </div>
-      <div class="card fi d2">
-        <div class="ch">Certifications</div>
-        ${(r.certs||[]).map(c=>`
-          <div class="cert">
-            <span aria-hidden="true" style="font-size:.95rem">🏅</span>
-            <div>
-              <div class="cname">${esc(c.name)}</div>
-              <div class="cwhy">${esc(c.why)}</div>
-            </div>
-          </div>`).join("")}
-      </div>
-    </div>
-
-    <div class="card g1 fi d2">
-      <div class="ch">Current Skill Levels</div>
-      ${(r.skillGap||[]).map(g=>`
-        <div class="sgrow">
-          <div class="sglbl">${esc(g.skill)}</div>
-          <div class="sgtrk" role="progressbar" aria-valuenow="${g.current}" aria-valuemin="0" aria-valuemax="100" aria-label="${g.skill}: ${g.current}%">
-            <div class="sgfil" data-w="${g.current}" style="width:0%;background:${g.current<40?"#dc2626":g.current<70?"#d97706":"#166534"}"></div>
-          </div>
-          <div class="sgpct">${g.current}%</div>
-        </div>`).join("")}
-    </div>
-
-    <div class="card g1 fi d3">
-      <div class="ch">30 / 60 / 90-Day Action Plan</div>
-      ${(r.actionPlan||[]).map(a=>`
-        <div class="ap">
-          <div class="apph">${esc(a.phase)}</div>
-          <div>${esc(a.action)}</div>
-        </div>`).join("")}
-    </div>
-
-    <div style="text-align:center;padding:.5rem 0 1rem" class="fi d4">
-      <button class="btn bo" onclick="go('upload')">↑ Analyze Another CV</button>
-    </div>
-  </div>
-  </div>`; }
-
-function pgEmpty() { return `
-  ${tb("No Data","")}
-  <div class="scroll">
-  <div class="page">
-    <div class="empty">
-      <p>Upload and analyze a CV first to view results here.</p>
-      <button class="btn bd" onclick="go('upload')">Upload CV →</button>
-    </div>
-  </div>
-  </div>`; }
-
-// ── RENDER ────────────────────────────────────────────────────────
-function render() {
-  renderNav();
-  const m = document.getElementById("main");
-  switch(state.page) {
-    case "upload":     m.innerHTML = pgUpload(); break;
-    case "processing": m.innerHTML = pgProc();   break;
-    case "dashboard":  m.innerHTML = state.result ? pgDash() : pgEmpty(); break;
-    case "rewritten":  m.innerHTML = state.result ? pgRW()   : pgEmpty(); break;
-    case "skillgap":   m.innerHTML = state.result ? pgSG()   : pgEmpty(); break;
+// Close on outside click
+document.addEventListener("click", e => {
+  if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+    mobileMenu.classList.remove("open");
+    hamburger.setAttribute("aria-expanded","false");
+    mobileMenu.setAttribute("aria-hidden","true");
   }
-  bindEvents();
-  animBars();
-  window.scrollTo(0,0);
-}
+});
 
-// ── HELPERS ───────────────────────────────────────────────────────
-function bRow(label, val) {
-  const col = val>=70?"#1a6b3c":val>=45?"#d97706":"#dc2626";
-  return `<div class="brow">
-    <div class="btop"><span>${label}</span><span>${val}%</span></div>
-    <div class="btrack" role="progressbar" aria-valuenow="${val}" aria-valuemin="0" aria-valuemax="100" aria-label="${label}: ${val}%">
-      <div class="bfill" data-width="${val}" style="width:0%;background:${col}"></div>
-    </div>
-  </div>`;
-}
-
-function animBars() {
-  setTimeout(() => {
-    document.querySelectorAll(".bfill[data-width]").forEach(el => el.style.width = el.dataset.width + "%");
-    document.querySelectorAll(".sgfil[data-w]").forEach(el => el.style.width = el.dataset.w + "%");
-    const arc = document.getElementById("scoreArc");
-    if (arc && state.result) {
-      const circ = 2*Math.PI*37;
-      arc.style.strokeDashoffset = circ*(1-state.result.score/100);
-    }
-  }, 100);
-}
-
-function esc(s="") {
-  return String(s)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#39;");
-}
-
-function showErr(msg) {
-  const el = document.getElementById("errMsg");
-  if (!el) return;
-  el.textContent = msg;
-  el.classList.add("show");
-}
-function clearErr() {
-  const el = document.getElementById("errMsg");
-  if (el) el.classList.remove("show");
-}
-
-// ── BIND EVENTS ───────────────────────────────────────────────────
-function bindEvents() {
-  const ufi = document.getElementById("ufi");
-  if (ufi) ufi.addEventListener("change", e => handleFile(e.target.files[0]));
-
-  const dz = document.getElementById("dz");
-  if (dz) {
-    dz.addEventListener("dragover",  e => { e.preventDefault(); dz.classList.add("ov"); });
-    dz.addEventListener("dragleave", ()  => dz.classList.remove("ov"));
-    dz.addEventListener("drop", e => {
-      e.preventDefault(); dz.classList.remove("ov");
-      handleFile(e.dataTransfer.files[0]);
-    });
-    dz.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") dz.querySelector("input")?.click(); });
-  }
-}
-
-function handleFile(file) {
-  if (!file) return;
-  const allowed = [".txt",".doc",".docx"];
-  const ext = "." + file.name.split(".").pop().toLowerCase();
-  if (!allowed.includes(ext)) { toast("Please upload a TXT or DOCX file", "error"); return; }
-  if (file.size > 500*1024) { toast("File too large. Max 500KB.", "error"); return; }
-
-  document.getElementById("dzTitle").textContent = file.name;
-  document.getElementById("dzSub").textContent   = "File ready";
-  const ok = document.getElementById("dzOk");
-  ok.textContent = "✓ " + file.name;
-  ok.classList.remove("hidden");
-
-  const reader = new FileReader();
-  reader.onload  = e => { const ta = document.getElementById("cvta"); if(ta) ta.value = e.target.result; };
-  reader.onerror = ()  => toast("Could not read file", "error");
-  reader.readAsText(file);
-}
-
-// ── SUBMIT ────────────────────────────────────────────────────────
-async function doSubmit() {
-  const cv = document.getElementById("cvta")?.value.trim() || "";
-  const ro = document.getElementById("rs")?.value || "";
-
-  clearErr();
-
-  if (!cv)          { showErr("Please paste or upload your CV text."); return; }
-  if (cv.length < 50) { showErr("CV text is too short. Please provide more content."); return; }
-  if (!ro)          { showErr("Please select a target role."); return; }
-
-  state.loading = true;
-  state.page    = "processing";
-  render();
-
-  // Animate steps
-  const stepDelay = [700, 1350, 2050, 2700];
-  stepDelay.forEach((d, i) => {
-    setTimeout(() => {
-      const el = document.getElementById(`ps${i+2}`);
-      if (el) el.classList.add("active");
-    }, d);
+// Close on nav link click (mobile)
+mobileMenu.querySelectorAll("a").forEach(a => {
+  a.addEventListener("click", () => {
+    mobileMenu.classList.remove("open");
+    hamburger.setAttribute("aria-expanded","false");
+    mobileMenu.setAttribute("aria-hidden","true");
   });
+});
 
-  try {
-    const res = await fetch("/analyze", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ cvText: cv, role: ro }),
-      signal:  AbortSignal.timeout(90000),
-    });
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver(
+  entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); observer.unobserve(e.target); } }),
+  { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+);
+document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
 
-    const data = await res.json();
+// ── NAV SCROLL SHRINK ──
+const nav = document.querySelector("nav");
+window.addEventListener("scroll", () => {
+  nav.style.padding = window.scrollY > 40 ? ".75rem 2.5rem" : "";
+}, { passive: true });
 
-    if (!res.ok) {
-      throw new Error(data.error || `Server error (${res.status})`);
-    }
-
-    state.result  = data;
-    state.loading = false;
-    state.page    = "dashboard";
-    render();
-    toast("Analysis complete!", "success");
-
-  } catch (e) {
-    state.loading = false;
-    state.page    = "upload";
-    render();
-    if (e.name === "TimeoutError") {
-      toast("Request timed out. Please try again.", "error", 5000);
-    } else {
-      toast(e.message || "Analysis failed. Please try again.", "error", 5000);
-    }
-  }
-}
-
-// ── COPY / DOWNLOAD ───────────────────────────────────────────────
-function copyCV() {
-  if (!state.result) return;
-  navigator.clipboard.writeText(state.result.rewrittenCV)
-    .then(() => {
-      const el = document.getElementById("cpok");
-      if (el) { el.textContent = "✓ Copied"; setTimeout(() => { if(el) el.textContent = ""; }, 2200); }
-      toast("CV copied to clipboard!", "success");
-    })
-    .catch(() => toast("Copy failed — please copy manually", "error"));
-}
-
-function dlCV() {
-  if (!state.result) return;
-  try {
-    const blob = new Blob([state.result.rewrittenCV], { type: "text/plain" });
-    const a    = document.createElement("a");
-    a.href     = URL.createObjectURL(blob);
-    a.download = `GreenCV_${state.result.role.replace(/[\s\/]+/g,"_")}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    toast("Download started!", "success");
-  } catch { toast("Download failed", "error"); }
-}
-
-// ── INIT ──────────────────────────────────────────────────────────
-render();
+// ── SMOOTH SCROLL for hash links ──
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener("click", e => {
+    const target = document.querySelector(a.getAttribute("href"));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior:"smooth", block:"start" }); }
+  });
+});
 </script>
 </body>
 </html>
