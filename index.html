@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="GreenCV — AI-powered CV analysis for green energy and sustainability professionals. Get your ATS score, skill gap report, and a fully rewritten CV.">
+<meta name="robots" content="noindex">
+<title>GreenCV — Analyze Your CV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --white:   #ffffff;
+  --off:     #f8f8f6;
+  --rule:    #e8e8e4;
+  --muted:   #9a9990;
+  --body:    #2c2c28;
+  --head:    #111110;
+  --accent:  #1a6b3c;
+  --accent2: #0e4a28;
+  --danger:  #b91c1c;
+  --warn:    #b45309;
+  --good:    #166534;
+}
+
+html, body { height: 100%; }
+body {
+  font-family: 'Figtree', sans-serif;
+  background: var(--white);
+  color: var(--body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ── LAYOUT ── */
+.shell { display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sb {
+  width: 215px; background: var(--head);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+  transition: transform .25s ease;
+}
+.brand {
+  padding: 1.5rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,.07);
+  display: flex; align-items: center; gap: .55rem;
+}
+.brand a { display: flex; align-items: center; gap: .55rem; text-decoration: none; }
+.leaf {
+  width: 27px; height: 27px; border-radius: 5px;
+  background: var(--accent); display: flex; align-items: center;
+  justify-content: center; font-size: .78rem; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.bname { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: #fff; }
+
+.nav { padding: .75rem; flex: 1; overflow-y: auto; }
+.nlbl { font-size: .6rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #333330; padding: 0 .5rem; margin: .75rem 0 .35rem; }
+.nlbl:first-child { margin-top: 0; }
+
+.nbtn {
+  display: flex; align-items: center; gap: .55rem;
+  width: 100%; padding: .5rem .65rem;
+  border: none; background: none; color: #66665e;
+  cursor: pointer; border-radius: 5px;
+  font-family: 'Figtree', sans-serif; font-size: .8rem; font-weight: 500;
+  text-align: left; transition: color .14s, background .14s;
+  position: relative;
+}
+.nbtn:hover { color: #fff; background: rgba(255,255,255,.07); }
+.nbtn.on    { color: #fff; background: rgba(255,255,255,.1); }
+.nbtn.on .dot { background: var(--accent); }
+.nbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: #2a2a28; flex-shrink: 0; transition: background .14s; }
+.nbtn-lock { opacity: .35; cursor: not-allowed; }
+
+.sbfoot { padding: 1rem 1.25rem; border-top: 1px solid rgba(255,255,255,.07); font-size: .68rem; color: #2e2e2c; line-height: 1.55; }
+
+/* ── MAIN ── */
+.main { margin-left: 215px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── TOPBAR ── */
+.topbar {
+  height: 52px; border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; padding: 0 2rem; gap: .5rem;
+  background: var(--white); position: sticky; top: 0; z-index: 40;
+}
+.ttitle { font-family: 'Playfair Display', serif; font-size: .95rem; font-weight: 700; color: var(--head); }
+.tsep   { color: var(--rule); }
+.tsub   { font-size: .76rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
+.tact   { margin-left: auto; display: flex; gap: .4rem; align-items: center; }
+
+/* ── SCROLL ── */
+.scroll { flex: 1; overflow-y: auto; }
+.page   { padding: 2rem; }
+.page-center { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: calc(100vh - 52px); padding: 2rem; }
+
+/* ── CARD ── */
+.card { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 1.4rem; }
+.ch { font-size: .63rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .9rem; padding-bottom: .65rem; border-bottom: 1px solid var(--rule); }
+
+/* ── GRID ── */
+.g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1rem; }
+.g1 { margin-bottom: 1rem; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .52rem 1.05rem; border-radius: 5px;
+  font-family: 'Figtree', sans-serif; font-weight: 600; font-size: .8rem;
+  cursor: pointer; border: 1px solid transparent;
+  transition: all .14s; letter-spacing: .01em; white-space: nowrap;
+  text-decoration: none;
+}
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn:disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
+.bd { background: var(--head); color: #fff; border-color: var(--head); }
+.bd:hover { background: #222; }
+.bo { background: transparent; color: var(--head); border-color: var(--rule); }
+.bo:hover { border-color: #aaa; }
+.bg { background: var(--accent); color: #fff; border-color: var(--accent); }
+.bg:hover { background: var(--accent2); }
+.blg { padding: .65rem 1.3rem; font-size: .85rem; }
+.bfull { width: 100%; justify-content: center; }
+
+/* ── UPLOAD ── */
+.ushell { width: 100%; max-width: 520px; }
+.dz {
+  border: 1.5px dashed #d0d0cc; border-radius: 8px;
+  padding: 2.25rem 2rem; text-align: center; cursor: pointer;
+  transition: border-color .15s, background .15s;
+  background: var(--off); position: relative; margin-bottom: 1.1rem;
+}
+.dz:hover, .dz.ov { border-color: var(--accent); background: #f0f7f3; }
+.dz input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.dz-icon { width: 38px; height: 38px; background: #fff; border: 1px solid var(--rule); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin: 0 auto .65rem; font-size: 1rem; }
+.dz h3 { font-size: .9rem; font-weight: 600; color: var(--head); }
+.dz p  { font-size: .76rem; color: var(--muted); margin-top: .2rem; }
+.fok   { font-size: .76rem; color: var(--accent); font-weight: 600; margin-top: .4rem; }
+
+.orline { display: flex; align-items: center; gap: .65rem; margin-bottom: .9rem; }
+.orline::before, .orline::after { content:''; flex:1; height:1px; background: var(--rule); }
+.orline span { font-size: .7rem; color: var(--muted); }
+
+textarea.cta {
+  width: 100%; min-height: 145px;
+  border: 1px solid var(--rule); border-radius: 6px;
+  padding: .8rem .9rem;
+  font-family: 'Figtree', sans-serif; font-size: .82rem; line-height: 1.6;
+  resize: vertical; background: var(--off); color: var(--body);
+  outline: none; transition: border-color .15s; margin-bottom: 1.05rem;
+}
+textarea.cta:focus { border-color: var(--accent); background: #fff; }
+textarea.cta::placeholder { color: #c0c0bc; }
+
+.field { margin-bottom: 1.05rem; }
+.flbl { display: block; font-size: .66rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
+.sel {
+  width: 100%; padding: .6rem .85rem;
+  border: 1px solid var(--rule); border-radius: 6px;
+  font-family: 'Figtree', sans-serif; font-size: .85rem;
+  background: #fff; color: var(--body);
+  outline: none; transition: border-color .15s; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%239a9990' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right .85rem center; padding-right: 2rem;
+}
+.sel:focus { border-color: var(--accent); }
+
+.err-msg { font-size: .76rem; color: var(--danger); margin-bottom: .65rem; padding: .5rem .75rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 5px; display: none; }
+.err-msg.show { display: block; }
+
+/* ── PROCESSING ── */
+.proc-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+.spinner { width: 34px; height: 34px; border: 2.5px solid var(--rule); border-top-color: var(--accent); border-radius: 50%; animation: spin .65s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.psteps { display: flex; flex-direction: column; width: 310px; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.pstep { display: flex; align-items: center; gap: .65rem; padding: .8rem 1rem; font-size: .8rem; color: var(--muted); border-bottom: 1px solid var(--rule); background: #fff; transition: all .2s; }
+.pstep:last-child { border-bottom: none; }
+.pstep.done   { color: var(--accent); }
+.pstep.active { color: var(--body); font-weight: 600; background: var(--off); }
+.psico { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid currentColor; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .6rem; }
+.pstep.done .psico { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── SCORE ── */
+.swrap { display: flex; align-items: center; gap: 1.25rem; }
+.sring { position: relative; width: 84px; height: 84px; flex-shrink: 0; }
+.sring svg { transform: rotate(-90deg); }
+.snum { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
+.smeta h2 { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
+.smeta p { font-size: .76rem; color: var(--muted); margin-top: .2rem; line-height: 1.45; max-width: 170px; }
+
+/* ── BARS ── */
+.brow { margin-bottom: .85rem; }
+.brow:last-child { margin-bottom: 0; }
+.btop { display: flex; justify-content: space-between; margin-bottom: .32rem; }
+.btop span:first-child { font-size: .79rem; font-weight: 500; }
+.btop span:last-child  { font-size: .73rem; color: var(--muted); }
+.btrack { height: 3px; background: var(--rule); border-radius: 99px; overflow: hidden; }
+.bfill  { height: 100%; border-radius: 99px; transition: width 1.3s cubic-bezier(.4,0,.2,1); }
+
+/* ── TAGS ── */
+.tags { display: flex; flex-wrap: wrap; gap: .32rem; }
+.tag  { padding: .22rem .58rem; border-radius: 3px; font-size: .72rem; font-weight: 500; }
+.tg { background: #f0f7f3; color: var(--accent); border: 1px solid #b6dfc8; }
+.tr { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
+.tb { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+/* ── LIST ── */
+.clist { list-style: none; }
+.clist li { display: flex; align-items: flex-start; gap: .55rem; padding: .52rem 0; border-bottom: 1px solid var(--rule); font-size: .8rem; line-height: 1.48; }
+.clist li:first-child { padding-top: 0; }
+.clist li:last-child  { border-bottom: none; padding-bottom: 0; }
+.lm { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+
+/* ── CTA STRIP ── */
+.cstrip { background: var(--head); border-radius: 8px; padding: 1.5rem 1.75rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+.cstrip h3 { font-family: 'Playfair Display', serif; font-size: .92rem; color: #fff; }
+.cstrip p  { font-size: .75rem; color: rgba(255,255,255,.4); margin-top: .12rem; }
+.cstrip-btns { display: flex; gap: .45rem; flex-wrap: wrap; }
+
+/* ── REWRITTEN ── */
+.arow { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; margin-bottom: 1.35rem; }
+.arow-btns { display: flex; gap: .4rem; align-items: center; }
+.cpok { font-size: .74rem; color: var(--accent); font-weight: 600; }
+.cvbody { font-size: .81rem; line-height: 1.78; color: var(--body); white-space: pre-wrap; font-family: 'Figtree', sans-serif; }
+
+/* ── SKILL GAP ── */
+.sgrow { display: flex; align-items: center; gap: .7rem; padding: .5rem 0; border-bottom: 1px solid var(--rule); }
+.sgrow:last-child { border-bottom: none; }
+.sglbl { font-size: .79rem; width: 190px; flex-shrink: 0; }
+.sgtrk { flex: 1; height: 3px; background: var(--rule); border-radius: 99px; overflow: hidden; }
+.sgfil { height: 100%; border-radius: 99px; transition: width 1.3s cubic-bezier(.4,0,.2,1); }
+.sgpct { font-size: .71rem; color: var(--muted); width: 30px; text-align: right; flex-shrink: 0; }
+
+/* ── CERT ── */
+.cert { display: flex; gap: .75rem; align-items: flex-start; padding: .7rem 0; border-bottom: 1px solid var(--rule); }
+.cert:first-child { padding-top: 0; }
+.cert:last-child  { border-bottom: none; }
+.cname { font-size: .8rem; font-weight: 600; color: var(--head); }
+.cwhy  { font-size: .73rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+/* ── ACTION PLAN ── */
+.ap { display: flex; gap: .8rem; align-items: flex-start; padding: .65rem 0; border-bottom: 1px solid var(--rule); font-size: .8rem; }
+.ap:first-child { padding-top: 0; }
+.ap:last-child  { border-bottom: none; }
+.apph { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); width: 52px; flex-shrink: 0; margin-top: 1px; border-right: 1px solid var(--rule); padding-right: .65rem; line-height: 1.4; }
+
+/* ── EMPTY ── */
+.empty { text-align: center; padding: 3.5rem 2rem; color: var(--muted); }
+.empty p { font-size: .84rem; margin-bottom: 1.1rem; }
+
+/* ── MISC ── */
+.hr { height: 1px; background: var(--rule); margin-bottom: 1.4rem; }
+.hidden { display: none !important; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
+  background: var(--head); color: #fff;
+  padding: .75rem 1.25rem; border-radius: 7px;
+  font-size: .82rem; font-weight: 500;
+  box-shadow: 0 4px 20px rgba(0,0,0,.3);
+  transform: translateY(10px); opacity: 0;
+  transition: all .25s; pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { border-left: 3px solid var(--accent); }
+.toast.error   { border-left: 3px solid var(--danger); }
+
+/* ── MOBILE HAMBURGER ── */
+.hamburger { display: none; position: fixed; top: .85rem; left: .85rem; z-index: 60; background: var(--head); border: none; border-radius: 5px; padding: .45rem .55rem; cursor: pointer; flex-direction: column; gap: 4px; }
+.hamburger span { display: block; width: 18px; height: 2px; background: rgba(255,255,255,.7); border-radius: 99px; transition: all .2s; }
+.sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 45; }
+
+/* ── FADE ── */
+@keyframes fu { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);} }
+.fi  { animation: fu .3s ease both; }
+.d1  { animation-delay:.05s; }
+.d2  { animation-delay:.1s; }
+.d3  { animation-delay:.15s; }
+.d4  { animation-delay:.2s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .sb { transform: translateX(-100%); }
+  .sb.open { transform: translateX(0); }
+  .sb-overlay.open { display: block; }
+  .main { margin-left: 0; }
+  .hamburger { display: flex; }
+  .topbar { padding-left: 3.5rem; }
+  .g3 { grid-template-columns: 1fr; }
+  .page { padding: 1.25rem; }
+  .page-center { padding: 1.25rem; min-height: calc(100vh - 52px); }
+  .psteps { width: 100%; max-width: 310px; }
+}
+@media (max-width: 480px) {
+  .arow { flex-direction: column; align-items: flex-start; }
+  .cstrip { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile hamburger -->
+<button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+  <span></span><span></span><span></span>
+</button>
+<div class="sb-overlay" id="sbOverlay"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sb" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="brand">
+      <a href="/landing" aria-label="GreenCV home">
+        <div class="leaf" aria-hidden="true">G</div>
+        <span class="bname">GreenCV</span>
+      </a>
+    </div>
+    <nav class="nav" id="nav" aria-label="App pages"></nav>
+    <div class="sbfoot">AI-powered CV analysis for sustainability &amp; energy professionals</div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="main" role="main"></main>
+
+</div>
+
+<script>
+"use strict";
+
+// ── STATE ──────────────────────────────────────────────────────────
+const state = {
+  page:   "upload",
+  result: null,
+  loading: false,
+};
+
+const ROLES = [
+  "Sustainability Analyst","Green Building Consultant","Architect",
+  "Urban Planner","Climate / ESG Analyst","Renewable Energy Engineer",
+  "Environmental Consultant","Carbon Manager","Energy Auditor",
+  "Circular Economy Specialist",
+];
+
+const PAGES = [
+  { id:"upload",    label:"New Analysis"  },
+  { id:"dashboard", label:"Dashboard"     },
+  { id:"rewritten", label:"Rewritten CV"  },
+  { id:"skillgap",  label:"Skill Gap"     },
+];
+
+// ── TOAST ──────────────────────────────────────────────────────────
+function toast(msg, type="success", duration=3000) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove("show"), duration);
+}
+
+// ── NAV ───────────────────────────────────────────────────────────
+function go(p) {
+  if (state.loading) return;
+  if (p !== "upload" && !state.result) { toast("Analyze a CV first", "error"); return; }
+  state.page = p;
+  render();
+  closeSidebar();
+}
+
+function renderNav() {
+  document.getElementById("nav").innerHTML =
+    `<div class="nlbl">Navigation</div>` +
+    PAGES.map(p => {
+      const locked = p.id !== "upload" && !state.result;
+      return `<button
+        class="nbtn ${state.page===p.id?"on":""} ${locked?"nbtn-lock":""}"
+        onclick="go('${p.id}')"
+        aria-current="${state.page===p.id?"page":"false"}"
+        ${locked?`aria-disabled="true" title="Analyze a CV first"`:""}>
+        <span class="dot" aria-hidden="true"></span>${p.label}
+        ${locked?`<span class="visually-hidden">(locked)</span>`:""}
+      </button>`;
+    }).join("");
+}
+
+// ── MOBILE SIDEBAR ────────────────────────────────────────────────
+document.getElementById("hamburger").addEventListener("click", () => {
+  const sb = document.getElementById("sidebar");
+  const ov = document.getElementById("sbOverlay");
+  const hb = document.getElementById("hamburger");
+  const open = sb.classList.toggle("open");
+  ov.classList.toggle("open", open);
+  hb.setAttribute("aria-expanded", open);
+});
+document.getElementById("sbOverlay").addEventListener("click", closeSidebar);
+function closeSidebar() {
+  document.getElementById("sidebar").classList.remove("open");
+  document.getElementById("sbOverlay").classList.remove("open");
+  document.getElementById("hamburger").setAttribute("aria-expanded","false");
+}
+
+// ── TOPBAR ────────────────────────────────────────────────────────
+function tb(title, sub="", actionsHTML="") {
+  return `<div class="topbar">
+    <span class="ttitle">${esc(title)}</span>
+    ${sub ? `<span class="tsep" aria-hidden="true">·</span><span class="tsub">${esc(sub)}</span>` : ""}
+    ${actionsHTML ? `<div class="tact">${actionsHTML}</div>` : ""}
+  </div>`;
+}
+
+// ── PAGES ─────────────────────────────────────────────────────────
+
+function pgUpload() { return `
+  ${tb("New Analysis","Upload your CV for AI feedback")}
+  <div class="scroll">
+    <div class="page-center">
+      <div class="ushell">
+        <div class="card fi">
+          <div class="ch">Your CV Document</div>
+
+          <div class="dz" id="dz" role="button" aria-label="Drop zone for CV file upload" tabindex="0">
+            <input type="file" id="ufi" accept=".txt,.doc,.docx" aria-label="Upload CV file">
+            <div class="dz-icon" aria-hidden="true">📄</div>
+            <h3 id="dzTitle">Drop your CV here</h3>
+            <p id="dzSub">or click to browse — DOCX, TXT</p>
+            <div id="dzOk" class="fok hidden" aria-live="polite"></div>
+          </div>
+
+          <div class="orline"><span>or paste your CV text</span></div>
+
+          <label class="visually-hidden" for="cvta">CV text content</label>
+          <textarea class="cta" id="cvta" placeholder="Paste your CV content here…" aria-label="CV text content" rows="8"></textarea>
+
+          <div class="field">
+            <label class="flbl" for="rs">Target Role</label>
+            <select class="sel" id="rs" aria-required="true">
+              <option value="">Select your target role</option>
+              ${ROLES.map(r => `<option value="${r}">${r}</option>`).join("")}
+            </select>
+          </div>
+
+          <div class="err-msg" id="errMsg" role="alert"></div>
+
+          <button class="btn bd blg bfull" id="analyzeBtn" onclick="doSubmit()">
+            Analyze My CV →
+          </button>
+          <p style="text-align:center;font-size:.7rem;color:var(--muted);margin-top:.65rem;">
+            Processed securely — your CV is never stored
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>`; }
+
+function pgProc() { return `
+  ${tb("Analyzing","Please wait…")}
+  <div class="scroll">
+    <div class="page-center">
+      <div class="proc-wrap">
+        <div class="spinner" role="status" aria-label="Analyzing"></div>
+        <div class="psteps" role="list">
+          <div class="pstep done" role="listitem"><div class="psico" aria-hidden="true">✓</div>Extracting CV content</div>
+          <div class="pstep" id="ps2" role="listitem"><div class="psico" aria-hidden="true">2</div>Scoring ATS compatibility</div>
+          <div class="pstep" id="ps3" role="listitem"><div class="psico" aria-hidden="true">3</div>Identifying green skill gaps</div>
+          <div class="pstep" id="ps4" role="listitem"><div class="psico" aria-hidden="true">4</div>Rewriting for sustainability roles</div>
+          <div class="pstep" id="ps5" role="listitem"><div class="psico" aria-hidden="true">5</div>Building 90-day action plan</div>
+        </div>
+        <p style="font-size:.74rem;color:var(--muted);">This usually takes 15–30 seconds</p>
+      </div>
+    </div>
+  </div>`; }
+
+function pgDash() {
+  const r   = state.result;
+  const sc  = r.score;
+  const col = sc>=70 ? "#166534" : sc>=45 ? "#b45309" : "#dc2626";
+  const lbl = sc>=70 ? "Strong"  : sc>=45 ? "Needs Work" : "Weak";
+  const circ= 2*Math.PI*37;
+  const off = circ*(1-sc/100);
+  return `
+  ${tb("Dashboard","CV Analysis Results")}
+  <div class="scroll">
+  <div class="page">
+    <div class="g3 fi">
+      <div class="card">
+        <div class="ch">CV Score</div>
+        <div class="swrap">
+          <div class="sring" aria-label="Score: ${sc} out of 100">
+            <svg width="84" height="84" viewBox="0 0 84 84" aria-hidden="true">
+              <circle fill="none" stroke="#e8e8e4" stroke-width="5" cx="42" cy="42" r="37"/>
+              <circle fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"
+                cx="42" cy="42" r="37"
+                stroke-dasharray="${circ}"
+                stroke-dashoffset="${circ}"
+                id="scoreArc"
+                style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)"/>
+            </svg>
+            <div class="snum" style="color:${col}">${sc}</div>
+          </div>
+          <div class="smeta">
+            <h2 style="color:${col}">${lbl}</h2>
+            <p>${esc(r.scoreComment)}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card fi d1">
+        <div class="ch">Score Breakdown</div>
+        ${bRow("ATS Compatibility", r.ats)}
+        ${bRow("Green Skills Match", r.greenSkills)}
+        ${bRow("Experience Impact", r.expImpact)}
+      </div>
+
+      <div class="card fi d2">
+        <div class="ch">Top Strengths</div>
+        <div class="tags">
+          ${(r.strengths||[]).map(s=>`<span class="tag tg">${esc(s)}</span>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <div class="g3 fi d2">
+      <div class="card">
+        <div class="ch">Key Issues</div>
+        <ul class="clist" aria-label="Key issues">
+          ${(r.issues||[]).map(i=>`
+            <li>
+              <div class="lm" style="background:${i.sev==="high"?"#dc2626":i.sev==="med"?"#d97706":"#1a6b3c"}" aria-label="Severity: ${i.sev}"></div>
+              ${esc(i.text)}
+            </li>`).join("")}
+        </ul>
+      </div>
+
+      <div class="card fi d1">
+        <div class="ch">Missing Skills</div>
+        <div class="tags">
+          ${(r.missingSkills||[]).map(s=>`<span class="tag tr">${esc(s)}</span>`).join("")}
+        </div>
+      </div>
+
+      <div class="card fi d2">
+        <div class="ch">Next Steps</div>
+        <ul class="clist" aria-label="Recommended next steps">
+          ${(r.steps||[]).map(s=>`
+            <li>
+              <div class="lm" style="background:#1a6b3c" aria-hidden="true"></div>
+              ${esc(s)}
+            </li>`).join("")}
+        </ul>
+      </div>
+    </div>
+
+    <div class="cstrip fi d3">
+      <div>
+        <h3>Ready to improve your CV?</h3>
+        <p>View the AI-rewritten version or explore your full skill gap</p>
+      </div>
+      <div class="cstrip-btns">
+        <button class="btn bg" onclick="go('rewritten')">View Rewritten CV →</button>
+        <button class="btn bo" style="color:rgba(255,255,255,.55);border-color:rgba(255,255,255,.12);" onclick="go('skillgap')">Skill Gap</button>
+      </div>
+    </div>
+  </div>
+  </div>`; }
+
+function pgRW() {
+  const r = state.result;
+  return `
+  ${tb("Rewritten CV", `Optimized for ${esc(r.role)}`,
+    `<span id="cpok" class="cpok" aria-live="polite"></span>
+     <button class="btn bo" onclick="copyCV()">Copy</button>
+     <button class="btn bd" onclick="dlCV()">Download .txt</button>`)}
+  <div class="scroll">
+  <div class="page">
+    <div class="hr"></div>
+    <div class="card fi">
+      <div class="cvbody" id="cvContent">${esc(r.rewrittenCV)}</div>
+    </div>
+  </div>
+  </div>`; }
+
+function pgSG() {
+  const r = state.result;
+  return `
+  ${tb("Skill Gap Analysis", `Target: ${esc(r.role)}`)}
+  <div class="scroll">
+  <div class="page">
+    <div class="g3 fi">
+      <div class="card">
+        <div class="ch">Missing Skills</div>
+        <div class="tags">
+          ${(r.missingSkills||[]).map(s=>`<span class="tag tr">${esc(s)}</span>`).join("")}
+        </div>
+      </div>
+      <div class="card fi d1">
+        <div class="ch">Tools to Learn</div>
+        <div class="tags">
+          ${(r.tools||[]).map(t=>`<span class="tag tb">${esc(t)}</span>`).join("")}
+        </div>
+      </div>
+      <div class="card fi d2">
+        <div class="ch">Certifications</div>
+        ${(r.certs||[]).map(c=>`
+          <div class="cert">
+            <span aria-hidden="true" style="font-size:.95rem">🏅</span>
+            <div>
+              <div class="cname">${esc(c.name)}</div>
+              <div class="cwhy">${esc(c.why)}</div>
+            </div>
+          </div>`).join("")}
+      </div>
+    </div>
+
+    <div class="card g1 fi d2">
+      <div class="ch">Current Skill Levels</div>
+      ${(r.skillGap||[]).map(g=>`
+        <div class="sgrow">
+          <div class="sglbl">${esc(g.skill)}</div>
+          <div class="sgtrk" role="progressbar" aria-valuenow="${g.current}" aria-valuemin="0" aria-valuemax="100" aria-label="${g.skill}: ${g.current}%">
+            <div class="sgfil" data-w="${g.current}" style="width:0%;background:${g.current<40?"#dc2626":g.current<70?"#d97706":"#166534"}"></div>
+          </div>
+          <div class="sgpct">${g.current}%</div>
+        </div>`).join("")}
+    </div>
+
+    <div class="card g1 fi d3">
+      <div class="ch">30 / 60 / 90-Day Action Plan</div>
+      ${(r.actionPlan||[]).map(a=>`
+        <div class="ap">
+          <div class="apph">${esc(a.phase)}</div>
+          <div>${esc(a.action)}</div>
+        </div>`).join("")}
+    </div>
+
+    <div style="text-align:center;padding:.5rem 0 1rem" class="fi d4">
+      <button class="btn bo" onclick="go('upload')">↑ Analyze Another CV</button>
+    </div>
+  </div>
+  </div>`; }
+
+function pgEmpty() { return `
+  ${tb("No Data","")}
+  <div class="scroll">
+  <div class="page">
+    <div class="empty">
+      <p>Upload and analyze a CV first to view results here.</p>
+      <button class="btn bd" onclick="go('upload')">Upload CV →</button>
+    </div>
+  </div>
+  </div>`; }
+
+// ── RENDER ────────────────────────────────────────────────────────
+function render() {
+  renderNav();
+  const m = document.getElementById("main");
+  switch(state.page) {
+    case "upload":     m.innerHTML = pgUpload(); break;
+    case "processing": m.innerHTML = pgProc();   break;
+    case "dashboard":  m.innerHTML = state.result ? pgDash() : pgEmpty(); break;
+    case "rewritten":  m.innerHTML = state.result ? pgRW()   : pgEmpty(); break;
+    case "skillgap":   m.innerHTML = state.result ? pgSG()   : pgEmpty(); break;
+  }
+  bindEvents();
+  animBars();
+  window.scrollTo(0,0);
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function bRow(label, val) {
+  const col = val>=70?"#1a6b3c":val>=45?"#d97706":"#dc2626";
+  return `<div class="brow">
+    <div class="btop"><span>${label}</span><span>${val}%</span></div>
+    <div class="btrack" role="progressbar" aria-valuenow="${val}" aria-valuemin="0" aria-valuemax="100" aria-label="${label}: ${val}%">
+      <div class="bfill" data-width="${val}" style="width:0%;background:${col}"></div>
+    </div>
+  </div>`;
+}
+
+function animBars() {
+  setTimeout(() => {
+    document.querySelectorAll(".bfill[data-width]").forEach(el => el.style.width = el.dataset.width + "%");
+    document.querySelectorAll(".sgfil[data-w]").forEach(el => el.style.width = el.dataset.w + "%");
+    const arc = document.getElementById("scoreArc");
+    if (arc && state.result) {
+      const circ = 2*Math.PI*37;
+      arc.style.strokeDashoffset = circ*(1-state.result.score/100);
+    }
+  }, 100);
+}
+
+function esc(s="") {
+  return String(s)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+
+function showErr(msg) {
+  const el = document.getElementById("errMsg");
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add("show");
+}
+function clearErr() {
+  const el = document.getElementById("errMsg");
+  if (el) el.classList.remove("show");
+}
+
+// ── BIND EVENTS ───────────────────────────────────────────────────
+function bindEvents() {
+  const ufi = document.getElementById("ufi");
+  if (ufi) ufi.addEventListener("change", e => handleFile(e.target.files[0]));
+
+  const dz = document.getElementById("dz");
+  if (dz) {
+    dz.addEventListener("dragover",  e => { e.preventDefault(); dz.classList.add("ov"); });
+    dz.addEventListener("dragleave", ()  => dz.classList.remove("ov"));
+    dz.addEventListener("drop", e => {
+      e.preventDefault(); dz.classList.remove("ov");
+      handleFile(e.dataTransfer.files[0]);
+    });
+    dz.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") dz.querySelector("input")?.click(); });
+  }
+}
+
+function handleFile(file) {
+  if (!file) return;
+  const allowed = [".txt",".doc",".docx"];
+  const ext = "." + file.name.split(".").pop().toLowerCase();
+  if (!allowed.includes(ext)) { toast("Please upload a TXT or DOCX file", "error"); return; }
+  if (file.size > 500*1024) { toast("File too large. Max 500KB.", "error"); return; }
+
+  document.getElementById("dzTitle").textContent = file.name;
+  document.getElementById("dzSub").textContent   = "File ready";
+  const ok = document.getElementById("dzOk");
+  ok.textContent = "✓ " + file.name;
+  ok.classList.remove("hidden");
+
+  const reader = new FileReader();
+  reader.onload  = e => { const ta = document.getElementById("cvta"); if(ta) ta.value = e.target.result; };
+  reader.onerror = ()  => toast("Could not read file", "error");
+  reader.readAsText(file);
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────
+async function doSubmit() {
+  const cv = document.getElementById("cvta")?.value.trim() || "";
+  const ro = document.getElementById("rs")?.value || "";
+
+  clearErr();
+
+  if (!cv)          { showErr("Please paste or upload your CV text."); return; }
+  if (cv.length < 50) { showErr("CV text is too short. Please provide more content."); return; }
+  if (!ro)          { showErr("Please select a target role."); return; }
+
+  state.loading = true;
+  state.page    = "processing";
+  render();
+
+  // Animate steps
+  const stepDelay = [700, 1350, 2050, 2700];
+  stepDelay.forEach((d, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(`ps${i+2}`);
+      if (el) el.classList.add("active");
+    }, d);
+  });
+
+  try {
+    const res = await fetch("/analyze", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ cvText: cv, role: ro }),
+      signal:  AbortSignal.timeout(90000),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || `Server error (${res.status})`);
+    }
+
+    state.result  = data;
+    state.loading = false;
+    state.page    = "dashboard";
+    render();
+    toast("Analysis complete!", "success");
+
+  } catch (e) {
+    state.loading = false;
+    state.page    = "upload";
+    render();
+    if (e.name === "TimeoutError") {
+      toast("Request timed out. Please try again.", "error", 5000);
+    } else {
+      toast(e.message || "Analysis failed. Please try again.", "error", 5000);
+    }
+  }
+}
+
+// ── COPY / DOWNLOAD ───────────────────────────────────────────────
+function copyCV() {
+  if (!state.result) return;
+  navigator.clipboard.writeText(state.result.rewrittenCV)
+    .then(() => {
+      const el = document.getElementById("cpok");
+      if (el) { el.textContent = "✓ Copied"; setTimeout(() => { if(el) el.textContent = ""; }, 2200); }
+      toast("CV copied to clipboard!", "success");
+    })
+    .catch(() => toast("Copy failed — please copy manually", "error"));
+}
+
+function dlCV() {
+  if (!state.result) return;
+  try {
+    const blob = new Blob([state.result.rewrittenCV], { type: "text/plain" });
+    const a    = document.createElement("a");
+    a.href     = URL.createObjectURL(blob);
+    a.download = `GreenCV_${state.result.role.replace(/[\s\/]+/g,"_")}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    toast("Download started!", "success");
+  } catch { toast("Download failed", "error"); }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
