@@ -3,259 +3,169 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="GreenCV — AI-powered CV analysis for green energy and sustainability professionals. Get your ATS score, skill gap report, and a fully rewritten CV in under 30 seconds.">
-<meta name="keywords" content="green CV, sustainability CV, ESG jobs, green energy careers, ATS CV checker, sustainability analyst, carbon manager">
-<meta property="og:title" content="GreenCV — AI CV Analysis for Green Professionals">
-<meta property="og:description" content="Upload your CV and get an instant AI analysis, ATS score, and fully rewritten version — tailored to sustainability and energy roles.">
+<meta name="description" content="GreenCV — AI-powered CV analysis for green energy and sustainability professionals. Get your ATS score, rewritten CV, job match, cover letter, and LinkedIn optimizer in seconds.">
+<meta name="keywords" content="green CV, sustainability CV, ESG jobs, green energy careers, ATS CV checker, cover letter generator, LinkedIn optimizer">
+<meta property="og:title" content="GreenCV — AI CV Tools for Green Professionals">
+<meta property="og:description" content="Upload your CV and get an AI score, rewrite, job match, cover letter and LinkedIn optimization — all tailored to sustainability and energy roles.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<title>GreenCV — AI CV Analysis for Green & Energy Professionals</title>
+<title>GreenCV — AI CV Tools for Green & Energy Professionals</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=DM+Mono:wght@400;500&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --ink:    #0d0d0b;
-  --deep:   #111110;
-  --forest: #1a3d28;
-  --moss:   #1a6b3c;
-  --lime:   #b5e853;
-  --cream:  #f5f2eb;
-  --white:  #ffffff;
-  --muted:  #888880;
-  --rule:   rgba(255,255,255,0.07);
+  --ink:#0d0d0b; --deep:#111110; --forest:#1a3d28; --moss:#1a6b3c;
+  --lime:#b5e853; --cream:#f5f2eb; --white:#fff; --muted:#888880; --rule:rgba(255,255,255,.07);
 }
-
 html { scroll-behavior: smooth; }
+body { font-family:'Figtree',sans-serif; background:var(--ink); color:var(--cream); overflow-x:hidden; -webkit-font-smoothing:antialiased; }
 
-body {
-  font-family: 'Figtree', sans-serif;
-  background: var(--ink);
-  color: var(--cream);
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+/* SKIP */
+.skip-link { position:absolute; top:-40px; left:0; background:var(--lime); color:var(--ink); padding:.5rem 1rem; border-radius:0 0 5px 0; font-weight:700; font-size:.85rem; z-index:999; transition:top .15s; }
+.skip-link:focus { top:0; }
 
-/* ── SKIP LINK (accessibility) ── */
-.skip-link {
-  position: absolute; top: -40px; left: 0;
-  background: var(--lime); color: var(--ink);
-  padding: .5rem 1rem; border-radius: 0 0 5px 0;
-  font-weight: 700; font-size: .85rem; z-index: 999;
-  transition: top .15s;
-}
-.skip-link:focus { top: 0; }
+/* NAV */
+nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 2.5rem; background:rgba(13,13,11,.88); backdrop-filter:blur(14px); border-bottom:1px solid var(--rule); transition:padding .2s; }
+.nav-logo { display:flex; align-items:center; gap:.55rem; text-decoration:none; }
+.nav-leaf { width:27px; height:27px; background:var(--moss); border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700; color:#fff; flex-shrink:0; }
+.nav-name { font-family:'Cormorant Garamond',serif; font-size:1.15rem; font-weight:700; color:var(--white); }
+.nav-links { display:flex; align-items:center; gap:1.75rem; }
+.nav-links a { text-decoration:none; font-size:.8rem; color:rgba(255,255,255,.45); font-weight:500; transition:color .15s; }
+.nav-links a:hover { color:var(--white); }
+.nav-cta { background:var(--lime)!important; color:var(--ink)!important; padding:.45rem 1.05rem; border-radius:5px; font-weight:700!important; transition:all .15s!important; }
+.nav-cta:hover { background:#c8f566!important; transform:translateY(-1px); }
+.hamburger-nav { display:none; background:none; border:none; cursor:pointer; padding:.25rem; }
+.hamburger-nav span { display:block; width:20px; height:2px; background:rgba(255,255,255,.6); border-radius:99px; margin:4px 0; }
+.mobile-menu { display:none; position:fixed; top:56px; left:0; right:0; z-index:99; background:var(--deep); border-bottom:1px solid var(--rule); flex-direction:column; padding:1rem; }
+.mobile-menu.open { display:flex; }
+.mobile-menu a { text-decoration:none; color:rgba(255,255,255,.6); padding:.65rem .75rem; font-size:.875rem; border-radius:5px; }
+.mobile-menu a:hover { background:rgba(255,255,255,.06); color:#fff; }
+.mobile-menu .nav-cta { margin-top:.5rem; text-align:center; }
 
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 1.1rem 2.5rem;
-  background: rgba(13,13,11,.88);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--rule);
-}
-.nav-logo { display: flex; align-items: center; gap: .55rem; text-decoration: none; }
-.nav-leaf  { width: 27px; height: 27px; background: var(--moss); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 700; color: #fff; flex-shrink: 0; }
-.nav-name  { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 700; color: var(--white); }
-.nav-links { display: flex; align-items: center; gap: 1.75rem; }
-.nav-links a { text-decoration: none; font-size: .8rem; color: rgba(255,255,255,.45); font-weight: 500; transition: color .15s; }
-.nav-links a:hover, .nav-links a:focus { color: var(--white); }
-.nav-links a:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; border-radius: 3px; }
-.nav-cta {
-  background: var(--lime); color: var(--ink) !important;
-  padding: .45rem 1.05rem; border-radius: 5px;
-  font-weight: 700 !important; font-size: .8rem;
-  transition: all .15s;
-}
-.nav-cta:hover { background: #c8f566 !important; transform: translateY(-1px); }
-
-/* ── MOBILE NAV ── */
-.hamburger-nav { display: none; background: none; border: none; cursor: pointer; padding: .25rem; }
-.hamburger-nav span { display: block; width: 20px; height: 2px; background: rgba(255,255,255,.6); border-radius: 99px; margin: 4px 0; transition: all .2s; }
-.mobile-menu {
-  display: none; position: fixed; top: 56px; left: 0; right: 0; z-index: 99;
-  background: var(--deep); border-bottom: 1px solid var(--rule);
-  flex-direction: column; padding: 1rem;
-}
-.mobile-menu.open { display: flex; }
-.mobile-menu a { text-decoration: none; color: rgba(255,255,255,.6); padding: .65rem .75rem; font-size: .875rem; border-radius: 5px; }
-.mobile-menu a:hover { background: rgba(255,255,255,.06); color: #fff; }
-.mobile-menu .nav-cta { margin-top: .5rem; text-align: center; background: var(--lime); color: var(--ink) !important; }
-
-/* ── HERO ── */
-.hero {
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-  justify-content: center; align-items: center;
-  text-align: center; padding: 8rem 2rem 5rem;
-  position: relative; overflow: hidden;
-}
-.hero-grid {
-  position: absolute; inset: 0;
-  background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
-  pointer-events: none;
-}
-.hero-glow {
-  position: absolute; width: 700px; height: 700px;
-  background: radial-gradient(circle, rgba(26,107,60,.22) 0%, transparent 70%);
-  top: 50%; left: 50%; transform: translate(-50%,-56%); pointer-events: none;
-}
-
-.hero-badge {
-  display: inline-flex; align-items: center; gap: .5rem;
-  background: rgba(181,232,83,.09); border: 1px solid rgba(181,232,83,.18);
-  color: var(--lime); border-radius: 99px;
-  padding: .32rem .9rem; font-size: .73rem; font-weight: 600;
-  letter-spacing: .06em; text-transform: uppercase;
-  margin-bottom: 1.75rem; position: relative; z-index: 1;
-  animation: fadeUp .6s ease both;
-}
-.badge-dot { width: 6px; height: 6px; background: var(--lime); border-radius: 50%; animation: pulse 2s ease infinite; flex-shrink: 0; }
+/* HERO */
+.hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:8rem 2rem 5rem; position:relative; overflow:hidden; }
+.hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px); background-size:64px 64px; mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%); pointer-events:none; }
+.hero-glow { position:absolute; width:700px; height:700px; background:radial-gradient(circle,rgba(26,107,60,.22) 0%,transparent 70%); top:50%; left:50%; transform:translate(-50%,-56%); pointer-events:none; }
+.hero-badge { display:inline-flex; align-items:center; gap:.5rem; background:rgba(181,232,83,.09); border:1px solid rgba(181,232,83,.18); color:var(--lime); border-radius:99px; padding:.32rem .9rem; font-size:.73rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin-bottom:1.75rem; position:relative; z-index:1; animation:fadeUp .6s ease both; }
+.badge-dot { width:6px; height:6px; background:var(--lime); border-radius:50%; animation:pulse 2s ease infinite; flex-shrink:0; }
 @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.35} }
+.hero h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(2.75rem,7.5vw,6rem); font-weight:700; line-height:1.0; letter-spacing:-.03em; color:var(--white); position:relative; z-index:1; max-width:880px; animation:fadeUp .6s .08s ease both; }
+.hero h1 em { font-style:italic; color:var(--lime); }
+.hero-sub { font-size:1rem; color:rgba(255,255,255,.48); max-width:520px; line-height:1.68; margin:1.65rem auto 0; position:relative; z-index:1; animation:fadeUp .6s .16s ease both; }
+.hero-actions { display:flex; gap:.85rem; justify-content:center; flex-wrap:wrap; margin-top:2.25rem; position:relative; z-index:1; animation:fadeUp .6s .24s ease both; }
+.btn-hero { display:inline-flex; align-items:center; gap:.45rem; padding:.72rem 1.6rem; border-radius:6px; font-family:'Figtree',sans-serif; font-weight:600; font-size:.875rem; text-decoration:none; transition:all .18s; letter-spacing:.01em; }
+.btn-p { background:var(--lime); color:var(--ink); }
+.btn-p:hover { background:#c8f566; transform:translateY(-2px); box-shadow:0 8px 24px rgba(181,232,83,.22); }
+.btn-s { background:transparent; color:rgba(255,255,255,.65); border:1px solid rgba(255,255,255,.14); }
+.btn-s:hover { border-color:rgba(255,255,255,.3); color:#fff; }
+.hero-note { font-size:.73rem; color:rgba(255,255,255,.28); margin-top:1.1rem; position:relative; z-index:1; animation:fadeUp .6s .32s ease both; }
 
-.hero h1 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2.75rem, 7.5vw, 6rem);
-  font-weight: 700; line-height: 1.0; letter-spacing: -.03em;
-  color: var(--white); position: relative; z-index: 1;
-  max-width: 880px; animation: fadeUp .6s .08s ease both;
-}
-.hero h1 em { font-style: italic; color: var(--lime); }
+/* TOOL PILLS */
+.tool-pills { display:flex; gap:.5rem; flex-wrap:wrap; justify-content:center; margin-top:1.75rem; position:relative; z-index:1; animation:fadeUp .6s .28s ease both; }
+.pill { display:inline-flex; align-items:center; gap:.4rem; padding:.3rem .75rem; border-radius:99px; font-size:.72rem; font-weight:600; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:rgba(255,255,255,.6); }
+.pill .pi { font-size:.85rem; }
 
-.hero-sub {
-  font-size: 1rem; color: rgba(255,255,255,.48);
-  max-width: 500px; line-height: 1.68;
-  margin: 1.65rem auto 0; position: relative; z-index: 1;
-  animation: fadeUp .6s .16s ease both;
-}
+/* STATS */
+.stats { border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); display:grid; grid-template-columns:repeat(4,1fr); }
+.stat { padding:2rem; text-align:center; border-right:1px solid var(--rule); }
+.stat:last-child { border-right:none; }
+.stat-num { font-family:'Cormorant Garamond',serif; font-size:2.6rem; font-weight:700; color:var(--white); line-height:1; }
+.stat-num span { color:var(--lime); }
+.stat-lbl { font-size:.76rem; color:var(--muted); margin-top:.4rem; }
 
-.hero-actions {
-  display: flex; gap: .85rem; justify-content: center; flex-wrap: wrap;
-  margin-top: 2.25rem; position: relative; z-index: 1;
-  animation: fadeUp .6s .24s ease both;
-}
+/* SECTIONS */
+section { padding:6.5rem 2.5rem; }
+.container { max-width:1100px; margin:0 auto; }
+.section-tag { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--lime); letter-spacing:.12em; text-transform:uppercase; margin-bottom:.85rem; display:block; }
+.section-title { font-family:'Cormorant Garamond',serif; font-size:clamp(1.9rem,4vw,3rem); font-weight:700; line-height:1.1; letter-spacing:-.02em; color:var(--white); }
+.section-sub { font-size:.9rem; color:rgba(255,255,255,.42); line-height:1.65; max-width:460px; margin-top:.65rem; }
 
-.btn-hero {
-  display: inline-flex; align-items: center; gap: .45rem;
-  padding: .72rem 1.6rem; border-radius: 6px;
-  font-family: 'Figtree', sans-serif; font-weight: 600; font-size: .875rem;
-  text-decoration: none; transition: all .18s; letter-spacing: .01em;
-}
-.btn-hero:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
-.btn-p { background: var(--lime); color: var(--ink); }
-.btn-p:hover { background: #c8f566; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(181,232,83,.22); }
-.btn-s { background: transparent; color: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.14); }
-.btn-s:hover { border-color: rgba(255,255,255,.3); color: #fff; }
+/* HOW */
+.how { background:var(--deep); }
+.how-head { text-align:center; margin-bottom:3.5rem; }
+.how-head .section-sub { margin:.65rem auto 0; }
+.steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5px; background:var(--rule); border:1px solid var(--rule); border-radius:12px; overflow:hidden; }
+.step-card { background:var(--deep); padding:2.25rem 1.85rem; transition:background .2s; }
+.step-card:hover { background:#151513; }
+.step-num { font-family:'DM Mono',monospace; font-size:.66rem; color:var(--lime); letter-spacing:.1em; margin-bottom:1.35rem; display:block; }
+.step-icon { width:42px; height:42px; background:rgba(26,107,60,.14); border:1px solid rgba(26,107,60,.22); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-bottom:1.15rem; }
+.step-card h3 { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:700; color:var(--white); margin-bottom:.5rem; line-height:1.2; }
+.step-card p { font-size:.82rem; color:rgba(255,255,255,.42); line-height:1.6; }
 
-.hero-note { font-size: .73rem; color: rgba(255,255,255,.28); margin-top: 1.1rem; position: relative; z-index: 1; animation: fadeUp .6s .32s ease both; }
+/* FEATURES GRID */
+.features-section { background:var(--ink); }
+.feat-head { text-align:center; margin-bottom:3.5rem; }
+.feat-head .section-sub { margin:.65rem auto 0; }
+.feat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
+.feat-card { background:var(--deep); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:1.75rem; transition:all .2s; position:relative; overflow:hidden; }
+.feat-card:hover { border-color:rgba(26,107,60,.3); transform:translateY(-2px); }
+.feat-card::before { content:''; position:absolute; top:-30px; right:-30px; width:120px; height:120px; background:radial-gradient(circle,rgba(26,107,60,.1) 0%,transparent 70%); border-radius:50%; pointer-events:none; }
+.feat-icon { width:44px; height:44px; background:rgba(26,107,60,.15); border:1px solid rgba(26,107,60,.25); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-bottom:1.1rem; }
+.feat-card h3 { font-family:'Cormorant Garamond',serif; font-size:1.15rem; font-weight:700; color:var(--white); margin-bottom:.5rem; }
+.feat-card p { font-size:.82rem; color:rgba(255,255,255,.42); line-height:1.6; }
+.feat-tag { display:inline-block; margin-top:.85rem; font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--lime); }
 
-/* ── STATS ── */
-.stats { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: repeat(4,1fr); }
-.stat { padding: 2rem; text-align: center; border-right: 1px solid var(--rule); }
-.stat:last-child { border-right: none; }
-.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.6rem; font-weight: 700; color: var(--white); line-height: 1; }
-.stat-num span { color: var(--lime); }
-.stat-lbl { font-size: .76rem; color: var(--muted); margin-top: .4rem; }
+/* DEMO SECTION */
+.demo-section { background:var(--deep); }
+.demo-layout { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; }
+.demo-visual { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:1.75rem; position:relative; overflow:hidden; }
+.demo-visual::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; background:radial-gradient(circle,rgba(26,107,60,.14) 0%,transparent 70%); border-radius:50%; pointer-events:none; }
 
-/* ── SECTIONS ── */
-section { padding: 6.5rem 2.5rem; }
-.container { max-width: 1100px; margin: 0 auto; }
-.section-tag { font-family: 'DM Mono', monospace; font-size: .68rem; color: var(--lime); letter-spacing: .12em; text-transform: uppercase; margin-bottom: .85rem; display: block; }
-.section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.9rem, 4vw, 3rem); font-weight: 700; line-height: 1.1; letter-spacing: -.02em; color: var(--white); }
-.section-sub { font-size: .9rem; color: rgba(255,255,255,.42); line-height: 1.65; max-width: 460px; margin-top: .65rem; }
-
-/* ── HOW IT WORKS ── */
-.how { background: var(--deep); }
-.how-head { text-align: center; margin-bottom: 3.5rem; }
-.how-head .section-sub { margin: .65rem auto 0; }
-
-.steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5px; background: var(--rule); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
-.step-card { background: var(--deep); padding: 2.25rem 1.85rem; transition: background .2s; }
-.step-card:hover { background: #151513; }
-.step-num { font-family: 'DM Mono', monospace; font-size: .66rem; color: var(--lime); letter-spacing: .1em; margin-bottom: 1.35rem; display: block; }
-.step-icon { width: 42px; height: 42px; background: rgba(26,107,60,.14); border: 1px solid rgba(26,107,60,.22); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1.15rem; }
-.step-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 700; color: var(--white); margin-bottom: .5rem; line-height: 1.2; }
-.step-card p  { font-size: .82rem; color: rgba(255,255,255,.42); line-height: 1.6; }
-
-/* ── FEATURES ── */
-.feature-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 4.5rem; align-items: center; margin-bottom: 6rem; }
-.feature-wrap:last-child { margin-bottom: 0; }
-.feature-wrap.flip { direction: rtl; }
-.feature-wrap.flip > * { direction: ltr; }
-
-.fv {
-  background: var(--deep); border: 1px solid rgba(255,255,255,.06);
-  border-radius: 12px; padding: 1.75rem; position: relative; overflow: hidden;
-}
-.fv::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; background:radial-gradient(circle,rgba(26,107,60,.14) 0%,transparent 70%); border-radius:50%; pointer-events:none; }
-
-/* mock elements */
+/* mock score */
 .mock-score-wrap { display:flex; align-items:center; gap:1.4rem; margin-bottom:1.35rem; }
 .mock-ring { position:relative; width:76px; height:76px; flex-shrink:0; }
 .mock-ring svg { transform:rotate(-90deg); }
 .mock-num { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:1.4rem; font-weight:700; color:var(--lime); }
 .mock-lbl h4 { font-family:'Cormorant Garamond',serif; font-size:1.05rem; font-weight:700; color:var(--lime); }
-.mock-lbl p  { font-size:.73rem; color:var(--muted); margin-top:.15rem; line-height:1.4; }
-
+.mock-lbl p { font-size:.73rem; color:var(--muted); margin-top:.15rem; line-height:1.4; }
 .mbar { margin-bottom:.7rem; }
-.mbar:last-of-type { margin-bottom:0; }
 .mbar-top { display:flex; justify-content:space-between; margin-bottom:.28rem; }
 .mbar-top span:first-child { font-size:.73rem; color:rgba(255,255,255,.55); }
-.mbar-top span:last-child  { font-size:.73rem; color:var(--muted); }
+.mbar-top span:last-child { font-size:.73rem; color:var(--muted); }
 .mbar-track { height:3px; background:rgba(255,255,255,.08); border-radius:99px; }
-.mbar-fill  { height:100%; border-radius:99px; }
-
+.mbar-fill { height:100%; border-radius:99px; }
 .mtags { display:flex; flex-wrap:wrap; gap:.32rem; margin-top:1.1rem; }
 .mtag { padding:.2rem .52rem; border-radius:3px; font-size:.69rem; font-weight:500; }
 .mt-g { background:rgba(26,107,60,.18); color:#6dca8a; border:1px solid rgba(26,107,60,.28); }
 .mt-r { background:rgba(185,28,28,.14); color:#f87171; border:1px solid rgba(185,28,28,.24); }
 
-.mock-cv { font-family:'DM Mono',monospace; font-size:.68rem; line-height:1.85; color:rgba(255,255,255,.32); }
-.mock-cv .h1 { color:rgba(255,255,255,.68); }
-.mock-cv .h2 { color:var(--lime); }
-
 .feat-list { list-style:none; margin-top:1.75rem; display:flex; flex-direction:column; gap:.8rem; }
 .feat-list li { display:flex; align-items:flex-start; gap:.7rem; font-size:.855rem; color:rgba(255,255,255,.5); line-height:1.5; }
 .feat-check { width:16px; height:16px; background:rgba(26,107,60,.18); border:1px solid rgba(26,107,60,.32); border-radius:3px; flex-shrink:0; margin-top:1px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8' viewBox='0 0 10 8'%3E%3Cpath d='M1 4l2.5 2.5L9 1' stroke='%231a6b3c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:center; }
 
-/* ── ROLES ── */
-.roles-s { background: var(--deep); }
+/* ROLES */
+.roles-s { background:var(--ink); }
 .roles-head { display:grid; grid-template-columns:1fr 1fr; gap:3.5rem; align-items:end; margin-bottom:2.75rem; }
 .roles-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:.75rem; }
-.role-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:8px; padding:1.2rem .9rem; text-align:center; transition:all .18s; cursor:default; }
+.role-card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:8px; padding:1.2rem .9rem; text-align:center; transition:all .18s; }
 .role-card:hover { background:rgba(26,107,60,.1); border-color:rgba(26,107,60,.24); transform:translateY(-2px); }
 .role-icon { font-size:1.4rem; margin-bottom:.55rem; display:block; }
 .role-name { font-size:.72rem; font-weight:600; color:rgba(255,255,255,.55); line-height:1.4; }
 
-/* ── TESTIMONIALS ── */
+/* TESTIMONIALS */
+.testi-s { background:var(--deep); }
 .testi-head { text-align:center; margin-bottom:3rem; }
 .testi-head .section-sub { margin:.65rem auto 0; }
 .testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem; }
-.tcard { background:var(--deep); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:1.6rem; }
-.tstars { color:var(--lime); font-size:.82rem; margin-bottom:.9rem; letter-spacing:.05em; }
-.ttext  { font-size:.845rem; color:rgba(255,255,255,.5); line-height:1.65; font-style:italic; }
+.tcard { background:var(--ink); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:1.6rem; }
+.tstars { color:var(--lime); font-size:.82rem; margin-bottom:.9rem; }
+.ttext { font-size:.845rem; color:rgba(255,255,255,.5); line-height:1.65; font-style:italic; }
 .tauthor { display:flex; align-items:center; gap:.7rem; margin-top:1.15rem; padding-top:1.15rem; border-top:1px solid rgba(255,255,255,.06); }
 .tavatar { width:34px; height:34px; border-radius:50%; background:var(--forest); display:flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:700; color:var(--lime); flex-shrink:0; font-family:'Cormorant Garamond',serif; }
 .tname { font-size:.78rem; font-weight:600; color:var(--white); }
 .trole { font-size:.7rem; color:var(--muted); margin-top:1px; }
 
-/* ── CTA ── */
+/* CTA */
 .cta-s { background:var(--forest); text-align:center; padding:6.5rem 2rem; position:relative; overflow:hidden; }
 .cta-s::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px); background-size:44px 44px; pointer-events:none; }
-.cta-s::after  { content:''; position:absolute; top:-80px; left:50%; transform:translateX(-50%); width:500px; height:500px; background:radial-gradient(circle,rgba(181,232,83,.1) 0%,transparent 70%); pointer-events:none; }
+.cta-s::after { content:''; position:absolute; top:-80px; left:50%; transform:translateX(-50%); width:500px; height:500px; background:radial-gradient(circle,rgba(181,232,83,.1) 0%,transparent 70%); pointer-events:none; }
 .cta-inner { position:relative; z-index:1; max-width:580px; margin:0 auto; }
-.cta-s h2  { font-family:'Cormorant Garamond',serif; font-size:clamp(2.1rem,5vw,3.75rem); font-weight:700; line-height:1.1; letter-spacing:-.02em; color:var(--white); }
-.cta-s p   { font-size:.92rem; color:rgba(255,255,255,.45); margin-top:.9rem; line-height:1.6; }
-.cta-s .hero-actions { margin-top:2rem; }
-.cta-note  { font-size:.72rem; color:rgba(255,255,255,.28); margin-top:.9rem; }
+.cta-s h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(2.1rem,5vw,3.75rem); font-weight:700; line-height:1.1; letter-spacing:-.02em; color:var(--white); }
+.cta-s p { font-size:.92rem; color:rgba(255,255,255,.45); margin-top:.9rem; line-height:1.6; }
+.cta-note { font-size:.72rem; color:rgba(255,255,255,.28); margin-top:.9rem; }
 
-/* ── FOOTER ── */
+/* FOOTER */
 footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25rem 2.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
 .footer-logo { display:flex; align-items:center; gap:.5rem; text-decoration:none; }
 .footer-name { font-family:'Cormorant Garamond',serif; font-size:.95rem; font-weight:700; color:rgba(255,255,255,.4); }
@@ -264,35 +174,36 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
 .footer-links a:hover { color:rgba(255,255,255,.55); }
 .footer-copy { font-size:.72rem; color:rgba(255,255,255,.18); }
 
-/* ── ANIMATIONS ── */
+/* ANIMATIONS */
 @keyframes fadeUp { from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);} }
-.reveal { opacity:0; transform:translateY(16px); transition:opacity .55s ease, transform .55s ease; }
+.reveal { opacity:0; transform:translateY(16px); transition:opacity .55s ease,transform .55s ease; }
 .reveal.visible { opacity:1; transform:translateY(0); }
 .reveal.d1 { transition-delay:.06s; }
 .reveal.d2 { transition-delay:.12s; }
 .reveal.d3 { transition-delay:.18s; }
 .reveal.d4 { transition-delay:.24s; }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 960px) {
-  nav { padding: 1rem 1.5rem; }
-  .nav-links { display: none; }
-  .hamburger-nav { display: block; }
-  section { padding: 4.5rem 1.5rem; }
-  .stats { grid-template-columns: repeat(2,1fr); }
-  .stats .stat:nth-child(2) { border-right: none; }
-  .steps-grid { grid-template-columns: 1fr; }
-  .feature-wrap, .feature-wrap.flip { grid-template-columns:1fr; direction:ltr; gap:2rem; }
-  .roles-head { grid-template-columns: 1fr; gap:1.25rem; }
-  .roles-grid { grid-template-columns: repeat(2,1fr); }
-  .testi-grid { grid-template-columns: 1fr; }
+/* RESPONSIVE */
+@media(max-width:960px) {
+  nav { padding:1rem 1.5rem; }
+  .nav-links { display:none; }
+  .hamburger-nav { display:block; }
+  section { padding:4.5rem 1.5rem; }
+  .stats { grid-template-columns:repeat(2,1fr); }
+  .stats .stat:nth-child(2) { border-right:none; }
+  .steps-grid { grid-template-columns:1fr; }
+  .feat-grid { grid-template-columns:1fr; }
+  .demo-layout { grid-template-columns:1fr; gap:2rem; }
+  .roles-head { grid-template-columns:1fr; gap:1.25rem; }
+  .roles-grid { grid-template-columns:repeat(2,1fr); }
+  .testi-grid { grid-template-columns:1fr; }
   footer { flex-direction:column; text-align:center; }
   .footer-links { justify-content:center; }
 }
-@media (max-width: 480px) {
-  .hero { padding: 7rem 1.25rem 4rem; }
-  .stats { grid-template-columns: 1fr 1fr; }
-  .roles-grid { grid-template-columns: repeat(2,1fr); }
+@media(max-width:480px) {
+  .hero { padding:7rem 1.25rem 4rem; }
+  .roles-grid { grid-template-columns:repeat(2,1fr); }
+  .tool-pills { gap:.35rem; }
 }
 </style>
 </head>
@@ -301,46 +212,56 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <!-- NAV -->
-<nav role="navigation" aria-label="Main navigation">
-  <a class="nav-logo" href="/" aria-label="GreenCV homepage">
-    <div class="nav-leaf" aria-hidden="true">G</div>
+<nav>
+  <a class="nav-logo" href="/">
+    <div class="nav-leaf">G</div>
     <span class="nav-name">GreenCV</span>
   </a>
-  <div class="nav-links" role="menubar">
-    <a href="#how" role="menuitem">How it works</a>
-    <a href="#features" role="menuitem">Features</a>
-    <a href="#roles" role="menuitem">Roles</a>
-    <a href="#testimonials" role="menuitem">Reviews</a>
-    <a href="/app.html" class="nav-cta" role="menuitem">Analyze My CV →</a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#roles">Roles</a>
+    <a href="#testimonials">Reviews</a>
+    <a href="/app.html" class="nav-cta">Get Started Free →</a>
   </div>
-  <button class="hamburger-nav" id="hamburger" aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu">
+  <button class="hamburger-nav" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
 </nav>
 
-<div class="mobile-menu" id="mobileMenu" role="menu" aria-hidden="true">
-  <a href="#how" role="menuitem">How it works</a>
-  <a href="#features" role="menuitem">Features</a>
-  <a href="#roles" role="menuitem">Roles</a>
-  <a href="#testimonials" role="menuitem">Reviews</a>
-  <a href="/app.html" class="nav-cta" role="menuitem">Analyze My CV →</a>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#how">How it works</a>
+  <a href="#features">Features</a>
+  <a href="#roles">Roles</a>
+  <a href="#testimonials">Reviews</a>
+  <a href="/app.html" class="nav-cta">Get Started Free →</a>
 </div>
 
 <!-- HERO -->
-<section class="hero" id="main-content" aria-label="Hero">
-  <div class="hero-grid" aria-hidden="true"></div>
-  <div class="hero-glow" aria-hidden="true"></div>
+<section class="hero" id="main-content">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
 
-  <div class="hero-badge" aria-label="AI-Powered, Built for Green Professionals">
-    <div class="badge-dot" aria-hidden="true"></div>
-    AI-Powered · Built for Green Professionals
+  <div class="hero-badge">
+    <div class="badge-dot"></div>
+    7 AI Tools · Built for Green Professionals
   </div>
 
-  <h1>Your CV,<br><em>optimized</em> for<br>a greener future</h1>
+  <h1>Every tool you need<br>to land your <em>green</em> role</h1>
 
   <p class="hero-sub">
-    Upload your CV and get an instant AI analysis, ATS score, skill gap report, and a fully rewritten version — tailored for sustainability and energy roles.
+    Upload your CV once and get an instant AI score, full rewrite, job match, cover letter, LinkedIn optimizer, score history and email results — all tailored to sustainability and energy roles.
   </p>
+
+  <div class="tool-pills">
+    <div class="pill"><span class="pi">📊</span> CV Score</div>
+    <div class="pill"><span class="pi">✦</span> CV Rewrite</div>
+    <div class="pill"><span class="pi">🎯</span> Job Match</div>
+    <div class="pill"><span class="pi">📝</span> Cover Letter</div>
+    <div class="pill"><span class="pi">💼</span> LinkedIn</div>
+    <div class="pill"><span class="pi">📈</span> Score History</div>
+    <div class="pill"><span class="pi">📧</span> Email Results</div>
+  </div>
 
   <div class="hero-actions">
     <a href="/app.html" class="btn-hero btn-p">Analyze My CV Free →</a>
@@ -351,51 +272,128 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
 </section>
 
 <!-- STATS -->
-<div class="stats" role="region" aria-label="Key statistics">
-  <div class="stat reveal"><div class="stat-num">10<span>+</span></div><div class="stat-lbl">Green role categories</div></div>
+<div class="stats">
+  <div class="stat reveal"><div class="stat-num">7<span>+</span></div><div class="stat-lbl">AI-powered tools</div></div>
   <div class="stat reveal d1"><div class="stat-num">30<span>s</span></div><div class="stat-lbl">Average analysis time</div></div>
-  <div class="stat reveal d2"><div class="stat-num">5<span>×</span></div><div class="stat-lbl">More interview callbacks</div></div>
+  <div class="stat reveal d2"><div class="stat-num">10<span>+</span></div><div class="stat-lbl">Green role categories</div></div>
   <div class="stat reveal d3"><div class="stat-num">100<span>%</span></div><div class="stat-lbl">Powered by Claude AI</div></div>
 </div>
 
 <!-- HOW IT WORKS -->
-<section class="how" id="how" aria-labelledby="how-title">
+<section class="how" id="how">
   <div class="container">
     <div class="how-head">
       <span class="section-tag">// How it works</span>
-      <h2 class="section-title reveal" id="how-title">Three steps to a stronger CV</h2>
-      <p class="section-sub reveal d1">From upload to interview-ready in under a minute</p>
+      <h2 class="section-title reveal">Three steps, seven tools</h2>
+      <p class="section-sub reveal d1">From CV upload to interview-ready in under a minute</p>
     </div>
-    <div class="steps-grid reveal" role="list">
-      <div class="step-card" role="listitem">
-        <span class="step-num" aria-hidden="true">01 —</span>
-        <div class="step-icon" aria-hidden="true">📄</div>
+    <div class="steps-grid reveal">
+      <div class="step-card">
+        <span class="step-num">01 —</span>
+        <div class="step-icon">📄</div>
         <h3>Upload Your CV</h3>
-        <p>Paste your CV text or upload a DOCX or TXT file. Select your target green or energy role from our list of specialist categories.</p>
+        <p>Paste text or upload PDF, DOCX, DOC, TXT, JPG or PNG. Select your target green or energy role — or type a custom one.</p>
       </div>
-      <div class="step-card" role="listitem">
-        <span class="step-num" aria-hidden="true">02 —</span>
-        <div class="step-icon" aria-hidden="true">🤖</div>
+      <div class="step-card">
+        <span class="step-num">02 —</span>
+        <div class="step-icon">🤖</div>
         <h3>AI Analysis</h3>
         <p>Claude AI scores your CV on ATS compatibility, green skill alignment, and experience impact — then identifies exactly what's missing.</p>
       </div>
-      <div class="step-card" role="listitem">
-        <span class="step-num" aria-hidden="true">03 —</span>
-        <div class="step-icon" aria-hidden="true">✦</div>
-        <h3>Get Results</h3>
-        <p>Receive a full dashboard, a rewritten CV optimized for sustainability roles, a skill gap breakdown, and a 90-day action plan.</p>
+      <div class="step-card">
+        <span class="step-num">03 —</span>
+        <div class="step-icon">🚀</div>
+        <h3>Use All 7 Tools</h3>
+        <p>Get your rewritten CV, match it to any job, generate a cover letter, optimize your LinkedIn, track your history and email everything.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- FEATURES -->
-<section id="features" aria-labelledby="features-title">
+<section class="features-section" id="features">
   <div class="container">
-    <div class="feature-wrap">
-      <div class="fv reveal">
+    <div class="feat-head">
+      <span class="section-tag">// Features</span>
+      <h2 class="section-title reveal">Everything in one place</h2>
+      <p class="section-sub reveal d1">Seven AI tools built specifically for green and energy career professionals</p>
+    </div>
+    <div class="feat-grid">
+
+      <div class="feat-card reveal">
+        <div class="feat-icon">📊</div>
+        <h3>CV Score & Analysis</h3>
+        <p>Get an overall score plus ATS compatibility, green skills match, and experience impact breakdown with specific issues flagged.</p>
+        <span class="feat-tag">Core Feature</span>
+      </div>
+
+      <div class="feat-card reveal d1">
+        <div class="feat-icon">✦</div>
+        <h3>AI CV Rewrite</h3>
+        <p>Your entire CV rewritten with sustainability keywords, quantified achievements, and ATS-friendly structure. Download as PDF or TXT.</p>
+        <span class="feat-tag">Most Popular</span>
+      </div>
+
+      <div class="feat-card reveal d2">
+        <div class="feat-icon">🎯</div>
+        <h3>Job Match</h3>
+        <p>Paste any job description and see how well your CV matches. Get matched keywords, missing keywords, and tips to improve your score.</p>
+        <span class="feat-tag">New</span>
+      </div>
+
+      <div class="feat-card reveal d1">
+        <div class="feat-icon">📝</div>
+        <h3>Cover Letter Generator</h3>
+        <p>AI writes a tailored, professional cover letter based on your CV, target role, and the specific job description you're applying for.</p>
+        <span class="feat-tag">New</span>
+      </div>
+
+      <div class="feat-card reveal d2">
+        <div class="feat-icon">💼</div>
+        <h3>LinkedIn Optimizer</h3>
+        <p>Get an optimized LinkedIn headline, About section, top skills list, and profile tips — all tailored to your green career target.</p>
+        <span class="feat-tag">New</span>
+      </div>
+
+      <div class="feat-card reveal d3">
+        <div class="feat-icon">📈</div>
+        <h3>Score History</h3>
+        <p>Every analysis is saved to your browser. Track your improvement over time as you update your CV and build new green skills.</p>
+        <span class="feat-tag">New</span>
+      </div>
+
+      <div class="feat-card reveal">
+        <div class="feat-icon">📧</div>
+        <h3>Email Results</h3>
+        <p>Send your full CV analysis, score breakdown, and rewritten CV directly to your inbox so you always have a copy.</p>
+        <span class="feat-tag">New</span>
+      </div>
+
+      <div class="feat-card reveal d1">
+        <div class="feat-icon">◈</div>
+        <h3>Skill Gap Analysis</h3>
+        <p>See exactly which green skills you're missing, tools to learn, certifications to get, and a 90-day action plan to close the gaps.</p>
+        <span class="feat-tag">Core Feature</span>
+      </div>
+
+      <div class="feat-card reveal d2">
+        <div class="feat-icon">⬇</div>
+        <h3>Save Full Report</h3>
+        <p>Download your complete analysis as a PDF — score, breakdown, skill gap, action plan, and rewritten CV all in one document.</p>
+        <span class="feat-tag">New</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="demo-section">
+  <div class="container">
+    <div class="demo-layout">
+      <div class="demo-visual reveal">
         <div class="mock-score-wrap">
-          <div class="mock-ring" aria-hidden="true">
+          <div class="mock-ring">
             <svg width="76" height="76" viewBox="0 0 76 76">
               <circle fill="none" stroke="rgba(255,255,255,.07)" stroke-width="5" cx="38" cy="38" r="32"/>
               <circle fill="none" stroke="#b5e853" stroke-width="5" stroke-linecap="round" cx="38" cy="38" r="32" stroke-dasharray="201" stroke-dashoffset="50"/>
@@ -407,18 +405,9 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
             <p>Solid foundations with<br>clear improvement areas</p>
           </div>
         </div>
-        <div class="mbar">
-          <div class="mbar-top"><span>ATS Compatibility</span><span>82%</span></div>
-          <div class="mbar-track"><div class="mbar-fill" style="width:82%;background:#1a6b3c"></div></div>
-        </div>
-        <div class="mbar">
-          <div class="mbar-top"><span>Green Skills Match</span><span>61%</span></div>
-          <div class="mbar-track"><div class="mbar-fill" style="width:61%;background:#d97706"></div></div>
-        </div>
-        <div class="mbar">
-          <div class="mbar-top"><span>Experience Impact</span><span>78%</span></div>
-          <div class="mbar-track"><div class="mbar-fill" style="width:78%;background:#1a6b3c"></div></div>
-        </div>
+        <div class="mbar"><div class="mbar-top"><span>ATS Compatibility</span><span>82%</span></div><div class="mbar-track"><div class="mbar-fill" style="width:82%;background:#1a6b3c"></div></div></div>
+        <div class="mbar"><div class="mbar-top"><span>Green Skills Match</span><span>61%</span></div><div class="mbar-track"><div class="mbar-fill" style="width:61%;background:#d97706"></div></div></div>
+        <div class="mbar"><div class="mbar-top"><span>Experience Impact</span><span>78%</span></div><div class="mbar-track"><div class="mbar-fill" style="width:78%;background:#1a6b3c"></div></div></div>
         <div class="mtags">
           <span class="mtag mt-g">Project Management</span>
           <span class="mtag mt-g">AutoCAD</span>
@@ -429,112 +418,78 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
       </div>
       <div class="reveal d1">
         <span class="section-tag">// Instant Scoring</span>
-        <h2 class="section-title" id="features-title">Know exactly where your CV stands</h2>
+        <h2 class="section-title">Know exactly where your CV stands</h2>
         <p class="section-sub">Detailed scores across the three dimensions that matter most to green sector recruiters.</p>
-        <ul class="feat-list" aria-label="Scoring features">
-          <li><div class="feat-check" aria-hidden="true"></div>ATS compatibility — will recruiters' systems read your CV?</li>
-          <li><div class="feat-check" aria-hidden="true"></div>Green skills match — aligned with the role's requirements?</li>
-          <li><div class="feat-check" aria-hidden="true"></div>Experience impact — are your achievements compelling?</li>
-          <li><div class="feat-check" aria-hidden="true"></div>Instant identification of missing sustainability keywords</li>
+        <ul class="feat-list">
+          <li><div class="feat-check"></div>ATS compatibility — will recruiters' systems read your CV?</li>
+          <li><div class="feat-check"></div>Green skills match — aligned with the role's requirements?</li>
+          <li><div class="feat-check"></div>Experience impact — are your achievements compelling?</li>
+          <li><div class="feat-check"></div>Instant identification of missing sustainability keywords</li>
+          <li><div class="feat-check"></div>Auto-retry if analysis fails — no data lost</li>
         </ul>
-      </div>
-    </div>
-
-    <div class="feature-wrap flip">
-      <div class="fv reveal">
-        <div class="mock-cv" aria-hidden="true">
-<span class="h1">PROFESSIONAL SUMMARY</span>
-──────────────────────────────
-<span class="h2">Sustainability Analyst</span> with 5+ years
-driving <span class="h2">carbon reduction initiatives</span>.
-Delivered <span class="h2">23% emissions reduction</span>
-across portfolio of 40+ assets.
-Certified <span class="h2">LEED AP BD+C</span>.
-
-<span class="h1">KEY COMPETENCIES</span>
-──────────────────────────────
-• Carbon Accounting &amp; GHG Reporting
-• ESG Framework Implementation
-• Life Cycle Assessment (LCA)
-• LEED / BREEAM Certification
-• Net Zero Strategy Development
-
-<span class="h1">CERTIFICATIONS</span>
-──────────────────────────────
-✓ LEED AP BD+C — USGBC
-✓ ISO 14001 Lead Auditor
-✓ GRI Sustainability Reporting</div>
-      </div>
-      <div class="reveal d1">
-        <span class="section-tag">// CV Rewrite</span>
-        <h2 class="section-title">A fully rewritten CV, ready to send</h2>
-        <p class="section-sub">Claude rewrites your entire CV with the right language, structure, and keywords for green and energy roles.</p>
-        <ul class="feat-list" aria-label="CV rewrite features">
-          <li><div class="feat-check" aria-hidden="true"></div>Sustainability keywords embedded naturally throughout</li>
-          <li><div class="feat-check" aria-hidden="true"></div>Achievements rewritten with quantified impact</li>
-          <li><div class="feat-check" aria-hidden="true"></div>ATS-friendly structure that passes automated screening</li>
-          <li><div class="feat-check" aria-hidden="true"></div>Download as .txt — ready to use immediately</li>
-        </ul>
+        <div style="margin-top:1.75rem;">
+          <a href="/app.html" class="btn-hero btn-p" style="font-size:.82rem;padding:.6rem 1.25rem;">Try it free →</a>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ROLES -->
-<section class="roles-s" id="roles" aria-labelledby="roles-title">
+<section class="roles-s" id="roles">
   <div class="container">
     <div class="roles-head">
       <div>
         <span class="section-tag">// Supported Roles</span>
-        <h2 class="section-title reveal" id="roles-title">Built for every green career path</h2>
+        <h2 class="section-title reveal">Built for every green career path</h2>
       </div>
-      <p class="section-sub reveal d1">Specialized analysis for 10 sustainability and energy roles, with more being added regularly.</p>
+      <p class="section-sub reveal d1">10 specialist roles plus a custom option — type any green career and Claude AI will tailor the analysis.</p>
     </div>
-    <div class="roles-grid" role="list" aria-label="Supported green career roles">
-      <div class="role-card reveal" role="listitem"><span class="role-icon" aria-hidden="true">🌿</span><div class="role-name">Sustainability Analyst</div></div>
-      <div class="role-card reveal d1" role="listitem"><span class="role-icon" aria-hidden="true">🏗</span><div class="role-name">Green Building Consultant</div></div>
-      <div class="role-card reveal d2" role="listitem"><span class="role-icon" aria-hidden="true">🏛</span><div class="role-name">Architect</div></div>
-      <div class="role-card reveal d3" role="listitem"><span class="role-icon" aria-hidden="true">🏙</span><div class="role-name">Urban Planner</div></div>
-      <div class="role-card reveal d4" role="listitem"><span class="role-icon" aria-hidden="true">📊</span><div class="role-name">Climate / ESG Analyst</div></div>
-      <div class="role-card reveal" role="listitem"><span class="role-icon" aria-hidden="true">⚡</span><div class="role-name">Renewable Energy Engineer</div></div>
-      <div class="role-card reveal d1" role="listitem"><span class="role-icon" aria-hidden="true">🌍</span><div class="role-name">Environmental Consultant</div></div>
-      <div class="role-card reveal d2" role="listitem"><span class="role-icon" aria-hidden="true">💨</span><div class="role-name">Carbon Manager</div></div>
-      <div class="role-card reveal d3" role="listitem"><span class="role-icon" aria-hidden="true">🔋</span><div class="role-name">Energy Auditor</div></div>
-      <div class="role-card reveal d4" role="listitem"><span class="role-icon" aria-hidden="true">♻️</span><div class="role-name">Circular Economy Specialist</div></div>
+    <div class="roles-grid">
+      <div class="role-card reveal"><span class="role-icon">🌿</span><div class="role-name">Sustainability Analyst</div></div>
+      <div class="role-card reveal d1"><span class="role-icon">🏗</span><div class="role-name">Green Building Consultant</div></div>
+      <div class="role-card reveal d2"><span class="role-icon">🏛</span><div class="role-name">Architect</div></div>
+      <div class="role-card reveal d3"><span class="role-icon">🏙</span><div class="role-name">Urban Planner</div></div>
+      <div class="role-card reveal d4"><span class="role-icon">📊</span><div class="role-name">Climate / ESG Analyst</div></div>
+      <div class="role-card reveal"><span class="role-icon">⚡</span><div class="role-name">Renewable Energy Engineer</div></div>
+      <div class="role-card reveal d1"><span class="role-icon">🌍</span><div class="role-name">Environmental Consultant</div></div>
+      <div class="role-card reveal d2"><span class="role-icon">💨</span><div class="role-name">Carbon Manager</div></div>
+      <div class="role-card reveal d3"><span class="role-icon">🔋</span><div class="role-name">Energy Auditor</div></div>
+      <div class="role-card reveal d4"><span class="role-icon">♻️</span><div class="role-name">+ Any Custom Role</div></div>
     </div>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
-<section id="testimonials" aria-labelledby="testi-title">
+<section class="testi-s" id="testimonials">
   <div class="container">
     <div class="testi-head">
       <span class="section-tag">// What people say</span>
-      <h2 class="section-title reveal" id="testi-title">Professionals who landed green roles with GreenCV</h2>
+      <h2 class="section-title reveal">Professionals who landed green roles</h2>
       <p class="section-sub reveal d1">Join thousands of sustainability professionals who used GreenCV to break into the green economy</p>
     </div>
     <div class="testi-grid">
-      <article class="tcard reveal" aria-label="Testimonial from Amara O.">
-        <div class="tstars" aria-label="5 stars">★★★★★</div>
-        <p class="ttext">"I had no idea my CV was missing so many sustainability keywords. GreenCV identified the gaps in minutes and the rewritten version helped me land interviews at three top ESG firms."</p>
+      <article class="tcard reveal">
+        <div class="tstars">★★★★★</div>
+        <p class="ttext">"The job match feature is a game changer. I pasted the job description and instantly saw exactly which keywords I was missing. Updated my CV and got an interview the same week."</p>
         <div class="tauthor">
-          <div class="tavatar" aria-hidden="true">A</div>
+          <div class="tavatar">A</div>
           <div><div class="tname">Amara O.</div><div class="trole">ESG Analyst, Lagos</div></div>
         </div>
       </article>
-      <article class="tcard reveal d1" aria-label="Testimonial from Kwame A.">
-        <div class="tstars" aria-label="5 stars">★★★★★</div>
-        <p class="ttext">"The skill gap analysis was eye-opening. I followed the 90-day plan, got my LEED certification, and within 3 months had an offer as a Green Building Consultant."</p>
+      <article class="tcard reveal d1">
+        <div class="tstars">★★★★★</div>
+        <p class="ttext">"The cover letter generator saved me hours. It read my CV and wrote a cover letter that actually sounded like me — professional, passionate, and tailored to the sustainability role."</p>
         <div class="tauthor">
-          <div class="tavatar" aria-hidden="true">K</div>
+          <div class="tavatar">K</div>
           <div><div class="tname">Kwame A.</div><div class="trole">Green Building Consultant, Accra</div></div>
         </div>
       </article>
-      <article class="tcard reveal d2" aria-label="Testimonial from Fatima M.">
-        <div class="tstars" aria-label="5 stars">★★★★★</div>
-        <p class="ttext">"As someone transitioning from traditional engineering, GreenCV showed me exactly what sustainability skills I needed to highlight. The rewritten CV was incredibly professional."</p>
+      <article class="tcard reveal d2">
+        <div class="tstars">★★★★★</div>
+        <p class="ttext">"I used the LinkedIn optimizer and my profile views tripled in two weeks. The headline and summary it generated were far better than anything I could write myself."</p>
         <div class="tauthor">
-          <div class="tavatar" aria-hidden="true">F</div>
+          <div class="tavatar">F</div>
           <div><div class="tname">Fatima M.</div><div class="trole">Renewable Energy Engineer, Nairobi</div></div>
         </div>
       </article>
@@ -543,24 +498,24 @@ Certified <span class="h2">LEED AP BD+C</span>.
 </section>
 
 <!-- CTA -->
-<section class="cta-s" aria-labelledby="cta-title">
+<section class="cta-s">
   <div class="cta-inner reveal">
-    <h2 id="cta-title">Ready to land your green role?</h2>
-    <p>Get your AI-powered CV analysis in under 30 seconds. No account needed.</p>
-    <div class="hero-actions">
+    <h2>Ready to land your green role?</h2>
+    <p>Get your AI-powered CV analysis and all 7 tools in under 30 seconds. No account needed.</p>
+    <div style="display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;">
       <a href="/app.html" class="btn-hero btn-p">Analyze My CV Free →</a>
     </div>
-    <p class="cta-note">Powered by Claude AI · No sign-up required · Results instantly</p>
+    <p class="cta-note">Powered by Claude AI · No sign-up · Results instantly · Free to use</p>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer role="contentinfo">
-  <a class="footer-logo" href="/" aria-label="GreenCV home">
-    <div class="nav-leaf" aria-hidden="true">G</div>
+<footer>
+  <a class="footer-logo" href="/">
+    <div class="nav-leaf">G</div>
     <span class="footer-name">GreenCV</span>
   </a>
-  <nav class="footer-links" aria-label="Footer navigation">
+  <nav class="footer-links">
     <a href="#how">How it works</a>
     <a href="#features">Features</a>
     <a href="#roles">Roles</a>
@@ -573,52 +528,42 @@ Certified <span class="h2">LEED AP BD+C</span>.
 <script>
 "use strict";
 
-// ── MOBILE NAV ──
-const hamburger  = document.getElementById("hamburger");
+// Mobile nav
+const hamburger = document.getElementById("hamburger");
 const mobileMenu = document.getElementById("mobileMenu");
-
 hamburger.addEventListener("click", () => {
   const open = mobileMenu.classList.toggle("open");
   hamburger.setAttribute("aria-expanded", open);
-  mobileMenu.setAttribute("aria-hidden", !open);
 });
-
-// Close on outside click
 document.addEventListener("click", e => {
   if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
     mobileMenu.classList.remove("open");
     hamburger.setAttribute("aria-expanded","false");
-    mobileMenu.setAttribute("aria-hidden","true");
   }
 });
+mobileMenu.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+  mobileMenu.classList.remove("open");
+  hamburger.setAttribute("aria-expanded","false");
+}));
 
-// Close on nav link click (mobile)
-mobileMenu.querySelectorAll("a").forEach(a => {
-  a.addEventListener("click", () => {
-    mobileMenu.classList.remove("open");
-    hamburger.setAttribute("aria-expanded","false");
-    mobileMenu.setAttribute("aria-hidden","true");
-  });
-});
-
-// ── SCROLL REVEAL ──
+// Scroll reveal
 const observer = new IntersectionObserver(
-  entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); observer.unobserve(e.target); } }),
-  { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+  entries => entries.forEach(e => { if(e.isIntersecting){e.target.classList.add("visible");observer.unobserve(e.target);} }),
+  { threshold:0.1, rootMargin:"0px 0px -40px 0px" }
 );
 document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
 
-// ── NAV SCROLL SHRINK ──
+// Nav shrink on scroll
 const nav = document.querySelector("nav");
 window.addEventListener("scroll", () => {
   nav.style.padding = window.scrollY > 40 ? ".75rem 2.5rem" : "";
-}, { passive: true });
+}, { passive:true });
 
-// ── SMOOTH SCROLL for hash links ──
+// Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener("click", e => {
     const target = document.querySelector(a.getAttribute("href"));
-    if (target) { e.preventDefault(); target.scrollIntoView({ behavior:"smooth", block:"start" }); }
+    if (target) { e.preventDefault(); target.scrollIntoView({behavior:"smooth",block:"start"}); }
   });
 });
 </script>
