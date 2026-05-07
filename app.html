@@ -440,7 +440,8 @@ function pgDash() {
   const circ = 2*Math.PI*37, off = circ*(1-sc/100);
   return `
   ${tb("Dashboard","CV Analysis Results",
-    `<button class="btn bo" onclick="openEmailModal()">📧 Email Results</button>`)}
+    `<button class="btn bo" onclick="openEmailModal()">📧 Email Results</button>
+     <button class="btn bd" onclick="saveFullReport()">⬇ Save Report</button>`)}
   <div class="scroll"><div class="page">
     <div class="g3 fi">
       <div class="card">
@@ -859,7 +860,7 @@ async function doSubmit() {
   if (ro === "Other") { ro = customEl?.value.trim() || ""; if (!ro) { showErr("Please type your target role."); return; } }
   clearErr();
   if (!cv) { showErr("Please paste or upload your CV text."); return; }
-  if (cv.length < 50) { showErr("CV text is too short."); return; }
+  if (cv.length < 50) { showErr("CV text is too short. Please add more content."); return; }
   if (!ro) { showErr("Please select a target role."); return; }
 
   S.loading = true; S.page = "processing"; render();
@@ -868,25 +869,62 @@ async function doSubmit() {
     setTimeout(() => { const el=document.getElementById(id); if(el) el.classList.add("active"); }, 700+(i*600));
   });
 
-  try {
-    const res = await fetch("/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cvText:cv,role:ro}),signal:AbortSignal.timeout(90000)});
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error||`Server error (${res.status})`);
-    data.role = ro;
-    S.result = data;
-    S.loading = false;
+  // Auto-retry: try up to 2 times
+  let lastError = null;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      if (attempt === 2) {
+        toast("First attempt failed. Retrying automatically…", "success", 4000);
+        await new Promise(r => setTimeout(r, 1500));
+      }
 
-    // Save to history
-    S.history.push({score:data.score,role:ro,ats:data.ats,greenSkills:data.greenSkills,date:new Date().toISOString(),id:Date.now()});
-    if (S.history.length > 20) S.history.shift();
-    localStorage.setItem("greencv_history", JSON.stringify(S.history));
+      const res = await fetch("/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cvText: cv, role: ro }),
+        signal: AbortSignal.timeout(90000),
+      });
 
-    S.page = "dashboard"; render();
-    toast("Analysis complete!", "success");
-  } catch(e) {
-    S.loading = false; S.page = "upload"; render();
-    toast(e.name==="TimeoutError"?"Request timed out. Please try again.":e.message||"Analysis failed.","error",5000);
+      const data = await res.json();
+
+      if (!res.ok) {
+        // Friendly error messages based on status
+        if (res.status === 429) throw new Error("Too many requests. Please wait a minute and try again.");
+        if (res.status === 500) throw new Error("Server configuration error. Please contact support.");
+        if (res.status === 502) throw new Error("AI service is temporarily busy. Please try again in a moment.");
+        throw new Error(data.error || `Server error (${res.status})`);
+      }
+
+      data.role = ro;
+      S.result = data;
+      S.loading = false;
+
+      // Save to history
+      S.history.push({score:data.score,role:ro,ats:data.ats,greenSkills:data.greenSkills,date:new Date().toISOString(),id:Date.now()});
+      if (S.history.length > 20) S.history.shift();
+      localStorage.setItem("greencv_history", JSON.stringify(S.history));
+
+      S.page = "dashboard"; render();
+      toast("Analysis complete!", "success");
+      return; // success — exit loop
+
+    } catch(e) {
+      lastError = e;
+      if (attempt === 1 && e.name !== "TimeoutError") continue; // retry on non-timeout errors
+      if (e.name === "TimeoutError" && attempt === 1) {
+        toast("Taking longer than usual, retrying…", "success", 3000);
+        continue;
+      }
+    }
   }
+
+  // Both attempts failed
+  S.loading = false; S.page = "upload"; render();
+  const msg = lastError?.name === "TimeoutError"
+    ? "The analysis timed out twice. Your CV may be too long — try shortening it or paste the key sections only."
+    : lastError?.message || "Analysis failed. Please try again.";
+  toast(msg, "error", 7000);
+  showErr(msg);
 }
 
 // ── JOB MATCH ──
@@ -1025,6 +1063,152 @@ function dlPDF() {
   if (!win) toast("Please allow popups to download PDF","error",4000);
   else toast("Select 'Save as PDF' in the print dialog","success",5000);
   setTimeout(()=>URL.revokeObjectURL(url),10000);
+}
+
+// ── SAVE FULL REPORT ──
+function saveFullReport() {
+  if (!S.result) return;
+  const r = S.result;
+  const scoreLabel = r.score>=70?"Strong":r.score>=45?"Needs Work":"Weak";
+  const date = new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>GreenCV Report — ${r.role}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; font-size: 11pt; line-height: 1.7; color: #1a1a1a; background: #fff; }
+  .page { max-width: 21cm; margin: 0 auto; padding: 2cm; }
+  .header { border-bottom: 3px solid #1a6b3c; padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end; }
+  .logo { font-size: 1.3rem; font-weight: 700; color: #1a6b3c; }
+  .date { font-size: .8rem; color: #999; }
+  h1 { font-size: 1.4rem; color: #111; margin-bottom: .25rem; }
+  h2 { font-size: 1rem; font-weight: 700; color: #1a6b3c; margin: 1.5rem 0 .5rem; text-transform: uppercase; letter-spacing: .05em; font-size: .75rem; }
+  .score-box { background: #f8f8f6; border: 1px solid #e8e8e4; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+  .score-num { font-size: 3rem; font-weight: 700; color: ${r.score>=70?"#166534":r.score>=45?"#b45309":"#dc2626"}; line-height: 1; }
+  .score-info h3 { font-size: 1rem; font-weight: 700; color: ${r.score>=70?"#166534":r.score>=45?"#b45309":"#dc2626"}; }
+  .score-info p { font-size: .85rem; color: #666; margin-top: .25rem; }
+  .breakdown { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .breakdown-item { text-align: center; padding: .75rem; background: #f8f8f6; border-radius: 6px; border: 1px solid #e8e8e4; }
+  .breakdown-item .val { font-size: 1.4rem; font-weight: 700; color: #1a6b3c; }
+  .breakdown-item .lbl { font-size: .72rem; color: #999; margin-top: .2rem; }
+  ul { padding-left: 1.25rem; margin-bottom: 1rem; }
+  li { margin-bottom: .35rem; font-size: .9rem; }
+  .tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: 1rem; }
+  .tag { padding: .2rem .55rem; border-radius: 3px; font-size: .75rem; font-weight: 500; }
+  .tg { background: #f0f7f3; color: #1a6b3c; border: 1px solid #b6dfc8; }
+  .tr { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+  .section { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e8e8e4; }
+  .section:last-child { border-bottom: none; }
+  pre { white-space: pre-wrap; word-wrap: break-word; font-family: Georgia, serif; font-size: 10pt; line-height: 1.7; }
+  .ap-row { display: flex; gap: .75rem; padding: .4rem 0; border-bottom: 1px solid #f0f0ee; font-size: .88rem; }
+  .ap-phase { font-size: .65rem; font-weight: 700; text-transform: uppercase; color: #999; width: 55px; flex-shrink: 0; padding-right: .5rem; border-right: 1px solid #e8e8e4; margin-top: 2px; }
+  .footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e8e8e4; font-size: .75rem; color: #999; text-align: center; }
+  @media print { body { padding: 0; } .page { padding: 1.5cm; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div>
+      <div class="logo">🌱 GreenCV</div>
+      <h1>CV Analysis Report</h1>
+      <p style="font-size:.85rem;color:#666;">Target Role: ${r.role}</p>
+    </div>
+    <div class="date">${date}</div>
+  </div>
+
+  <!-- SCORE -->
+  <div class="score-box">
+    <div class="score-num">${r.score}</div>
+    <div class="score-info">
+      <h3>${scoreLabel}</h3>
+      <p>${r.scoreComment}</p>
+    </div>
+  </div>
+
+  <!-- BREAKDOWN -->
+  <div class="breakdown">
+    <div class="breakdown-item"><div class="val">${r.ats}%</div><div class="lbl">ATS Compatibility</div></div>
+    <div class="breakdown-item"><div class="val">${r.greenSkills}%</div><div class="lbl">Green Skills Match</div></div>
+    <div class="breakdown-item"><div class="val">${r.expImpact}%</div><div class="lbl">Experience Impact</div></div>
+  </div>
+
+  <!-- STRENGTHS -->
+  <div class="section">
+    <h2>Top Strengths</h2>
+    <div class="tags">${(r.strengths||[]).map(s=>`<span class="tag tg">${s}</span>`).join("")}</div>
+  </div>
+
+  <!-- ISSUES -->
+  <div class="section">
+    <h2>Key Issues</h2>
+    <ul>${(r.issues||[]).map(i=>`<li>${i.text}</li>`).join("")}</ul>
+  </div>
+
+  <!-- MISSING SKILLS -->
+  <div class="section">
+    <h2>Missing Skills</h2>
+    <div class="tags">${(r.missingSkills||[]).map(s=>`<span class="tag tr">${s}</span>`).join("")}</div>
+  </div>
+
+  <!-- NEXT STEPS -->
+  <div class="section">
+    <h2>Recommended Next Steps</h2>
+    <ul>${(r.steps||[]).map(s=>`<li>${s}</li>`).join("")}</ul>
+  </div>
+
+  <!-- SKILL GAP -->
+  <div class="section">
+    <h2>Skill Gap Overview</h2>
+    <table style="width:100%;border-collapse:collapse;">
+      ${(r.skillGap||[]).map(g=>`
+      <tr>
+        <td style="padding:.4rem 0;font-size:.88rem;width:200px;">${g.skill}</td>
+        <td style="padding:.4rem .75rem;">
+          <div style="height:6px;background:#e8e8e4;border-radius:99px;overflow:hidden;">
+            <div style="height:100%;width:${g.current}%;background:${g.current<40?"#dc2626":g.current<70?"#d97706":"#166534"};border-radius:99px;"></div>
+          </div>
+        </td>
+        <td style="font-size:.8rem;color:#999;width:40px;text-align:right;">${g.current}%</td>
+      </tr>`).join("")}
+    </table>
+  </div>
+
+  <!-- ACTION PLAN -->
+  <div class="section">
+    <h2>30 / 60 / 90-Day Action Plan</h2>
+    ${(r.actionPlan||[]).map(a=>`
+    <div class="ap-row">
+      <div class="ap-phase">${a.phase}</div>
+      <div>${a.action}</div>
+    </div>`).join("")}
+  </div>
+
+  <!-- REWRITTEN CV -->
+  <div class="section">
+    <h2>AI-Rewritten CV</h2>
+    <pre>${(r.rewrittenCV||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</pre>
+  </div>
+
+  <div class="footer">
+    Generated by GreenCV · AI CV Analysis for Green &amp; Energy Professionals · ${date}
+  </div>
+
+</div>
+<script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);};<\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], {type:"text/html"});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, "_blank");
+  if (!win) toast("Please allow popups to save the report", "error", 4000);
+  else toast("Select 'Save as PDF' in the print dialog", "success", 5000);
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
 }
 
 render();
