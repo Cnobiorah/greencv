@@ -428,10 +428,10 @@ function pgUpload() { return `
           <div class="ch">Your CV Document</div>
 
           <div class="dz" id="dz" role="button" aria-label="Drop zone for CV file upload" tabindex="0">
-            <input type="file" id="ufi" accept=".txt,.doc,.docx" aria-label="Upload CV file">
+            <input type="file" id="ufi" accept=".txt,.doc,.docx,.pdf,.jpg,.jpeg,.png,.webp" aria-label="Upload CV file">
             <div class="dz-icon" aria-hidden="true">📄</div>
             <h3 id="dzTitle">Drop your CV here</h3>
-            <p id="dzSub">or click to browse — DOCX, TXT</p>
+            <p id="dzSub">or click to browse — PDF, DOCX, DOC, TXT, JPG, PNG</p>
             <div id="dzOk" class="fok hidden" aria-live="polite"></div>
           </div>
 
@@ -736,22 +736,114 @@ function bindEvents() {
 
 function handleFile(file) {
   if (!file) return;
-  const allowed = [".txt",".doc",".docx"];
+  const allowed = [".txt",".doc",".docx",".pdf",".jpg",".jpeg",".png",".webp"];
   const ext = "." + file.name.split(".").pop().toLowerCase();
-  if (!allowed.includes(ext)) { toast("Please upload a TXT or DOCX file", "error"); return; }
-  if (file.size > 500*1024) { toast("File too large. Max 500KB.", "error"); return; }
+  if (!allowed.includes(ext)) { toast("Unsupported file type. Please use PDF, DOCX, DOC, TXT, JPG, or PNG.", "error"); return; }
+  if (file.size > 10*1024*1024) { toast("File too large. Max 10MB.", "error"); return; }
 
   document.getElementById("dzTitle").textContent = file.name;
-  document.getElementById("dzSub").textContent   = "File ready";
+  document.getElementById("dzSub").textContent   = "Reading file\u2026";
   const ok = document.getElementById("dzOk");
-  ok.textContent = "✓ " + file.name;
+  ok.textContent = "\u23f3 Reading " + file.name;
   ok.classList.remove("hidden");
 
-  const reader = new FileReader();
-  reader.onload  = e => { const ta = document.getElementById("cvta"); if(ta) ta.value = e.target.result; };
-  reader.onerror = ()  => toast("Could not read file", "error");
-  reader.readAsText(file);
+  function setCV(text) {
+    const ta = document.getElementById("cvta");
+    if (ta) ta.value = text;
+    document.getElementById("dzSub").textContent = "File ready";
+    ok.textContent = "\u2713 " + file.name;
+    toast("CV loaded successfully!", "success");
+  }
+
+  // ── DOCX / DOC ──
+  if (ext === ".docx" || ext === ".doc") {
+    loadScript("https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js", () => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        mammoth.extractRawText({ arrayBuffer: e.target.result })
+          .then(r => setCV(r.value))
+          .catch(() => toast("Could not read DOCX. Please paste your CV text instead.", "error"));
+      };
+      reader.onerror = () => toast("Could not read file", "error");
+      reader.readAsArrayBuffer(file);
+    });
+
+  // ── PDF ──
+  } else if (ext === ".pdf") {
+    loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js", () => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      const reader = new FileReader();
+      reader.onload = async e => {
+        try {
+          const pdf = await pdfjsLib.getDocument({ data: e.target.result }).promise;
+          let text = "";
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            text += content.items.map(item => item.str).join(" ") + "\n";
+          }
+          if (text.trim().length < 50) {
+            toast("PDF appears to be scanned. Trying image extraction\u2026", "success");
+            extractImageFromPDF(file);
+          } else {
+            setCV(text.trim());
+          }
+        } catch(e) {
+          toast("Could not read PDF. Please paste your CV text instead.", "error");
+        }
+      };
+      reader.onerror = () => toast("Could not read file", "error");
+      reader.readAsArrayBuffer(file);
+    });
+
+  // ── IMAGE (JPG, PNG, WEBP) ──
+  } else if ([".jpg",".jpeg",".png",".webp"].includes(ext)) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const base64 = e.target.result.split(",")[1];
+      const mime   = file.type || "image/jpeg";
+      toast("Extracting CV from image using AI\u2026", "success");
+      extractTextFromImage(base64, mime).then(setCV).catch(() =>
+        toast("Could not extract text from image. Please paste your CV text instead.", "error")
+      );
+    };
+    reader.onerror = () => toast("Could not read file", "error");
+    reader.readAsDataURL(file);
+
+  // ── TXT ──
+  } else {
+    const reader = new FileReader();
+    reader.onload = e => setCV(e.target.result);
+    reader.onerror = () => toast("Could not read file", "error");
+    reader.readAsText(file);
+  }
 }
+
+function loadScript(src, callback) {
+  if (document.querySelector(`script[src="${src}"]`)) { callback(); return; }
+  const s = document.createElement("script");
+  s.src = src;
+  s.onload = callback;
+  s.onerror = () => toast("Failed to load reader library.", "error");
+  document.head.appendChild(s);
+}
+
+async function extractTextFromImage(base64, mime) {
+  const res = await fetch("/analyze-image", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ base64, mime }),
+    signal: AbortSignal.timeout(30000),
+  });
+  if (!res.ok) throw new Error("Image extraction failed");
+  const data = await res.json();
+  return data.text;
+}
+
+function extractImageFromPDF(file) {
+  toast("Scanned PDF detected. Please paste your CV text instead.", "error");
+}
+
 
 // ── SUBMIT ────────────────────────────────────────────────────────
 async function doSubmit() {

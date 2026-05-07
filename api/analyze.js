@@ -7,12 +7,12 @@ const VALID_ROLES = new Set([
   "Circular Economy Specialist",
 ]);
 
-function callAnthropic(prompt, apiKey) {
+function callAnthropic(messages, apiKey, maxTokens = 4000) {
   return new Promise((resolve, reject) => {
     const payload = JSON.stringify({
       model: "claude-sonnet-4-5",
-      max_tokens: 4000,
-      messages: [{ role: "user", content: prompt }],
+      max_tokens: maxTokens,
+      messages,
     });
 
     const options = {
@@ -34,14 +34,9 @@ function callAnthropic(prompt, apiKey) {
         try {
           const parsed = JSON.parse(data);
           if (parsed.error) return reject(new Error(parsed.error.message));
-          const text = (parsed.content || []).map(b => b.text || "").join("");
-          const clean = text.replace(/```json|```/g, "").trim();
-          let result;
-          try { result = JSON.parse(clean); }
-          catch { const m = clean.match(/\{[\s\S]*\}/); result = JSON.parse(m[0]); }
-          resolve(result);
+          resolve(parsed);
         } catch (e) {
-          reject(new Error("Failed to parse AI response: " + e.message));
+          reject(new Error("Failed to parse Anthropic response"));
         }
       });
     });
@@ -53,8 +48,62 @@ function callAnthropic(prompt, apiKey) {
   });
 }
 
+function buildPrompt(cvText, role) {
+  return `You are a senior CV consultant specializing in green energy, sustainability, and environmental careers.
+
+Analyze this CV for the target role: "${role}"
+
+CV:
+---
+${cvText.slice(0, 6000)}
+---
+
+Respond ONLY with a valid JSON object. No markdown, no backticks, no text outside the JSON.
+
+{
+  "score": <integer 0-100>,
+  "scoreComment": "<one professional sentence on overall quality>",
+  "ats": <integer 0-100>,
+  "greenSkills": <integer 0-100>,
+  "expImpact": <integer 0-100>,
+  "strengths": ["<s1>","<s2>","<s3>","<s4>"],
+  "issues": [
+    {"sev":"high","text":"<specific issue>"},
+    {"sev":"med","text":"<specific issue>"},
+    {"sev":"high","text":"<specific issue>"},
+    {"sev":"low","text":"<specific issue>"}
+  ],
+  "missingSkills": ["<sk1>","<sk2>","<sk3>","<sk4>","<sk5>"],
+  "steps": ["<step1>","<step2>","<step3>","<step4>"],
+  "rewrittenCV": "<Complete ATS-optimised professional CV for ${role}. Use \\n for line breaks. Sections: CONTACT INFORMATION, PROFESSIONAL SUMMARY, KEY COMPETENCIES, PROFESSIONAL EXPERIENCE (quantified achievements), EDUCATION, CERTIFICATIONS & TRAINING, TECHNICAL SKILLS. Embed sustainability/green energy keywords naturally. Make it complete and excellent.>",
+  "skillGap": [
+    {"skill":"Carbon Accounting","current":<0-100>},
+    {"skill":"ESG Reporting","current":<0-100>},
+    {"skill":"Life Cycle Assessment","current":<0-100>},
+    {"skill":"Renewable Energy Systems","current":<0-100>},
+    {"skill":"LEED / BREEAM","current":<0-100>},
+    {"skill":"Climate Policy","current":<0-100>},
+    {"skill":"Green Finance","current":<0-100>},
+    {"skill":"Environmental Compliance","current":<0-100>}
+  ],
+  "tools": ["<tool1>","<tool2>","<tool3>","<tool4>","<tool5>"],
+  "certs": [
+    {"name":"<certification>","why":"<one sentence relevance to ${role}>"},
+    {"name":"<certification>","why":"<one sentence>"},
+    {"name":"<certification>","why":"<one sentence>"}
+  ],
+  "actionPlan": [
+    {"phase":"30 Days","action":"<specific task>"},
+    {"phase":"30 Days","action":"<specific task>"},
+    {"phase":"60 Days","action":"<specific task>"},
+    {"phase":"60 Days","action":"<specific task>"},
+    {"phase":"90 Days","action":"<specific task>"},
+    {"phase":"90 Days","action":"<specific task>"}
+  ]
+}`;
+}
+
 module.exports = async function handler(req, res) {
-  // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -72,61 +121,17 @@ module.exports = async function handler(req, res) {
   if (!role || !VALID_ROLES.has(role))
     return res.status(400).json({ error: "Invalid role selected." });
 
-  const prompt = `You are a senior CV consultant specializing in green energy, sustainability, and environmental careers.
-
-Analyze this CV for the target role: "${role}"
-
-CV:
----
-${cvText.slice(0, 6000)}
----
-
-Respond ONLY with a valid JSON object (no markdown, no backticks):
-
-{
-  "score": <integer 0-100>,
-  "scoreComment": "<one professional sentence>",
-  "ats": <integer 0-100>,
-  "greenSkills": <integer 0-100>,
-  "expImpact": <integer 0-100>,
-  "strengths": ["<s1>","<s2>","<s3>","<s4>"],
-  "issues": [
-    {"sev":"high","text":"<issue>"},
-    {"sev":"med","text":"<issue>"},
-    {"sev":"high","text":"<issue>"},
-    {"sev":"low","text":"<issue>"}
-  ],
-  "missingSkills": ["<sk1>","<sk2>","<sk3>","<sk4>","<sk5>"],
-  "steps": ["<step1>","<step2>","<step3>","<step4>"],
-  "rewrittenCV": "<complete ATS-optimised CV. Sections: CONTACT INFORMATION, PROFESSIONAL SUMMARY, KEY COMPETENCIES, PROFESSIONAL EXPERIENCE, EDUCATION, CERTIFICATIONS, TECHNICAL SKILLS. Use \\n for line breaks.>",
-  "skillGap": [
-    {"skill":"Carbon Accounting","current":<0-100>},
-    {"skill":"ESG Reporting","current":<0-100>},
-    {"skill":"Life Cycle Assessment","current":<0-100>},
-    {"skill":"Renewable Energy Systems","current":<0-100>},
-    {"skill":"LEED / BREEAM","current":<0-100>},
-    {"skill":"Climate Policy","current":<0-100>},
-    {"skill":"Green Finance","current":<0-100>},
-    {"skill":"Environmental Compliance","current":<0-100>}
-  ],
-  "tools": ["<t1>","<t2>","<t3>","<t4>","<t5>"],
-  "certs": [
-    {"name":"<cert>","why":"<one sentence>"},
-    {"name":"<cert>","why":"<one sentence>"},
-    {"name":"<cert>","why":"<one sentence>"}
-  ],
-  "actionPlan": [
-    {"phase":"30 Days","action":"<action>"},
-    {"phase":"30 Days","action":"<action>"},
-    {"phase":"60 Days","action":"<action>"},
-    {"phase":"60 Days","action":"<action>"},
-    {"phase":"90 Days","action":"<action>"},
-    {"phase":"90 Days","action":"<action>"}
-  ]
-}`;
-
   try {
-    const result = await callAnthropic(prompt, apiKey);
+    const response = await callAnthropic([
+      { role: "user", content: buildPrompt(cvText.trim(), role) }
+    ], apiKey);
+
+    const text = (response.content || []).map(b => b.text || "").join("");
+    const clean = text.replace(/```json|```/g, "").trim();
+    let result;
+    try { result = JSON.parse(clean); }
+    catch { const m = clean.match(/\{[\s\S]*\}/); result = JSON.parse(m[0]); }
+
     result.role = role;
     return res.status(200).json(result);
   } catch (e) {
