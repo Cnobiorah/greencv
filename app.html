@@ -3,345 +3,283 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="GreenCV — AI-powered CV analysis for green energy and sustainability professionals. Get your ATS score, skill gap report, and a fully rewritten CV.">
+<meta name="description" content="GreenCV — AI-powered CV analysis for green energy and sustainability professionals.">
 <meta name="robots" content="noindex">
 <title>GreenCV — Analyze Your CV</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --white:   #ffffff;
-  --off:     #f8f8f6;
-  --rule:    #e8e8e4;
-  --muted:   #9a9990;
-  --body:    #2c2c28;
-  --head:    #111110;
-  --accent:  #1a6b3c;
-  --accent2: #0e4a28;
-  --danger:  #b91c1c;
-  --warn:    #b45309;
-  --good:    #166534;
+  --white:#fff; --off:#f8f8f6; --rule:#e8e8e4; --muted:#9a9990;
+  --body:#2c2c28; --head:#111110; --accent:#1a6b3c; --accent2:#0e4a28;
+  --danger:#b91c1c; --warn:#b45309; --good:#166534;
 }
+html,body{height:100%;}
+body{font-family:'Figtree',sans-serif;background:var(--white);color:var(--body);-webkit-font-smoothing:antialiased;}
 
-html, body { height: 100%; }
-body {
-  font-family: 'Figtree', sans-serif;
-  background: var(--white);
-  color: var(--body);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+/* LAYOUT */
+.shell{display:flex;min-height:100vh;}
 
-/* ── LAYOUT ── */
-.shell { display: flex; min-height: 100vh; }
+/* SIDEBAR */
+.sb{width:215px;background:var(--head);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;transition:transform .25s ease;}
+.brand{padding:1.5rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:.55rem;}
+.brand a{display:flex;align-items:center;gap:.55rem;text-decoration:none;}
+.leaf{width:27px;height:27px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:#fff;flex-shrink:0;}
+.bname{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#fff;}
+.nav{padding:.75rem;flex:1;overflow-y:auto;}
+.nlbl{font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#333330;padding:0 .5rem;margin:.75rem 0 .35rem;}
+.nlbl:first-child{margin-top:0;}
+.nbtn{display:flex;align-items:center;gap:.55rem;width:100%;padding:.5rem .65rem;border:none;background:none;color:#66665e;cursor:pointer;border-radius:5px;font-family:'Figtree',sans-serif;font-size:.8rem;font-weight:500;text-align:left;transition:color .14s,background .14s;}
+.nbtn:hover{color:#fff;background:rgba(255,255,255,.07);}
+.nbtn.on{color:#fff;background:rgba(255,255,255,.1);}
+.nbtn.on .dot{background:var(--accent);}
+.nbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.dot{width:5px;height:5px;border-radius:50%;background:#2a2a28;flex-shrink:0;transition:background .14s;}
+.nbtn-lock{opacity:.35;cursor:not-allowed;}
+.sbfoot{padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,.07);font-size:.68rem;color:#2e2e2c;line-height:1.55;}
 
-/* ── SIDEBAR ── */
-.sb {
-  width: 215px; background: var(--head);
-  display: flex; flex-direction: column;
-  position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
-  transition: transform .25s ease;
-}
-.brand {
-  padding: 1.5rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,.07);
-  display: flex; align-items: center; gap: .55rem;
-}
-.brand a { display: flex; align-items: center; gap: .55rem; text-decoration: none; }
-.leaf {
-  width: 27px; height: 27px; border-radius: 5px;
-  background: var(--accent); display: flex; align-items: center;
-  justify-content: center; font-size: .78rem; font-weight: 700; color: #fff;
-  flex-shrink: 0;
-}
-.bname { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: #fff; }
+/* MAIN */
+.main{margin-left:215px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{height:52px;border-bottom:1px solid var(--rule);display:flex;align-items:center;padding:0 2rem;gap:.5rem;background:var(--white);position:sticky;top:0;z-index:40;}
+.ttitle{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--head);}
+.tsep{color:var(--rule);}
+.tsub{font-size:.76rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px;}
+.tact{margin-left:auto;display:flex;gap:.4rem;align-items:center;}
 
-.nav { padding: .75rem; flex: 1; overflow-y: auto; }
-.nlbl { font-size: .6rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: #333330; padding: 0 .5rem; margin: .75rem 0 .35rem; }
-.nlbl:first-child { margin-top: 0; }
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;}
+.page{padding:2rem;}
+.page-center{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:calc(100vh - 52px);padding:2rem;}
 
-.nbtn {
-  display: flex; align-items: center; gap: .55rem;
-  width: 100%; padding: .5rem .65rem;
-  border: none; background: none; color: #66665e;
-  cursor: pointer; border-radius: 5px;
-  font-family: 'Figtree', sans-serif; font-size: .8rem; font-weight: 500;
-  text-align: left; transition: color .14s, background .14s;
-  position: relative;
-}
-.nbtn:hover { color: #fff; background: rgba(255,255,255,.07); }
-.nbtn.on    { color: #fff; background: rgba(255,255,255,.1); }
-.nbtn.on .dot { background: var(--accent); }
-.nbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.dot { width: 5px; height: 5px; border-radius: 50%; background: #2a2a28; flex-shrink: 0; transition: background .14s; }
-.nbtn-lock { opacity: .35; cursor: not-allowed; }
+/* CARD */
+.card{background:var(--white);border:1px solid var(--rule);border-radius:8px;padding:1.4rem;}
+.ch{font-size:.63rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.9rem;padding-bottom:.65rem;border-bottom:1px solid var(--rule);}
 
-.sbfoot { padding: 1rem 1.25rem; border-top: 1px solid rgba(255,255,255,.07); font-size: .68rem; color: #2e2e2c; line-height: 1.55; }
+/* GRID */
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.g1{margin-bottom:1rem;}
 
-/* ── MAIN ── */
-.main { margin-left: 215px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.52rem 1.05rem;border-radius:5px;font-family:'Figtree',sans-serif;font-weight:600;font-size:.8rem;cursor:pointer;border:1px solid transparent;transition:all .14s;letter-spacing:.01em;white-space:nowrap;text-decoration:none;}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.bd{background:var(--head);color:#fff;border-color:var(--head);}
+.bd:hover{background:#222;}
+.bo{background:transparent;color:var(--head);border-color:var(--rule);}
+.bo:hover{border-color:#aaa;}
+.bg{background:var(--accent);color:#fff;border-color:var(--accent);}
+.bg:hover{background:var(--accent2);}
+.blg{padding:.65rem 1.3rem;font-size:.85rem;}
+.bfull{width:100%;justify-content:center;}
 
-/* ── TOPBAR ── */
-.topbar {
-  height: 52px; border-bottom: 1px solid var(--rule);
-  display: flex; align-items: center; padding: 0 2rem; gap: .5rem;
-  background: var(--white); position: sticky; top: 0; z-index: 40;
-}
-.ttitle { font-family: 'Playfair Display', serif; font-size: .95rem; font-weight: 700; color: var(--head); }
-.tsep   { color: var(--rule); }
-.tsub   { font-size: .76rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
-.tact   { margin-left: auto; display: flex; gap: .4rem; align-items: center; }
+/* UPLOAD */
+.ushell{width:100%;max-width:540px;}
+.dz{border:1.5px dashed #d0d0cc;border-radius:8px;padding:2.25rem 2rem;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:var(--off);position:relative;margin-bottom:1.1rem;}
+.dz:hover,.dz.ov{border-color:var(--accent);background:#f0f7f3;}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dz-icon{width:38px;height:38px;background:#fff;border:1px solid var(--rule);border-radius:6px;display:flex;align-items:center;justify-content:center;margin:0 auto .65rem;font-size:1rem;}
+.dz h3{font-size:.9rem;font-weight:600;color:var(--head);}
+.dz p{font-size:.76rem;color:var(--muted);margin-top:.2rem;}
+.fok{font-size:.76rem;color:var(--accent);font-weight:600;margin-top:.4rem;}
+.orline{display:flex;align-items:center;gap:.65rem;margin-bottom:.9rem;}
+.orline::before,.orline::after{content:'';flex:1;height:1px;background:var(--rule);}
+.orline span{font-size:.7rem;color:var(--muted);}
+textarea.cta{width:100%;min-height:145px;border:1px solid var(--rule);border-radius:6px;padding:.8rem .9rem;font-family:'Figtree',sans-serif;font-size:.82rem;line-height:1.6;resize:vertical;background:var(--off);color:var(--body);outline:none;transition:border-color .15s;margin-bottom:1.05rem;}
+textarea.cta:focus{border-color:var(--accent);background:#fff;}
+textarea.cta::placeholder{color:#c0c0bc;}
+.field{margin-bottom:1.05rem;}
+.flbl{display:block;font-size:.66rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;}
+.sel{width:100%;padding:.6rem .85rem;border:1px solid var(--rule);border-radius:6px;font-family:'Figtree',sans-serif;font-size:.85rem;background:#fff;color:var(--body);outline:none;transition:border-color .15s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%239a9990' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .85rem center;padding-right:2rem;}
+.sel:focus{border-color:var(--accent);}
+.input{width:100%;padding:.6rem .85rem;border:1px solid var(--rule);border-radius:6px;font-family:'Figtree',sans-serif;font-size:.85rem;background:#fff;color:var(--body);outline:none;transition:border-color .15s;}
+.input:focus{border-color:var(--accent);}
+.err-msg{font-size:.76rem;color:var(--danger);margin-bottom:.65rem;padding:.5rem .75rem;background:#fef2f2;border:1px solid #fecaca;border-radius:5px;display:none;}
+.err-msg.show{display:block;}
 
-/* ── SCROLL ── */
-.scroll { flex: 1; overflow-y: auto; }
-.page   { padding: 2rem; }
-.page-center { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: calc(100vh - 52px); padding: 2rem; }
+/* PROCESSING */
+.proc-wrap{display:flex;flex-direction:column;align-items:center;gap:1.5rem;}
+.spinner{width:34px;height:34px;border:2.5px solid var(--rule);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.psteps{display:flex;flex-direction:column;width:310px;border:1px solid var(--rule);border-radius:8px;overflow:hidden;}
+.pstep{display:flex;align-items:center;gap:.65rem;padding:.8rem 1rem;font-size:.8rem;color:var(--muted);border-bottom:1px solid var(--rule);background:#fff;transition:all .2s;}
+.pstep:last-child{border-bottom:none;}
+.pstep.done{color:var(--accent);}
+.pstep.active{color:var(--body);font-weight:600;background:var(--off);}
+.psico{width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.6rem;}
+.pstep.done .psico{background:var(--accent);border-color:var(--accent);color:#fff;}
 
-/* ── CARD ── */
-.card { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 1.4rem; }
-.ch { font-size: .63rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .9rem; padding-bottom: .65rem; border-bottom: 1px solid var(--rule); }
+/* SCORE */
+.swrap{display:flex;align-items:center;gap:1.25rem;}
+.sring{position:relative;width:84px;height:84px;flex-shrink:0;}
+.sring svg{transform:rotate(-90deg);}
+.snum{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;}
+.smeta h2{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;}
+.smeta p{font-size:.76rem;color:var(--muted);margin-top:.2rem;line-height:1.45;max-width:170px;}
 
-/* ── GRID ── */
-.g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1rem; }
-.g1 { margin-bottom: 1rem; }
+/* BARS */
+.brow{margin-bottom:.85rem;}
+.brow:last-child{margin-bottom:0;}
+.btop{display:flex;justify-content:space-between;margin-bottom:.32rem;}
+.btop span:first-child{font-size:.79rem;font-weight:500;}
+.btop span:last-child{font-size:.73rem;color:var(--muted);}
+.btrack{height:3px;background:var(--rule);border-radius:99px;overflow:hidden;}
+.bfill{height:100%;border-radius:99px;transition:width 1.3s cubic-bezier(.4,0,.2,1);}
 
-/* ── BUTTONS ── */
-.btn {
-  display: inline-flex; align-items: center; gap: .4rem;
-  padding: .52rem 1.05rem; border-radius: 5px;
-  font-family: 'Figtree', sans-serif; font-weight: 600; font-size: .8rem;
-  cursor: pointer; border: 1px solid transparent;
-  transition: all .14s; letter-spacing: .01em; white-space: nowrap;
-  text-decoration: none;
-}
-.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.btn:disabled { opacity: .4; cursor: not-allowed; pointer-events: none; }
-.bd { background: var(--head); color: #fff; border-color: var(--head); }
-.bd:hover { background: #222; }
-.bo { background: transparent; color: var(--head); border-color: var(--rule); }
-.bo:hover { border-color: #aaa; }
-.bg { background: var(--accent); color: #fff; border-color: var(--accent); }
-.bg:hover { background: var(--accent2); }
-.blg { padding: .65rem 1.3rem; font-size: .85rem; }
-.bfull { width: 100%; justify-content: center; }
+/* TAGS */
+.tags{display:flex;flex-wrap:wrap;gap:.32rem;}
+.tag{padding:.22rem .58rem;border-radius:3px;font-size:.72rem;font-weight:500;}
+.tg{background:#f0f7f3;color:var(--accent);border:1px solid #b6dfc8;}
+.tr{background:#fef2f2;color:var(--danger);border:1px solid #fecaca;}
+.tb{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
+.tp{background:#faf5ff;color:#7c3aed;border:1px solid #ddd6fe;}
 
-/* ── UPLOAD ── */
-.ushell { width: 100%; max-width: 520px; }
-.dz {
-  border: 1.5px dashed #d0d0cc; border-radius: 8px;
-  padding: 2.25rem 2rem; text-align: center; cursor: pointer;
-  transition: border-color .15s, background .15s;
-  background: var(--off); position: relative; margin-bottom: 1.1rem;
-}
-.dz:hover, .dz.ov { border-color: var(--accent); background: #f0f7f3; }
-.dz input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-.dz-icon { width: 38px; height: 38px; background: #fff; border: 1px solid var(--rule); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin: 0 auto .65rem; font-size: 1rem; }
-.dz h3 { font-size: .9rem; font-weight: 600; color: var(--head); }
-.dz p  { font-size: .76rem; color: var(--muted); margin-top: .2rem; }
-.fok   { font-size: .76rem; color: var(--accent); font-weight: 600; margin-top: .4rem; }
+/* LIST */
+.clist{list-style:none;}
+.clist li{display:flex;align-items:flex-start;gap:.55rem;padding:.52rem 0;border-bottom:1px solid var(--rule);font-size:.8rem;line-height:1.48;}
+.clist li:first-child{padding-top:0;}
+.clist li:last-child{border-bottom:none;padding-bottom:0;}
+.lm{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px;}
 
-.orline { display: flex; align-items: center; gap: .65rem; margin-bottom: .9rem; }
-.orline::before, .orline::after { content:''; flex:1; height:1px; background: var(--rule); }
-.orline span { font-size: .7rem; color: var(--muted); }
+/* CTA STRIP */
+.cstrip{background:var(--head);border-radius:8px;padding:1.5rem 1.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1rem;}
+.cstrip h3{font-family:'Playfair Display',serif;font-size:.92rem;color:#fff;}
+.cstrip p{font-size:.75rem;color:rgba(255,255,255,.4);margin-top:.12rem;}
+.cstrip-btns{display:flex;gap:.45rem;flex-wrap:wrap;}
 
-textarea.cta {
-  width: 100%; min-height: 145px;
-  border: 1px solid var(--rule); border-radius: 6px;
-  padding: .8rem .9rem;
-  font-family: 'Figtree', sans-serif; font-size: .82rem; line-height: 1.6;
-  resize: vertical; background: var(--off); color: var(--body);
-  outline: none; transition: border-color .15s; margin-bottom: 1.05rem;
-}
-textarea.cta:focus { border-color: var(--accent); background: #fff; }
-textarea.cta::placeholder { color: #c0c0bc; }
+/* REWRITTEN */
+.arow{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1.35rem;}
+.arow-btns{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;}
+.cpok{font-size:.74rem;color:var(--accent);font-weight:600;}
+.cvbody{font-size:.81rem;line-height:1.78;color:var(--body);white-space:pre-wrap;font-family:'Figtree',sans-serif;}
 
-.field { margin-bottom: 1.05rem; }
-.flbl { display: block; font-size: .66rem; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; }
-.sel {
-  width: 100%; padding: .6rem .85rem;
-  border: 1px solid var(--rule); border-radius: 6px;
-  font-family: 'Figtree', sans-serif; font-size: .85rem;
-  background: #fff; color: var(--body);
-  outline: none; transition: border-color .15s; appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%239a9990' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right .85rem center; padding-right: 2rem;
-}
-.sel:focus { border-color: var(--accent); }
+/* SKILL GAP */
+.sgrow{display:flex;align-items:center;gap:.7rem;padding:.5rem 0;border-bottom:1px solid var(--rule);}
+.sgrow:last-child{border-bottom:none;}
+.sglbl{font-size:.79rem;width:190px;flex-shrink:0;}
+.sgtrk{flex:1;height:3px;background:var(--rule);border-radius:99px;overflow:hidden;}
+.sgfil{height:100%;border-radius:99px;transition:width 1.3s cubic-bezier(.4,0,.2,1);}
+.sgpct{font-size:.71rem;color:var(--muted);width:30px;text-align:right;flex-shrink:0;}
 
-.err-msg { font-size: .76rem; color: var(--danger); margin-bottom: .65rem; padding: .5rem .75rem; background: #fef2f2; border: 1px solid #fecaca; border-radius: 5px; display: none; }
-.err-msg.show { display: block; }
+/* CERT */
+.cert{display:flex;gap:.75rem;align-items:flex-start;padding:.7rem 0;border-bottom:1px solid var(--rule);}
+.cert:first-child{padding-top:0;}
+.cert:last-child{border-bottom:none;}
+.cname{font-size:.8rem;font-weight:600;color:var(--head);}
+.cwhy{font-size:.73rem;color:var(--muted);margin-top:2px;line-height:1.4;}
 
-/* ── PROCESSING ── */
-.proc-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
-.spinner { width: 34px; height: 34px; border: 2.5px solid var(--rule); border-top-color: var(--accent); border-radius: 50%; animation: spin .65s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+/* ACTION PLAN */
+.ap{display:flex;gap:.8rem;align-items:flex-start;padding:.65rem 0;border-bottom:1px solid var(--rule);font-size:.8rem;}
+.ap:first-child{padding-top:0;}
+.ap:last-child{border-bottom:none;}
+.apph{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);width:52px;flex-shrink:0;margin-top:1px;border-right:1px solid var(--rule);padding-right:.65rem;line-height:1.4;}
 
-.psteps { display: flex; flex-direction: column; width: 310px; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
-.pstep { display: flex; align-items: center; gap: .65rem; padding: .8rem 1rem; font-size: .8rem; color: var(--muted); border-bottom: 1px solid var(--rule); background: #fff; transition: all .2s; }
-.pstep:last-child { border-bottom: none; }
-.pstep.done   { color: var(--accent); }
-.pstep.active { color: var(--body); font-weight: 600; background: var(--off); }
-.psico { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid currentColor; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .6rem; }
-.pstep.done .psico { background: var(--accent); border-color: var(--accent); color: #fff; }
+/* HISTORY */
+.hist-item{display:flex;align-items:center;gap:1rem;padding:.85rem;border:1px solid var(--rule);border-radius:7px;margin-bottom:.65rem;cursor:pointer;transition:border-color .15s,background .15s;}
+.hist-item:hover{border-color:var(--accent);background:#f8fdf9;}
+.hist-score{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;flex-shrink:0;border:2px solid currentColor;}
+.hist-info{flex:1;}
+.hist-role{font-size:.82rem;font-weight:600;color:var(--head);}
+.hist-date{font-size:.72rem;color:var(--muted);margin-top:2px;}
+.hist-empty{text-align:center;padding:2.5rem;color:var(--muted);font-size:.84rem;}
 
-/* ── SCORE ── */
-.swrap { display: flex; align-items: center; gap: 1.25rem; }
-.sring { position: relative; width: 84px; height: 84px; flex-shrink: 0; }
-.sring svg { transform: rotate(-90deg); }
-.snum { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; }
-.smeta h2 { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
-.smeta p { font-size: .76rem; color: var(--muted); margin-top: .2rem; line-height: 1.45; max-width: 170px; }
+/* JOB MATCH */
+.match-score{display:flex;align-items:center;gap:1.5rem;margin-bottom:1.5rem;}
+.match-circle{width:90px;height:90px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;border:3px solid var(--accent);flex-shrink:0;}
+.match-circle .mn{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--accent);}
+.match-circle .ml{font-size:.65rem;color:var(--muted);}
+.match-info h3{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--head);}
+.match-info p{font-size:.8rem;color:var(--muted);margin-top:.25rem;line-height:1.5;}
 
-/* ── BARS ── */
-.brow { margin-bottom: .85rem; }
-.brow:last-child { margin-bottom: 0; }
-.btop { display: flex; justify-content: space-between; margin-bottom: .32rem; }
-.btop span:first-child { font-size: .79rem; font-weight: 500; }
-.btop span:last-child  { font-size: .73rem; color: var(--muted); }
-.btrack { height: 3px; background: var(--rule); border-radius: 99px; overflow: hidden; }
-.bfill  { height: 100%; border-radius: 99px; transition: width 1.3s cubic-bezier(.4,0,.2,1); }
+/* EMAIL MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;}
+.modal{background:#fff;border-radius:10px;padding:1.75rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.15);}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--head);margin-bottom:.4rem;}
+.modal p{font-size:.82rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.5;}
+.modal-btns{display:flex;gap:.5rem;margin-top:1.1rem;}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);}
 
-/* ── TAGS ── */
-.tags { display: flex; flex-wrap: wrap; gap: .32rem; }
-.tag  { padding: .22rem .58rem; border-radius: 3px; font-size: .72rem; font-weight: 500; }
-.tg { background: #f0f7f3; color: var(--accent); border: 1px solid #b6dfc8; }
-.tr { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; }
-.tb { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+/* MISC */
+.hr{height:1px;background:var(--rule);margin-bottom:1.4rem;}
+.hidden{display:none!important;}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+.section-note{font-size:.76rem;color:var(--muted);margin-top:.5rem;line-height:1.5;}
 
-/* ── LIST ── */
-.clist { list-style: none; }
-.clist li { display: flex; align-items: flex-start; gap: .55rem; padding: .52rem 0; border-bottom: 1px solid var(--rule); font-size: .8rem; line-height: 1.48; }
-.clist li:first-child { padding-top: 0; }
-.clist li:last-child  { border-bottom: none; padding-bottom: 0; }
-.lm { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:300;background:var(--head);color:#fff;padding:.75rem 1.25rem;border-radius:7px;font-size:.82rem;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.3);transform:translateY(10px);opacity:0;transition:all .25s;pointer-events:none;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-left:3px solid var(--accent);}
+.toast.error{border-left:3px solid var(--danger);}
 
-/* ── CTA STRIP ── */
-.cstrip { background: var(--head); border-radius: 8px; padding: 1.5rem 1.75rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
-.cstrip h3 { font-family: 'Playfair Display', serif; font-size: .92rem; color: #fff; }
-.cstrip p  { font-size: .75rem; color: rgba(255,255,255,.4); margin-top: .12rem; }
-.cstrip-btns { display: flex; gap: .45rem; flex-wrap: wrap; }
+/* MOBILE */
+.hamburger{display:none;position:fixed;top:.85rem;left:.85rem;z-index:60;background:var(--head);border:none;border-radius:5px;padding:.45rem .55rem;cursor:pointer;flex-direction:column;gap:4px;}
+.hamburger span{display:block;width:18px;height:2px;background:rgba(255,255,255,.7);border-radius:99px;}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:45;}
 
-/* ── REWRITTEN ── */
-.arow { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; margin-bottom: 1.35rem; }
-.arow-btns { display: flex; gap: .4rem; align-items: center; }
-.cpok { font-size: .74rem; color: var(--accent); font-weight: 600; }
-.cvbody { font-size: .81rem; line-height: 1.78; color: var(--body); white-space: pre-wrap; font-family: 'Figtree', sans-serif; }
+/* FADE */
+@keyframes fu{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.fi{animation:fu .3s ease both;}
+.d1{animation-delay:.05s;}
+.d2{animation-delay:.1s;}
+.d3{animation-delay:.15s;}
 
-/* ── SKILL GAP ── */
-.sgrow { display: flex; align-items: center; gap: .7rem; padding: .5rem 0; border-bottom: 1px solid var(--rule); }
-.sgrow:last-child { border-bottom: none; }
-.sglbl { font-size: .79rem; width: 190px; flex-shrink: 0; }
-.sgtrk { flex: 1; height: 3px; background: var(--rule); border-radius: 99px; overflow: hidden; }
-.sgfil { height: 100%; border-radius: 99px; transition: width 1.3s cubic-bezier(.4,0,.2,1); }
-.sgpct { font-size: .71rem; color: var(--muted); width: 30px; text-align: right; flex-shrink: 0; }
-
-/* ── CERT ── */
-.cert { display: flex; gap: .75rem; align-items: flex-start; padding: .7rem 0; border-bottom: 1px solid var(--rule); }
-.cert:first-child { padding-top: 0; }
-.cert:last-child  { border-bottom: none; }
-.cname { font-size: .8rem; font-weight: 600; color: var(--head); }
-.cwhy  { font-size: .73rem; color: var(--muted); margin-top: 2px; line-height: 1.4; }
-
-/* ── ACTION PLAN ── */
-.ap { display: flex; gap: .8rem; align-items: flex-start; padding: .65rem 0; border-bottom: 1px solid var(--rule); font-size: .8rem; }
-.ap:first-child { padding-top: 0; }
-.ap:last-child  { border-bottom: none; }
-.apph { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); width: 52px; flex-shrink: 0; margin-top: 1px; border-right: 1px solid var(--rule); padding-right: .65rem; line-height: 1.4; }
-
-/* ── EMPTY ── */
-.empty { text-align: center; padding: 3.5rem 2rem; color: var(--muted); }
-.empty p { font-size: .84rem; margin-bottom: 1.1rem; }
-
-/* ── MISC ── */
-.hr { height: 1px; background: var(--rule); margin-bottom: 1.4rem; }
-.hidden { display: none !important; }
-.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200;
-  background: var(--head); color: #fff;
-  padding: .75rem 1.25rem; border-radius: 7px;
-  font-size: .82rem; font-weight: 500;
-  box-shadow: 0 4px 20px rgba(0,0,0,.3);
-  transform: translateY(10px); opacity: 0;
-  transition: all .25s; pointer-events: none;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.success { border-left: 3px solid var(--accent); }
-.toast.error   { border-left: 3px solid var(--danger); }
-
-/* ── MOBILE HAMBURGER ── */
-.hamburger { display: none; position: fixed; top: .85rem; left: .85rem; z-index: 60; background: var(--head); border: none; border-radius: 5px; padding: .45rem .55rem; cursor: pointer; flex-direction: column; gap: 4px; }
-.hamburger span { display: block; width: 18px; height: 2px; background: rgba(255,255,255,.7); border-radius: 99px; transition: all .2s; }
-.sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 45; }
-
-/* ── FADE ── */
-@keyframes fu { from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);} }
-.fi  { animation: fu .3s ease both; }
-.d1  { animation-delay:.05s; }
-.d2  { animation-delay:.1s; }
-.d3  { animation-delay:.15s; }
-.d4  { animation-delay:.2s; }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .sb { transform: translateX(-100%); }
-  .sb.open { transform: translateX(0); }
-  .sb-overlay.open { display: block; }
-  .main { margin-left: 0; }
-  .hamburger { display: flex; }
-  .topbar { padding-left: 3.5rem; }
-  .g3 { grid-template-columns: 1fr; }
-  .page { padding: 1.25rem; }
-  .page-center { padding: 1.25rem; min-height: calc(100vh - 52px); }
-  .psteps { width: 100%; max-width: 310px; }
-}
-@media (max-width: 480px) {
-  .arow { flex-direction: column; align-items: flex-start; }
-  .cstrip { flex-direction: column; }
+@media(max-width:768px){
+  .sb{transform:translateX(-100%);}
+  .sb.open{transform:translateX(0);}
+  .sb-overlay.open{display:block;}
+  .main{margin-left:0;}
+  .hamburger{display:flex;}
+  .topbar{padding-left:3.5rem;}
+  .g3,.g2{grid-template-columns:1fr;}
+  .page{padding:1.25rem;}
+  .page-center{padding:1.25rem;}
 }
 </style>
 </head>
 <body>
 
-<!-- Mobile hamburger -->
-<button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
-  <span></span><span></span><span></span>
-</button>
+<button class="hamburger" id="hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
 <div class="sb-overlay" id="sbOverlay"></div>
-
-<!-- Toast -->
 <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
-<div class="shell">
-
-  <!-- SIDEBAR -->
-  <aside class="sb" id="sidebar" role="navigation" aria-label="Main navigation">
-    <div class="brand">
-      <a href="/" aria-label="GreenCV home">
-        <div class="leaf" aria-hidden="true">G</div>
-        <span class="bname">GreenCV</span>
-      </a>
+<!-- EMAIL MODAL -->
+<div class="modal-overlay hidden" id="emailModal">
+  <div class="modal">
+    <h3>📧 Email Your Results</h3>
+    <p>Enter your email address and we'll send your full CV analysis, score breakdown, and rewritten CV.</p>
+    <div class="field">
+      <label class="flbl" for="emailInput">Your Email Address</label>
+      <input type="email" class="input" id="emailInput" placeholder="you@example.com">
     </div>
-    <nav class="nav" id="nav" aria-label="App pages"></nav>
+    <div class="err-msg" id="emailErr"></div>
+    <div class="modal-btns">
+      <button class="btn bg bfull" onclick="sendEmail()">Send Results →</button>
+      <button class="btn bo" onclick="closeEmailModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="shell">
+  <aside class="sb" id="sidebar">
+    <div class="brand">
+      <a href="/"><div class="leaf">G</div><span class="bname">GreenCV</span></a>
+    </div>
+    <nav class="nav" id="nav"></nav>
     <div class="sbfoot">AI-powered CV analysis for sustainability &amp; energy professionals</div>
   </aside>
-
-  <!-- MAIN -->
-  <main class="main" id="main" role="main"></main>
-
+  <main class="main" id="main"></main>
 </div>
 
 <script>
 "use strict";
 
-// ── STATE ──────────────────────────────────────────────────────────
-const state = {
-  page:   "upload",
+// ── STATE ──
+const S = {
+  page: "upload",
   result: null,
   loading: false,
+  history: JSON.parse(localStorage.getItem("greencv_history") || "[]"),
 };
 
 const ROLES = [
@@ -352,161 +290,168 @@ const ROLES = [
 ];
 
 const PAGES = [
-  { id:"upload",    label:"New Analysis"  },
-  { id:"dashboard", label:"Dashboard"     },
-  { id:"rewritten", label:"Rewritten CV"  },
-  { id:"skillgap",  label:"Skill Gap"     },
+  {id:"upload",    label:"New Analysis"},
+  {id:"dashboard", label:"Dashboard"},
+  {id:"rewritten", label:"Rewritten CV"},
+  {id:"skillgap",  label:"Skill Gap"},
+  {id:"jobmatch",  label:"Job Match"},
+  {id:"coverletter",label:"Cover Letter"},
+  {id:"linkedin",  label:"LinkedIn"},
+  {id:"history",   label:"Score History"},
 ];
 
-// ── TOAST ──────────────────────────────────────────────────────────
-function toast(msg, type="success", duration=3000) {
+// ── TOAST ──
+function toast(msg, type="success", dur=3000) {
   const el = document.getElementById("toast");
   el.textContent = msg;
   el.className = `toast ${type} show`;
   clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove("show"), duration);
+  el._t = setTimeout(() => el.classList.remove("show"), dur);
 }
 
-// ── NAV ───────────────────────────────────────────────────────────
+// ── NAV ──
 function go(p) {
-  if (state.loading) return;
-  if (p !== "upload" && !state.result) { toast("Analyze a CV first", "error"); return; }
-  state.page = p;
-  render();
-  closeSidebar();
+  if (S.loading) return;
+  const noLock = ["upload","history"];
+  if (!noLock.includes(p) && !S.result) { toast("Analyze a CV first", "error"); return; }
+  S.page = p; render();
 }
 
 function renderNav() {
+  const main = ["upload","dashboard","rewritten","skillgap"];
+  const extra = ["jobmatch","coverletter","linkedin"];
+  const other = ["history"];
   document.getElementById("nav").innerHTML =
-    `<div class="nlbl">Navigation</div>` +
-    PAGES.map(p => {
-      const locked = p.id !== "upload" && !state.result;
-      return `<button
-        class="nbtn ${state.page===p.id?"on":""} ${locked?"nbtn-lock":""}"
-        onclick="go('${p.id}')"
-        aria-current="${state.page===p.id?"page":"false"}"
-        ${locked?`aria-disabled="true" title="Analyze a CV first"`:""}>
-        <span class="dot" aria-hidden="true"></span>${p.label}
-        ${locked?`<span class="visually-hidden">(locked)</span>`:""}
-      </button>`;
-    }).join("");
+    `<div class="nlbl">Main</div>` +
+    main.map(id => navBtn(id)).join("") +
+    `<div class="nlbl">AI Tools</div>` +
+    extra.map(id => navBtn(id)).join("") +
+    `<div class="nlbl">Account</div>` +
+    other.map(id => navBtn(id)).join("");
 }
 
-// ── MOBILE SIDEBAR ────────────────────────────────────────────────
+function navBtn(id) {
+  const p = PAGES.find(x => x.id === id);
+  const noLock = ["upload","history"];
+  const locked = !noLock.includes(id) && !S.result;
+  return `<button class="nbtn ${S.page===id?"on":""} ${locked?"nbtn-lock":""}"
+    onclick="go('${id}')" ${locked?`title="Analyze a CV first"`:""}>
+    <span class="dot"></span>${p.label}
+  </button>`;
+}
+
+// ── MOBILE ──
 document.getElementById("hamburger").addEventListener("click", () => {
-  const sb = document.getElementById("sidebar");
-  const ov = document.getElementById("sbOverlay");
-  const hb = document.getElementById("hamburger");
-  const open = sb.classList.toggle("open");
-  ov.classList.toggle("open", open);
-  hb.setAttribute("aria-expanded", open);
+  const open = document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("sbOverlay").classList.toggle("open", open);
 });
-document.getElementById("sbOverlay").addEventListener("click", closeSidebar);
-function closeSidebar() {
+document.getElementById("sbOverlay").addEventListener("click", () => {
   document.getElementById("sidebar").classList.remove("open");
   document.getElementById("sbOverlay").classList.remove("open");
-  document.getElementById("hamburger").setAttribute("aria-expanded","false");
-}
+});
 
-// ── TOPBAR ────────────────────────────────────────────────────────
-function tb(title, sub="", actionsHTML="") {
+// ── TOPBAR ──
+function tb(title, sub="", acts="") {
   return `<div class="topbar">
     <span class="ttitle">${esc(title)}</span>
-    ${sub ? `<span class="tsep" aria-hidden="true">·</span><span class="tsub">${esc(sub)}</span>` : ""}
-    ${actionsHTML ? `<div class="tact">${actionsHTML}</div>` : ""}
+    ${sub?`<span class="tsep">·</span><span class="tsub">${esc(sub)}</span>`:""}
+    ${acts?`<div class="tact">${acts}</div>`:""}
   </div>`;
 }
 
-// ── PAGES ─────────────────────────────────────────────────────────
+// ── RENDER ──
+function render() {
+  renderNav();
+  const m = document.getElementById("main");
+  switch(S.page) {
+    case "upload":      m.innerHTML = pgUpload(); break;
+    case "processing":  m.innerHTML = pgProc(); break;
+    case "dashboard":   m.innerHTML = S.result ? pgDash() : pgEmpty(); break;
+    case "rewritten":   m.innerHTML = S.result ? pgRW() : pgEmpty(); break;
+    case "skillgap":    m.innerHTML = S.result ? pgSG() : pgEmpty(); break;
+    case "jobmatch":    m.innerHTML = S.result ? pgJobMatch() : pgEmpty(); break;
+    case "coverletter": m.innerHTML = S.result ? pgCoverLetter() : pgEmpty(); break;
+    case "linkedin":    m.innerHTML = S.result ? pgLinkedIn() : pgEmpty(); break;
+    case "history":     m.innerHTML = pgHistory(); break;
+  }
+  bindEvents(); animBars(); window.scrollTo(0,0);
+}
+
+// ══════════════════════════════
+// PAGES
+// ══════════════════════════════
 
 function pgUpload() { return `
   ${tb("New Analysis","Upload your CV for AI feedback")}
-  <div class="scroll">
-    <div class="page-center">
-      <div class="ushell">
-        <div class="card fi">
-          <div class="ch">Your CV Document</div>
-
-          <div class="dz" id="dz" role="button" aria-label="Drop zone for CV file upload" tabindex="0">
-            <input type="file" id="ufi" accept=".txt,.doc,.docx,.pdf,.jpg,.jpeg,.png,.webp" aria-label="Upload CV file">
-            <div class="dz-icon" aria-hidden="true">📄</div>
-            <h3 id="dzTitle">Drop your CV here</h3>
-            <p id="dzSub">or click to browse — PDF, DOCX, DOC, TXT, JPG, PNG</p>
-            <div id="dzOk" class="fok hidden" aria-live="polite"></div>
-          </div>
-
-          <div class="orline"><span>or paste your CV text</span></div>
-
-          <label class="visually-hidden" for="cvta">CV text content</label>
-          <textarea class="cta" id="cvta" placeholder="Paste your CV content here…" aria-label="CV text content" rows="8"></textarea>
-
-          <div class="field">
-            <label class="flbl" for="rs">Target Role</label>
-            <select class="sel" id="rs" aria-required="true" onchange="toggleCustomRole()">
-              <option value="">Select your target role</option>
-              ${ROLES.map(r => `<option value="${r}">${r}</option>`).join("")}
-            </select>
-          </div>
-          <div class="field hidden" id="customRoleField">
-            <label class="flbl" for="customRole">Your Role</label>
-            <input type="text" class="sel" id="customRole" placeholder="e.g. Waste Management Officer, Solar Engineer…" maxlength="80" autocomplete="off">
-          </div>
-
-          <div class="err-msg" id="errMsg" role="alert"></div>
-
-          <button class="btn bd blg bfull" id="analyzeBtn" onclick="doSubmit()">
-            Analyze My CV →
-          </button>
-          <p style="text-align:center;font-size:.7rem;color:var(--muted);margin-top:.65rem;">
-            Processed securely — your CV is never stored
-          </p>
+  <div class="scroll"><div class="page-center">
+    <div class="ushell">
+      <div class="card fi">
+        <div class="ch">Your CV Document</div>
+        <div class="dz" id="dz">
+          <input type="file" id="ufi" accept=".txt,.doc,.docx,.pdf,.jpg,.jpeg,.png,.webp">
+          <div class="dz-icon">📄</div>
+          <h3 id="dzTitle">Drop your CV here</h3>
+          <p id="dzSub">or click to browse — PDF, DOCX, DOC, TXT, JPG, PNG</p>
+          <div id="dzOk" class="fok hidden"></div>
         </div>
+        <div class="orline"><span>or paste your CV text</span></div>
+        <textarea class="cta" id="cvta" placeholder="Paste your CV content here…" rows="8"></textarea>
+        <div class="field">
+          <label class="flbl" for="rs">Target Role</label>
+          <select class="sel" id="rs" onchange="toggleCustomRole()">
+            <option value="">Select your target role</option>
+            ${ROLES.map(r=>`<option value="${r}">${r}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field hidden" id="customRoleField">
+          <label class="flbl" for="customRole">Your Role</label>
+          <input type="text" class="input" id="customRole" placeholder="e.g. Waste Management Officer, Solar Engineer…" maxlength="80">
+        </div>
+        <div class="err-msg" id="errMsg"></div>
+        <button class="btn bd blg bfull" onclick="doSubmit()">Analyze My CV →</button>
+        <p style="text-align:center;font-size:.7rem;color:var(--muted);margin-top:.65rem;">
+          Processed securely — your CV is never stored
+        </p>
       </div>
     </div>
-  </div>`; }
+  </div></div>`; }
 
 function pgProc() { return `
   ${tb("Analyzing","Please wait…")}
-  <div class="scroll">
-    <div class="page-center">
-      <div class="proc-wrap">
-        <div class="spinner" role="status" aria-label="Analyzing"></div>
-        <div class="psteps" role="list">
-          <div class="pstep done" role="listitem"><div class="psico" aria-hidden="true">✓</div>Extracting CV content</div>
-          <div class="pstep" id="ps2" role="listitem"><div class="psico" aria-hidden="true">2</div>Scoring ATS compatibility</div>
-          <div class="pstep" id="ps3" role="listitem"><div class="psico" aria-hidden="true">3</div>Identifying green skill gaps</div>
-          <div class="pstep" id="ps4" role="listitem"><div class="psico" aria-hidden="true">4</div>Rewriting for sustainability roles</div>
-          <div class="pstep" id="ps5" role="listitem"><div class="psico" aria-hidden="true">5</div>Building 90-day action plan</div>
-        </div>
-        <p style="font-size:.74rem;color:var(--muted);">This usually takes 15–30 seconds</p>
+  <div class="scroll"><div class="page-center">
+    <div class="proc-wrap">
+      <div class="spinner"></div>
+      <div class="psteps">
+        <div class="pstep done"><div class="psico">✓</div>Extracting CV content</div>
+        <div class="pstep" id="ps2"><div class="psico">2</div>Scoring ATS compatibility</div>
+        <div class="pstep" id="ps3"><div class="psico">3</div>Identifying green skill gaps</div>
+        <div class="pstep" id="ps4"><div class="psico">4</div>Rewriting for sustainability roles</div>
+        <div class="pstep" id="ps5"><div class="psico">5</div>Building 90-day action plan</div>
       </div>
+      <p style="font-size:.74rem;color:var(--muted);">This usually takes 15–30 seconds</p>
     </div>
-  </div>`; }
+  </div></div>`; }
 
 function pgDash() {
-  const r   = state.result;
-  const sc  = r.score;
-  const col = sc>=70 ? "#166534" : sc>=45 ? "#b45309" : "#dc2626";
-  const lbl = sc>=70 ? "Strong"  : sc>=45 ? "Needs Work" : "Weak";
-  const circ= 2*Math.PI*37;
-  const off = circ*(1-sc/100);
+  const r = S.result;
+  const sc = r.score;
+  const col = sc>=70?"#166534":sc>=45?"#b45309":"#dc2626";
+  const lbl = sc>=70?"Strong":sc>=45?"Needs Work":"Weak";
+  const circ = 2*Math.PI*37, off = circ*(1-sc/100);
   return `
-  ${tb("Dashboard","CV Analysis Results")}
-  <div class="scroll">
-  <div class="page">
+  ${tb("Dashboard","CV Analysis Results",
+    `<button class="btn bo" onclick="openEmailModal()">📧 Email Results</button>`)}
+  <div class="scroll"><div class="page">
     <div class="g3 fi">
       <div class="card">
         <div class="ch">CV Score</div>
         <div class="swrap">
-          <div class="sring" aria-label="Score: ${sc} out of 100">
-            <svg width="84" height="84" viewBox="0 0 84 84" aria-hidden="true">
+          <div class="sring">
+            <svg width="84" height="84" viewBox="0 0 84 84">
               <circle fill="none" stroke="#e8e8e4" stroke-width="5" cx="42" cy="42" r="37"/>
               <circle fill="none" stroke="${col}" stroke-width="5" stroke-linecap="round"
-                cx="42" cy="42" r="37"
-                stroke-dasharray="${circ}"
-                stroke-dashoffset="${circ}"
-                id="scoreArc"
-                style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)"/>
+                cx="42" cy="42" r="37" stroke-dasharray="${circ}" stroke-dashoffset="${circ}"
+                id="scoreArc" style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1);transform:rotate(-90deg);transform-origin:center;"/>
             </svg>
             <div class="snum" style="color:${col}">${sc}</div>
           </div>
@@ -516,177 +461,279 @@ function pgDash() {
           </div>
         </div>
       </div>
-
       <div class="card fi d1">
         <div class="ch">Score Breakdown</div>
-        ${bRow("ATS Compatibility", r.ats)}
-        ${bRow("Green Skills Match", r.greenSkills)}
-        ${bRow("Experience Impact", r.expImpact)}
+        ${bRow("ATS Compatibility",r.ats)}
+        ${bRow("Green Skills Match",r.greenSkills)}
+        ${bRow("Experience Impact",r.expImpact)}
       </div>
-
       <div class="card fi d2">
         <div class="ch">Top Strengths</div>
-        <div class="tags">
-          ${(r.strengths||[]).map(s=>`<span class="tag tg">${esc(s)}</span>`).join("")}
-        </div>
+        <div class="tags">${(r.strengths||[]).map(s=>`<span class="tag tg">${esc(s)}</span>`).join("")}</div>
       </div>
     </div>
-
     <div class="g3 fi d2">
       <div class="card">
         <div class="ch">Key Issues</div>
-        <ul class="clist" aria-label="Key issues">
-          ${(r.issues||[]).map(i=>`
-            <li>
-              <div class="lm" style="background:${i.sev==="high"?"#dc2626":i.sev==="med"?"#d97706":"#1a6b3c"}" aria-label="Severity: ${i.sev}"></div>
-              ${esc(i.text)}
-            </li>`).join("")}
+        <ul class="clist">${(r.issues||[]).map(i=>`
+          <li><div class="lm" style="background:${i.sev==="high"?"#dc2626":i.sev==="med"?"#d97706":"#1a6b3c"}"></div>${esc(i.text)}</li>`).join("")}
         </ul>
       </div>
-
       <div class="card fi d1">
         <div class="ch">Missing Skills</div>
-        <div class="tags">
-          ${(r.missingSkills||[]).map(s=>`<span class="tag tr">${esc(s)}</span>`).join("")}
-        </div>
+        <div class="tags">${(r.missingSkills||[]).map(s=>`<span class="tag tr">${esc(s)}</span>`).join("")}</div>
       </div>
-
       <div class="card fi d2">
         <div class="ch">Next Steps</div>
-        <ul class="clist" aria-label="Recommended next steps">
-          ${(r.steps||[]).map(s=>`
-            <li>
-              <div class="lm" style="background:#1a6b3c" aria-hidden="true"></div>
-              ${esc(s)}
-            </li>`).join("")}
+        <ul class="clist">${(r.steps||[]).map(s=>`
+          <li><div class="lm" style="background:#1a6b3c"></div>${esc(s)}</li>`).join("")}
         </ul>
       </div>
     </div>
-
     <div class="cstrip fi d3">
       <div>
-        <h3>Ready to improve your CV?</h3>
-        <p>View the AI-rewritten version or explore your full skill gap</p>
+        <h3>Explore your full results</h3>
+        <p>Rewritten CV, skill gap, job match, cover letter &amp; LinkedIn</p>
       </div>
       <div class="cstrip-btns">
-        <button class="btn bg" onclick="go('rewritten')">View Rewritten CV →</button>
-        <button class="btn bo" style="color:rgba(255,255,255,.55);border-color:rgba(255,255,255,.12);" onclick="go('skillgap')">Skill Gap</button>
+        <button class="btn bg" onclick="go('rewritten')">Rewritten CV →</button>
+        <button class="btn bo" style="color:rgba(255,255,255,.55);border-color:rgba(255,255,255,.12);" onclick="go('jobmatch')">Job Match</button>
+        <button class="btn bo" style="color:rgba(255,255,255,.55);border-color:rgba(255,255,255,.12);" onclick="go('coverletter')">Cover Letter</button>
       </div>
     </div>
-  </div>
-  </div>`; }
+  </div></div>`; }
 
 function pgRW() {
-  const r = state.result;
+  const r = S.result;
   return `
-  ${tb("Rewritten CV", `Optimized for ${esc(r.role)}`,
-    `<span id="cpok" class="cpok" aria-live="polite"></span>
+  ${tb("Rewritten CV",`Optimized for ${esc(r.role)}`,
+    `<span id="cpok" class="cpok"></span>
      <button class="btn bo" onclick="copyCV()">Copy</button>
      <button class="btn bo" onclick="dlCV()">Download .txt</button>
      <button class="btn bd" onclick="dlPDF()">Download PDF</button>`)}
-  <div class="scroll">
-  <div class="page">
+  <div class="scroll"><div class="page">
     <div class="hr"></div>
-    <div class="card fi">
-      <div class="cvbody" id="cvContent">${esc(r.rewrittenCV)}</div>
-    </div>
-  </div>
-  </div>`; }
+    <div class="card fi"><div class="cvbody">${esc(r.rewrittenCV)}</div></div>
+  </div></div>`; }
 
 function pgSG() {
-  const r = state.result;
+  const r = S.result;
   return `
-  ${tb("Skill Gap Analysis", `Target: ${esc(r.role)}`)}
-  <div class="scroll">
-  <div class="page">
+  ${tb("Skill Gap Analysis",`Target: ${esc(r.role)}`)}
+  <div class="scroll"><div class="page">
     <div class="g3 fi">
       <div class="card">
         <div class="ch">Missing Skills</div>
-        <div class="tags">
-          ${(r.missingSkills||[]).map(s=>`<span class="tag tr">${esc(s)}</span>`).join("")}
-        </div>
+        <div class="tags">${(r.missingSkills||[]).map(s=>`<span class="tag tr">${esc(s)}</span>`).join("")}</div>
       </div>
       <div class="card fi d1">
         <div class="ch">Tools to Learn</div>
-        <div class="tags">
-          ${(r.tools||[]).map(t=>`<span class="tag tb">${esc(t)}</span>`).join("")}
-        </div>
+        <div class="tags">${(r.tools||[]).map(t=>`<span class="tag tb">${esc(t)}</span>`).join("")}</div>
       </div>
       <div class="card fi d2">
         <div class="ch">Certifications</div>
         ${(r.certs||[]).map(c=>`
           <div class="cert">
-            <span aria-hidden="true" style="font-size:.95rem">🏅</span>
-            <div>
-              <div class="cname">${esc(c.name)}</div>
-              <div class="cwhy">${esc(c.why)}</div>
-            </div>
+            <span style="font-size:.95rem">🏅</span>
+            <div><div class="cname">${esc(c.name)}</div><div class="cwhy">${esc(c.why)}</div></div>
           </div>`).join("")}
       </div>
     </div>
-
     <div class="card g1 fi d2">
       <div class="ch">Current Skill Levels</div>
       ${(r.skillGap||[]).map(g=>`
         <div class="sgrow">
           <div class="sglbl">${esc(g.skill)}</div>
-          <div class="sgtrk" role="progressbar" aria-valuenow="${g.current}" aria-valuemin="0" aria-valuemax="100" aria-label="${g.skill}: ${g.current}%">
-            <div class="sgfil" data-w="${g.current}" style="width:0%;background:${g.current<40?"#dc2626":g.current<70?"#d97706":"#166534"}"></div>
-          </div>
+          <div class="sgtrk"><div class="sgfil" data-w="${g.current}" style="width:0%;background:${g.current<40?"#dc2626":g.current<70?"#d97706":"#166534"}"></div></div>
           <div class="sgpct">${g.current}%</div>
         </div>`).join("")}
     </div>
-
     <div class="card g1 fi d3">
       <div class="ch">30 / 60 / 90-Day Action Plan</div>
       ${(r.actionPlan||[]).map(a=>`
-        <div class="ap">
-          <div class="apph">${esc(a.phase)}</div>
-          <div>${esc(a.action)}</div>
-        </div>`).join("")}
+        <div class="ap"><div class="apph">${esc(a.phase)}</div><div>${esc(a.action)}</div></div>`).join("")}
     </div>
+  </div></div>`; }
 
-    <div style="text-align:center;padding:.5rem 0 1rem" class="fi d4">
-      <button class="btn bo" onclick="go('upload')">↑ Analyze Another CV</button>
+// ── JOB MATCH ──
+function pgJobMatch() {
+  const r = S.result;
+  const hasMatch = r.jobMatch;
+  return `
+  ${tb("Job Match","Paste a job description to match your CV")}
+  <div class="scroll"><div class="page">
+    ${!hasMatch ? `
+    <div class="card fi g1">
+      <div class="ch">Job Description</div>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
+        Paste a job description below and Claude AI will score how well your CV matches it, identify gaps, and suggest improvements.
+      </p>
+      <textarea class="cta" id="jobDesc" placeholder="Paste the full job description here…" rows="10"></textarea>
+      <button class="btn bd blg bfull" onclick="runJobMatch()">Match My CV →</button>
+    </div>` : `
+    <div class="card fi g1">
+      <div class="ch">Match Results</div>
+      <div class="match-score">
+        <div class="match-circle">
+          <div class="mn">${r.jobMatch.score}%</div>
+          <div class="ml">Match</div>
+        </div>
+        <div class="match-info">
+          <h3>${r.jobMatch.verdict}</h3>
+          <p>${esc(r.jobMatch.summary)}</p>
+        </div>
+      </div>
+      <div class="hr"></div>
+      <div class="g2">
+        <div>
+          <div class="ch">Keywords You Have ✓</div>
+          <div class="tags">${(r.jobMatch.matched||[]).map(k=>`<span class="tag tg">${esc(k)}</span>`).join("")}</div>
+        </div>
+        <div>
+          <div class="ch">Keywords Missing ✗</div>
+          <div class="tags">${(r.jobMatch.missing||[]).map(k=>`<span class="tag tr">${esc(k)}</span>`).join("")}</div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;">
+        <div class="ch">How to Improve Your Match</div>
+        <ul class="clist">${(r.jobMatch.tips||[]).map(t=>`
+          <li><div class="lm" style="background:#1a6b3c"></div>${esc(t)}</li>`).join("")}
+        </ul>
+      </div>
+      <div style="margin-top:1rem;">
+        <button class="btn bo" onclick="S.result.jobMatch=null;render()">Try Another Job →</button>
+      </div>
+    </div>`}
+  </div></div>`; }
+
+// ── COVER LETTER ──
+function pgCoverLetter() {
+  const r = S.result;
+  const hasCL = r.coverLetter;
+  return `
+  ${tb("Cover Letter","AI-generated for your role",
+    hasCL ? `<span id="cpok2" class="cpok"></span>
+    <button class="btn bo" onclick="copyCL()">Copy</button>
+    <button class="btn bd" onclick="dlCL()">Download .txt</button>` : "")}
+  <div class="scroll"><div class="page">
+    ${!hasCL ? `
+    <div class="card fi g1">
+      <div class="ch">Generate Cover Letter</div>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
+        Claude will write a professional cover letter based on your CV and target role. Optionally paste a job description for a more tailored letter.
+      </p>
+      <div class="field">
+        <label class="flbl">Job Description (Optional)</label>
+        <textarea class="cta" id="clJobDesc" placeholder="Paste a job description for a more tailored cover letter…" rows="6"></textarea>
+      </div>
+      <div class="field">
+        <label class="flbl">Your Name</label>
+        <input type="text" class="input" id="clName" placeholder="e.g. John Smith">
+      </div>
+      <div class="field">
+        <label class="flbl">Company Name (Optional)</label>
+        <input type="text" class="input" id="clCompany" placeholder="e.g. GreenTech Solutions">
+      </div>
+      <button class="btn bd blg bfull" onclick="runCoverLetter()">Generate Cover Letter →</button>
+    </div>` : `
+    <div class="hr"></div>
+    <div class="card fi">
+      <div class="cvbody">${esc(r.coverLetter)}</div>
+    </div>`}
+  </div></div>`; }
+
+// ── LINKEDIN ──
+function pgLinkedIn() {
+  const r = S.result;
+  const hasLI = r.linkedin;
+  return `
+  ${tb("LinkedIn Optimizer","Optimize your LinkedIn profile",
+    hasLI ? `<button class="btn bo" onclick="copyLI()">Copy Summary</button>` : "")}
+  <div class="scroll"><div class="page">
+    ${!hasLI ? `
+    <div class="card fi g1">
+      <div class="ch">Generate LinkedIn Content</div>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
+        Claude will generate an optimized LinkedIn headline, summary, and key skills list based on your CV and target role.
+      </p>
+      <button class="btn bd blg bfull" onclick="runLinkedIn()">Optimize My LinkedIn →</button>
+    </div>` : `
+    <div class="g1 fi card">
+      <div class="ch">LinkedIn Headline</div>
+      <p style="font-size:.9rem;font-weight:600;color:var(--head);line-height:1.5;">${esc(r.linkedin.headline)}</p>
     </div>
-  </div>
-  </div>`; }
+    <div class="g1 fi d1 card">
+      <div class="ch">LinkedIn Summary (About Section)</div>
+      <div class="cvbody">${esc(r.linkedin.summary)}</div>
+    </div>
+    <div class="g2 fi d2">
+      <div class="card">
+        <div class="ch">Top Skills to Add</div>
+        <div class="tags">${(r.linkedin.skills||[]).map(s=>`<span class="tag tg">${esc(s)}</span>`).join("")}</div>
+      </div>
+      <div class="card">
+        <div class="ch">Profile Tips</div>
+        <ul class="clist">${(r.linkedin.tips||[]).map(t=>`
+          <li><div class="lm" style="background:#1a6b3c"></div>${esc(t)}</li>`).join("")}
+        </ul>
+      </div>
+    </div>
+    <div class="fi d3" style="text-align:center;padding:.5rem 0 1rem;">
+      <button class="btn bo" onclick="S.result.linkedin=null;render()">Regenerate →</button>
+    </div>`}
+  </div></div>`; }
+
+// ── HISTORY ──
+function pgHistory() {
+  const h = S.history;
+  return `
+  ${tb("Score History","Your previous CV analyses")}
+  <div class="scroll"><div class="page">
+    <div class="card fi">
+      <div class="ch">Previous Analyses (${h.length})</div>
+      ${h.length === 0 ? `
+        <div class="hist-empty">
+          <p>No analyses yet.</p>
+          <p>Analyze a CV to see your history here.</p>
+        </div>` :
+        [...h].reverse().map((item,i) => {
+          const col = item.score>=70?"#166534":item.score>=45?"#b45309":"#dc2626";
+          const date = new Date(item.date).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+          return `<div class="hist-item" onclick="loadHistory(${h.length-1-i})">
+            <div class="hist-score" style="color:${col}">${item.score}</div>
+            <div class="hist-info">
+              <div class="hist-role">${esc(item.role)}</div>
+              <div class="hist-date">${date} · ATS: ${item.ats}% · Green Skills: ${item.greenSkills}%</div>
+            </div>
+            <span style="font-size:.75rem;color:var(--muted);">Load →</span>
+          </div>`;
+        }).join("")
+      }
+    </div>
+    ${h.length > 0 ? `
+    <div style="text-align:center;margin-top:1rem;" class="fi d1">
+      <button class="btn bo" onclick="clearHistory()">Clear History</button>
+    </div>` : ""}
+  </div></div>`; }
 
 function pgEmpty() { return `
   ${tb("No Data","")}
-  <div class="scroll">
-  <div class="page">
-    <div class="empty">
-      <p>Upload and analyze a CV first to view results here.</p>
+  <div class="scroll"><div class="page">
+    <div style="text-align:center;padding:3.5rem 2rem;color:var(--muted);">
+      <p style="font-size:.84rem;margin-bottom:1.1rem;">Upload and analyze a CV first to view results here.</p>
       <button class="btn bd" onclick="go('upload')">Upload CV →</button>
     </div>
-  </div>
-  </div>`; }
+  </div></div>`; }
 
-// ── RENDER ────────────────────────────────────────────────────────
-function render() {
-  renderNav();
-  const m = document.getElementById("main");
-  switch(state.page) {
-    case "upload":     m.innerHTML = pgUpload(); break;
-    case "processing": m.innerHTML = pgProc();   break;
-    case "dashboard":  m.innerHTML = state.result ? pgDash() : pgEmpty(); break;
-    case "rewritten":  m.innerHTML = state.result ? pgRW()   : pgEmpty(); break;
-    case "skillgap":   m.innerHTML = state.result ? pgSG()   : pgEmpty(); break;
-  }
-  bindEvents();
-  animBars();
-  window.scrollTo(0,0);
-}
+// ══════════════════════════════
+// HELPERS
+// ══════════════════════════════
 
-// ── HELPERS ───────────────────────────────────────────────────────
 function bRow(label, val) {
   const col = val>=70?"#1a6b3c":val>=45?"#d97706":"#dc2626";
   return `<div class="brow">
     <div class="btop"><span>${label}</span><span>${val}%</span></div>
-    <div class="btrack" role="progressbar" aria-valuenow="${val}" aria-valuemin="0" aria-valuemax="100" aria-label="${label}: ${val}%">
-      <div class="bfill" data-width="${val}" style="width:0%;background:${col}"></div>
-    </div>
+    <div class="btrack"><div class="bfill" data-width="${val}" style="width:0%;background:${col}"></div></div>
   </div>`;
 }
 
@@ -695,334 +742,291 @@ function animBars() {
     document.querySelectorAll(".bfill[data-width]").forEach(el => el.style.width = el.dataset.width + "%");
     document.querySelectorAll(".sgfil[data-w]").forEach(el => el.style.width = el.dataset.w + "%");
     const arc = document.getElementById("scoreArc");
-    if (arc && state.result) {
+    if (arc && S.result) {
       const circ = 2*Math.PI*37;
-      arc.style.strokeDashoffset = circ*(1-state.result.score/100);
+      arc.style.strokeDashoffset = circ*(1-S.result.score/100);
     }
   }, 100);
 }
 
 function esc(s="") {
-  return String(s)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#39;");
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
 
-function showErr(msg) {
-  const el = document.getElementById("errMsg");
-  if (!el) return;
-  el.textContent = msg;
-  el.classList.add("show");
-}
-function clearErr() {
-  const el = document.getElementById("errMsg");
-  if (el) el.classList.remove("show");
-}
+function showErr(msg) { const el=document.getElementById("errMsg"); if(!el) return; el.textContent=msg; el.classList.add("show"); }
+function clearErr()    { const el=document.getElementById("errMsg"); if(el) el.classList.remove("show"); }
 
-// ── BIND EVENTS ───────────────────────────────────────────────────
+// ── BIND EVENTS ──
 function bindEvents() {
   const ufi = document.getElementById("ufi");
   if (ufi) ufi.addEventListener("change", e => handleFile(e.target.files[0]));
-
   const dz = document.getElementById("dz");
   if (dz) {
     dz.addEventListener("dragover",  e => { e.preventDefault(); dz.classList.add("ov"); });
-    dz.addEventListener("dragleave", ()  => dz.classList.remove("ov"));
-    dz.addEventListener("drop", e => {
-      e.preventDefault(); dz.classList.remove("ov");
-      handleFile(e.dataTransfer.files[0]);
-    });
-    dz.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") dz.querySelector("input")?.click(); });
+    dz.addEventListener("dragleave", () => dz.classList.remove("ov"));
+    dz.addEventListener("drop", e => { e.preventDefault(); dz.classList.remove("ov"); handleFile(e.dataTransfer.files[0]); });
   }
 }
 
+// ── FILE HANDLING ──
 function handleFile(file) {
   if (!file) return;
   const allowed = [".txt",".doc",".docx",".pdf",".jpg",".jpeg",".png",".webp"];
   const ext = "." + file.name.split(".").pop().toLowerCase();
-  if (!allowed.includes(ext)) { toast("Unsupported file type. Please use PDF, DOCX, DOC, TXT, JPG, or PNG.", "error"); return; }
+  if (!allowed.includes(ext)) { toast("Unsupported file type", "error"); return; }
   if (file.size > 10*1024*1024) { toast("File too large. Max 10MB.", "error"); return; }
 
   document.getElementById("dzTitle").textContent = file.name;
-  document.getElementById("dzSub").textContent   = "Reading file\u2026";
+  document.getElementById("dzSub").textContent = "Reading file…";
   const ok = document.getElementById("dzOk");
-  ok.textContent = "\u23f3 Reading " + file.name;
+  ok.textContent = "⏳ Reading " + file.name;
   ok.classList.remove("hidden");
 
   function setCV(text) {
     const ta = document.getElementById("cvta");
     if (ta) ta.value = text;
     document.getElementById("dzSub").textContent = "File ready";
-    ok.textContent = "\u2713 " + file.name;
-    toast("CV loaded successfully!", "success");
+    ok.textContent = "✓ " + file.name;
+    toast("CV loaded!", "success");
   }
 
-  // ── DOCX / DOC ──
   if (ext === ".docx" || ext === ".doc") {
     loadScript("https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js", () => {
       const reader = new FileReader();
-      reader.onload = e => {
-        mammoth.extractRawText({ arrayBuffer: e.target.result })
-          .then(r => setCV(r.value))
-          .catch(() => toast("Could not read DOCX. Please paste your CV text instead.", "error"));
-      };
-      reader.onerror = () => toast("Could not read file", "error");
+      reader.onload = e => mammoth.extractRawText({arrayBuffer:e.target.result}).then(r=>setCV(r.value)).catch(()=>toast("Could not read DOCX","error"));
       reader.readAsArrayBuffer(file);
     });
-
-  // ── PDF ──
   } else if (ext === ".pdf") {
     loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js", () => {
       pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
       const reader = new FileReader();
       reader.onload = async e => {
         try {
-          const pdf = await pdfjsLib.getDocument({ data: e.target.result }).promise;
+          const pdf = await pdfjsLib.getDocument({data:e.target.result}).promise;
           let text = "";
-          for (let i = 1; i <= pdf.numPages; i++) {
+          for (let i=1;i<=pdf.numPages;i++) {
             const page = await pdf.getPage(i);
             const content = await page.getTextContent();
-            text += content.items.map(item => item.str).join(" ") + "\n";
+            text += content.items.map(item=>item.str).join(" ") + "\n";
           }
-          if (text.trim().length < 50) {
-            toast("PDF appears to be scanned. Trying image extraction\u2026", "success");
-            extractImageFromPDF(file);
-          } else {
-            setCV(text.trim());
-          }
-        } catch(e) {
-          toast("Could not read PDF. Please paste your CV text instead.", "error");
-        }
+          if (text.trim().length < 50) toast("Scanned PDF detected. Please paste your CV text instead.","error");
+          else setCV(text.trim());
+        } catch(e) { toast("Could not read PDF","error"); }
       };
-      reader.onerror = () => toast("Could not read file", "error");
       reader.readAsArrayBuffer(file);
     });
-
-  // ── IMAGE (JPG, PNG, WEBP) ──
   } else if ([".jpg",".jpeg",".png",".webp"].includes(ext)) {
     const reader = new FileReader();
     reader.onload = e => {
       const base64 = e.target.result.split(",")[1];
-      const mime   = file.type || "image/jpeg";
-      toast("Extracting CV from image using AI\u2026", "success");
-      extractTextFromImage(base64, mime).then(setCV).catch(() =>
-        toast("Could not extract text from image. Please paste your CV text instead.", "error")
-      );
+      const mime = file.type || "image/jpeg";
+      toast("Extracting CV from image…","success");
+      fetch("/analyze-image",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({base64,mime})})
+        .then(r=>r.json()).then(d=>{ if(d.text) setCV(d.text); else toast("Could not extract text from image","error"); })
+        .catch(()=>toast("Image extraction failed","error"));
     };
-    reader.onerror = () => toast("Could not read file", "error");
     reader.readAsDataURL(file);
-
-  // ── TXT ──
   } else {
     const reader = new FileReader();
     reader.onload = e => setCV(e.target.result);
-    reader.onerror = () => toast("Could not read file", "error");
     reader.readAsText(file);
   }
 }
 
-function loadScript(src, callback) {
-  if (document.querySelector(`script[src="${src}"]`)) { callback(); return; }
+function loadScript(src, cb) {
+  if (document.querySelector(`script[src="${src}"]`)) { cb(); return; }
   const s = document.createElement("script");
-  s.src = src;
-  s.onload = callback;
-  s.onerror = () => toast("Failed to load reader library.", "error");
+  s.src = src; s.onload = cb;
+  s.onerror = () => toast("Failed to load reader library","error");
   document.head.appendChild(s);
 }
 
-async function extractTextFromImage(base64, mime) {
-  const res = await fetch("/analyze-image", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ base64, mime }),
-    signal: AbortSignal.timeout(30000),
-  });
-  if (!res.ok) throw new Error("Image extraction failed");
-  const data = await res.json();
-  return data.text;
-}
-
-function extractImageFromPDF(file) {
-  toast("Scanned PDF detected. Please paste your CV text instead.", "error");
-}
-
-
-// ── SUBMIT ────────────────────────────────────────────────────────
 function toggleCustomRole() {
   const rs = document.getElementById("rs");
   const field = document.getElementById("customRoleField");
   if (rs && field) {
     field.classList.toggle("hidden", rs.value !== "Other");
-    if (rs.value === "Other") {
-      document.getElementById("customRole").focus();
-    }
+    if (rs.value === "Other") document.getElementById("customRole")?.focus();
   }
 }
 
+// ── SUBMIT ──
 async function doSubmit() {
   const cv = document.getElementById("cvta")?.value.trim() || "";
   const rsEl = document.getElementById("rs");
   const customEl = document.getElementById("customRole");
   let ro = rsEl?.value || "";
-  if (ro === "Other") {
-    ro = customEl?.value.trim() || "";
-    if (!ro) { showErr("Please type your target role."); return; }
-  }
-
+  if (ro === "Other") { ro = customEl?.value.trim() || ""; if (!ro) { showErr("Please type your target role."); return; } }
   clearErr();
+  if (!cv) { showErr("Please paste or upload your CV text."); return; }
+  if (cv.length < 50) { showErr("CV text is too short."); return; }
+  if (!ro) { showErr("Please select a target role."); return; }
 
-  if (!cv)          { showErr("Please paste or upload your CV text."); return; }
-  if (cv.length < 50) { showErr("CV text is too short. Please provide more content."); return; }
-  if (!ro)          { showErr("Please select a target role."); return; }
+  S.loading = true; S.page = "processing"; render();
 
-  state.loading = true;
-  state.page    = "processing";
-  render();
-
-  // Animate steps
-  const stepDelay = [700, 1350, 2050, 2700];
-  stepDelay.forEach((d, i) => {
-    setTimeout(() => {
-      const el = document.getElementById(`ps${i+2}`);
-      if (el) el.classList.add("active");
-    }, d);
+  ["ps2","ps3","ps4","ps5"].forEach((id,i) => {
+    setTimeout(() => { const el=document.getElementById(id); if(el) el.classList.add("active"); }, 700+(i*600));
   });
 
   try {
-    const res = await fetch("/analyze", {
-      method:  "POST",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ cvText: cv, role: ro }),
-      signal:  AbortSignal.timeout(90000),
-    });
-
+    const res = await fetch("/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cvText:cv,role:ro}),signal:AbortSignal.timeout(90000)});
     const data = await res.json();
+    if (!res.ok) throw new Error(data.error||`Server error (${res.status})`);
+    data.role = ro;
+    S.result = data;
+    S.loading = false;
 
-    if (!res.ok) {
-      throw new Error(data.error || `Server error (${res.status})`);
-    }
+    // Save to history
+    S.history.push({score:data.score,role:ro,ats:data.ats,greenSkills:data.greenSkills,date:new Date().toISOString(),id:Date.now()});
+    if (S.history.length > 20) S.history.shift();
+    localStorage.setItem("greencv_history", JSON.stringify(S.history));
 
-    state.result  = data;
-    state.loading = false;
-    state.page    = "dashboard";
-    render();
+    S.page = "dashboard"; render();
     toast("Analysis complete!", "success");
-
-  } catch (e) {
-    state.loading = false;
-    state.page    = "upload";
-    render();
-    if (e.name === "TimeoutError") {
-      toast("Request timed out. Please try again.", "error", 5000);
-    } else {
-      toast(e.message || "Analysis failed. Please try again.", "error", 5000);
-    }
+  } catch(e) {
+    S.loading = false; S.page = "upload"; render();
+    toast(e.name==="TimeoutError"?"Request timed out. Please try again.":e.message||"Analysis failed.","error",5000);
   }
 }
 
-// ── COPY / DOWNLOAD ───────────────────────────────────────────────
+// ── JOB MATCH ──
+async function runJobMatch() {
+  const jd = document.getElementById("jobDesc")?.value.trim();
+  if (!jd || jd.length < 50) { toast("Please paste a job description (at least 50 characters)","error"); return; }
+  toast("Matching your CV to the job…","success",8000);
+  try {
+    const res = await fetch("/job-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cvText:S.result.rewrittenCV,jobDescription:jd,role:S.result.role}),signal:AbortSignal.timeout(60000)});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    S.result.jobMatch = data;
+    render();
+    toast("Job match complete!","success");
+  } catch(e) { toast(e.message||"Job match failed","error"); }
+}
+
+// ── COVER LETTER ──
+async function runCoverLetter() {
+  const jd   = document.getElementById("clJobDesc")?.value.trim() || "";
+  const name = document.getElementById("clName")?.value.trim() || "Applicant";
+  const co   = document.getElementById("clCompany")?.value.trim() || "the company";
+  toast("Writing your cover letter…","success",10000);
+  try {
+    const res = await fetch("/cover-letter",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cvText:S.result.rewrittenCV,role:S.result.role,jobDescription:jd,name,company:co}),signal:AbortSignal.timeout(60000)});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    S.result.coverLetter = data.coverLetter;
+    render();
+    toast("Cover letter ready!","success");
+  } catch(e) { toast(e.message||"Cover letter generation failed","error"); }
+}
+
+// ── LINKEDIN ──
+async function runLinkedIn() {
+  toast("Optimizing your LinkedIn…","success",10000);
+  try {
+    const res = await fetch("/linkedin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cvText:S.result.rewrittenCV,role:S.result.role}),signal:AbortSignal.timeout(60000)});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    S.result.linkedin = data;
+    render();
+    toast("LinkedIn content ready!","success");
+  } catch(e) { toast(e.message||"LinkedIn optimization failed","error"); }
+}
+
+// ── HISTORY ──
+function loadHistory(idx) {
+  toast("History view is read-only. Analyze again for a fresh result.","success",4000);
+}
+function clearHistory() {
+  if (!confirm("Clear all history?")) return;
+  S.history = [];
+  localStorage.removeItem("greencv_history");
+  render();
+  toast("History cleared","success");
+}
+
+// ── EMAIL MODAL ──
+function openEmailModal() { document.getElementById("emailModal").classList.remove("hidden"); }
+function closeEmailModal() { document.getElementById("emailModal").classList.add("hidden"); }
+
+async function sendEmail() {
+  const email = document.getElementById("emailInput")?.value.trim();
+  const errEl = document.getElementById("emailErr");
+  if (!email || !email.includes("@")) { errEl.textContent="Please enter a valid email."; errEl.classList.add("show"); return; }
+  errEl.classList.remove("show");
+  try {
+    const res = await fetch("/send-email",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,result:S.result}),signal:AbortSignal.timeout(30000)});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    closeEmailModal();
+    toast("Results sent to " + email,"success");
+  } catch(e) { toast(e.message||"Failed to send email","error"); }
+}
+
+// ── COPY / DOWNLOAD ──
 function copyCV() {
-  if (!state.result) return;
-  navigator.clipboard.writeText(state.result.rewrittenCV)
-    .then(() => {
-      const el = document.getElementById("cpok");
-      if (el) { el.textContent = "✓ Copied"; setTimeout(() => { if(el) el.textContent = ""; }, 2200); }
-      toast("CV copied to clipboard!", "success");
-    })
-    .catch(() => toast("Copy failed — please copy manually", "error"));
+  if (!S.result) return;
+  navigator.clipboard.writeText(S.result.rewrittenCV).then(() => {
+    const el=document.getElementById("cpok"); if(el){el.textContent="✓ Copied";setTimeout(()=>{if(el)el.textContent="";},2200);}
+    toast("CV copied!","success");
+  }).catch(()=>toast("Copy failed","error"));
+}
+
+function copyCL() {
+  if (!S.result?.coverLetter) return;
+  navigator.clipboard.writeText(S.result.coverLetter).then(() => {
+    const el=document.getElementById("cpok2"); if(el){el.textContent="✓ Copied";setTimeout(()=>{if(el)el.textContent="";},2200);}
+    toast("Cover letter copied!","success");
+  }).catch(()=>toast("Copy failed","error"));
+}
+
+function copyLI() {
+  if (!S.result?.linkedin) return;
+  const text = `HEADLINE:\n${S.result.linkedin.headline}\n\nSUMMARY:\n${S.result.linkedin.summary}`;
+  navigator.clipboard.writeText(text).then(()=>toast("LinkedIn content copied!","success")).catch(()=>toast("Copy failed","error"));
 }
 
 function dlCV() {
-  if (!state.result) return;
+  if (!S.result) return;
+  dlText(S.result.rewrittenCV, `GreenCV_${S.result.role.replace(/[\s/]+/g,"_")}.txt`);
+}
+
+function dlCL() {
+  if (!S.result?.coverLetter) return;
+  dlText(S.result.coverLetter, `CoverLetter_${S.result.role.replace(/[\s/]+/g,"_")}.txt`);
+}
+
+function dlText(content, filename) {
   try {
-    const blob = new Blob([state.result.rewrittenCV], { type: "text/plain" });
-    const a    = document.createElement("a");
-    a.href     = URL.createObjectURL(blob);
-    a.download = `GreenCV_${state.result.role.replace(/[\s\/]+/g,"_")}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const blob=new Blob([content],{type:"text/plain"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download=filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(a.href);
-    toast("Download started!", "success");
-  } catch { toast("Download failed", "error"); }
+    toast("Download started!","success");
+  } catch { toast("Download failed","error"); }
 }
 
 function dlPDF() {
-  if (!state.result) return;
-  try {
-    const cv   = state.result.rewrittenCV;
-    const role = state.result.role;
-    const name = role.replace(/[\s\/]+/g, "_");
-
-    // Build a clean printable HTML page
-    const html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>GreenCV — ${role}</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Georgia', serif;
-    font-size: 11pt;
-    line-height: 1.7;
-    color: #1a1a1a;
-    padding: 2.5cm 2.5cm 2.5cm 2.5cm;
-    max-width: 21cm;
-    margin: 0 auto;
-  }
-  pre {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-family: 'Georgia', serif;
-    font-size: 11pt;
-    line-height: 1.7;
-  }
-  h1 { font-size: 16pt; margin-bottom: 4px; color: #111; }
-  .footer {
-    margin-top: 2cm;
-    font-size: 8pt;
-    color: #999;
-    text-align: center;
-    border-top: 1px solid #eee;
-    padding-top: 8px;
-  }
-  @media print {
-    body { padding: 0; }
-    .footer { position: fixed; bottom: 0; width: 100%; }
-  }
-</style>
-</head>
-<body>
-<pre>${cv.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</pre>
-<div class="footer">Generated by GreenCV — AI CV Analysis for Green Professionals</div>
-<script>
-  window.onload = function() {
-    window.print();
-    setTimeout(function() { window.close(); }, 1000);
-  };
-<\/script>
-</body>
-</html>`;
-
-    const blob   = new Blob([html], { type: "text/html" });
-    const url    = URL.createObjectURL(blob);
-    const win    = window.open(url, "_blank");
-    if (!win) {
-      toast("Please allow popups to download PDF", "error", 4000);
-    } else {
-      toast("Print dialog opening — select Save as PDF", "success", 4000);
-    }
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
-  } catch(e) {
-    toast("PDF download failed: " + e.message, "error");
-  }
+  if (!S.result) return;
+  const cv = S.result.rewrittenCV;
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>GreenCV</title>
+  <style>body{font-family:Georgia,serif;font-size:11pt;line-height:1.7;color:#1a1a1a;padding:2cm;max-width:21cm;margin:0 auto;}
+  pre{white-space:pre-wrap;word-wrap:break-word;font-family:Georgia,serif;font-size:11pt;line-height:1.7;}
+  .footer{margin-top:1.5cm;font-size:8pt;color:#999;text-align:center;border-top:1px solid #eee;padding-top:6px;}
+  @media print{body{padding:0;}}</style></head>
+  <body><pre>${cv.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</pre>
+  <div class="footer">Generated by GreenCV — AI CV Analysis for Green Professionals</div>
+  <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1000);};<\/script>
+  </body></html>`;
+  const blob=new Blob([html],{type:"text/html"});
+  const url=URL.createObjectURL(blob);
+  const win=window.open(url,"_blank");
+  if (!win) toast("Please allow popups to download PDF","error",4000);
+  else toast("Select 'Save as PDF' in the print dialog","success",5000);
+  setTimeout(()=>URL.revokeObjectURL(url),10000);
 }
 
-// ── INIT ──────────────────────────────────────────────────────────
 render();
 </script>
 </body>

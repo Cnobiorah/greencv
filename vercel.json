@@ -1,8 +1,12 @@
 {
   "rewrites": [
-    { "source": "/analyze",       "destination": "/api/analyze" },
-    { "source": "/analyze-image", "destination": "/api/analyze-image" },
-    { "source": "/app",           "destination": "/app.html" },
-    { "source": "/",              "destination": "/index.html" }
+    { "source": "/analyze",        "destination": "/api/analyze" },
+    { "source": "/analyze-image",  "destination": "/api/analyze-image" },
+    { "source": "/job-match",      "destination": "/api/job-match" },
+    { "source": "/cover-letter",   "destination": "/api/cover-letter" },
+    { "source": "/linkedin",       "destination": "/api/linkedin" },
+    { "source": "/send-email",     "destination": "/api/send-email" },
+    { "source": "/app",            "destination": "/app.html" },
+    { "source": "/",               "destination": "/index.html" }
   ]
 }
