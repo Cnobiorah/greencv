@@ -7,6 +7,13 @@ const VALID_ROLES = new Set([
   "Circular Economy Specialist",
 ]);
 
+function isValidRole(role) {
+  // Accept predefined roles OR any custom role (2-80 chars, no HTML)
+  if (VALID_ROLES.has(role)) return true;
+  if (typeof role === "string" && role.length >= 2 && role.length <= 80 && !/[<>]/.test(role)) return true;
+  return false;
+}
+
 function callAnthropic(messages, apiKey, maxTokens = 4000) {
   return new Promise((resolve, reject) => {
     const payload = JSON.stringify({
@@ -118,8 +125,8 @@ module.exports = async function handler(req, res) {
 
   if (!cvText || cvText.trim().length < 50)
     return res.status(400).json({ error: "CV text is too short." });
-  if (!role || !VALID_ROLES.has(role))
-    return res.status(400).json({ error: "Invalid role selected." });
+  if (!role || !isValidRole(role))
+    return res.status(400).json({ error: "Invalid role. Please select or type a valid role." });
 
   try {
     const response = await callAnthropic([

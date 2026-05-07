@@ -348,7 +348,7 @@ const ROLES = [
   "Sustainability Analyst","Green Building Consultant","Architect",
   "Urban Planner","Climate / ESG Analyst","Renewable Energy Engineer",
   "Environmental Consultant","Carbon Manager","Energy Auditor",
-  "Circular Economy Specialist",
+  "Circular Economy Specialist","Other",
 ];
 
 const PAGES = [
@@ -442,10 +442,14 @@ function pgUpload() { return `
 
           <div class="field">
             <label class="flbl" for="rs">Target Role</label>
-            <select class="sel" id="rs" aria-required="true">
+            <select class="sel" id="rs" aria-required="true" onchange="toggleCustomRole()">
               <option value="">Select your target role</option>
               ${ROLES.map(r => `<option value="${r}">${r}</option>`).join("")}
             </select>
+          </div>
+          <div class="field hidden" id="customRoleField">
+            <label class="flbl" for="customRole">Your Role</label>
+            <input type="text" class="sel" id="customRole" placeholder="e.g. Waste Management Officer, Solar Engineer…" maxlength="80" autocomplete="off">
           </div>
 
           <div class="err-msg" id="errMsg" role="alert"></div>
@@ -846,9 +850,26 @@ function extractImageFromPDF(file) {
 
 
 // ── SUBMIT ────────────────────────────────────────────────────────
+function toggleCustomRole() {
+  const rs = document.getElementById("rs");
+  const field = document.getElementById("customRoleField");
+  if (rs && field) {
+    field.classList.toggle("hidden", rs.value !== "Other");
+    if (rs.value === "Other") {
+      document.getElementById("customRole").focus();
+    }
+  }
+}
+
 async function doSubmit() {
   const cv = document.getElementById("cvta")?.value.trim() || "";
-  const ro = document.getElementById("rs")?.value || "";
+  const rsEl = document.getElementById("rs");
+  const customEl = document.getElementById("customRole");
+  let ro = rsEl?.value || "";
+  if (ro === "Other") {
+    ro = customEl?.value.trim() || "";
+    if (!ro) { showErr("Please type your target role."); return; }
+  }
 
   clearErr();
 
