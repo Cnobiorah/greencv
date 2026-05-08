@@ -1,68 +1,60 @@
 const https = require("https");
 
-function supabaseInsert(table, data, url, key) {
+function supabaseInsert(supabaseUrl, supabaseKey, data) {
   return new Promise((resolve, reject) => {
-    const parsed  = new URL(url);
+    const parsed  = new URL(supabaseUrl);
     const payload = JSON.stringify(data);
-
     const options = {
       hostname: parsed.hostname,
-      path: `/rest/v1/${table}`,
-      method: "POST",
+      path:     "/rest/v1/feedback",
+      method:   "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type":  "application/json",
         "Content-Length": Buffer.byteLength(payload),
-        "apikey": key,
-        "Authorization": `Bearer ${key}`,
-        "Prefer": "return=minimal",
+        "apikey":         supabaseKey,
+        "Authorization":  `Bearer ${supabaseKey}`,
+        "Prefer":         "return=minimal",
       },
     };
-
-    const req = https.request(options, res => {
-      let data = "";
-      res.on("data", chunk => data += chunk);
-      res.on("end", () => resolve({ status: res.statusCode }));
+    const req = https.request(options, r => {
+      let d = "";
+      r.on("data", chunk => d += chunk);
+      r.on("end", () => resolve({ status: r.statusCode, body: d }));
     });
-
-    req.setTimeout(10000, () => { req.destroy(); reject(new Error("Timed out")); });
-    req.on("error", e => reject(new Error(e.message)));
+    req.setTimeout(8000, () => { req.destroy(); reject(new Error("Supabase timed out")); });
+    req.on("error", reject);
     req.write(payload);
     req.end();
   });
 }
 
-function sendSendGrid(to, subject, html, apiKey, fromEmail) {
+function sendEmail(to, subject, html, sgKey, fromEmail) {
   return new Promise((resolve, reject) => {
     const payload = JSON.stringify({
       personalizations: [{ to: [{ email: to }] }],
-      from: { email: fromEmail || "noreply.greencv@gmail.com", name: "GreenCV Feedback" },
+      from: { email: fromEmail, name: "GreenCV Feedback" },
       subject,
       content: [{ type: "text/html", value: html }],
     });
-
     const options = {
       hostname: "api.sendgrid.com",
-      path: "/v3/mail/send",
-      method: "POST",
+      path:     "/v3/mail/send",
+      method:   "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type":   "application/json",
         "Content-Length": Buffer.byteLength(payload),
-        "Authorization": `Bearer ${apiKey}`,
+        "Authorization":  `Bearer ${sgKey}`,
       },
     };
-
-    const req = https.request(options, res => {
-      let data = "";
-      res.on("data", chunk => data += chunk);
-      res.on("end", () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) resolve({ success: true });
-        else reject(new Error(`SendGrid error ${res.statusCode}`));
-      });
+    const req = https.request(options, r => {
+      let d = "";
+      r.on("data", chunk => d += chunk);
+      r.on("end", () => resolve({ status: r.statusCode }));
     });
-
-    req.setTimeout(15000, () => { req.destroy(); reject(new Error("Timed out")); });
-    req.on("error", e => reject(new Error(e.message)));
-    req.write(payload); req.end();
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error("SendGrid timed out")); });
+    req.on("error", reject);
+    req.write(payload);
+    req.end();
   });
 }
 
@@ -78,60 +70,50 @@ module.exports = async function handler(req, res) {
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_ANON_KEY;
-  const sendgridKey = process.env.SENDGRID_API_KEY;
+  const sgKey       = process.env.SENDGRID_API_KEY;
   const fromEmail   = process.env.SENDGRID_FROM_EMAIL || "noreply.greencv@gmail.com";
   const ownerEmail  = process.env.OWNER_EMAIL || fromEmail;
 
-  // Save to Supabase
+  // 1. Save to Supabase
   if (supabaseUrl && supabaseKey) {
     try {
-      await supabaseInsert("feedback", {
-        rating: Number(rating),
+      const result = await supabaseInsert(supabaseUrl, supabaseKey, {
+        rating:  Number(rating),
         feature: feature || null,
         improve: improve || null,
-        pay: pay || null,
-        email: email ? email.split("@")[0] + "@***" : null,
-      }, supabaseUrl, supabaseKey);
+        pay:     pay || null,
+        email:   email ? email.split("@")[0] + "@***" : null,
+      });
+      console.log("Supabase insert status:", result.status, result.body);
     } catch(e) {
-      console.error("Supabase insert error:", e.message);
+      console.error("Supabase error:", e.message);
     }
   }
 
-  // Send email notification
-  const stars = "★".repeat(rating || 0) + "☆".repeat(5 - (rating || 0));
-  const html = `<!DOCTYPE html>
-<html><head><meta charset="UTF-8"></head>
-<body style="font-family:Arial,sans-serif;background:#f5f5f3;padding:2rem;color:#2c2c28;">
+  // 2. Send email notification
+  const stars = "★".repeat(Number(rating)) + "☆".repeat(5 - Number(rating));
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+<body style="font-family:Arial,sans-serif;background:#f5f5f3;padding:2rem;">
   <div style="max-width:500px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden;">
     <div style="background:#111110;padding:1.5rem;text-align:center;">
       <span style="color:#b5e853;font-size:1.1rem;font-weight:700;">🌱 GreenCV — New Feedback</span>
     </div>
     <div style="padding:1.5rem;">
-      <table style="width:100%;border-collapse:collapse;">
-        <tr><td style="padding:.6rem 0;font-size:.85rem;color:#999;width:140px;border-bottom:1px solid #f0f0ee;">Rating</td>
-            <td style="padding:.6rem 0;font-size:1rem;color:#f59e0b;border-bottom:1px solid #f0f0ee;">${stars} (${rating}/5)</td></tr>
-        <tr><td style="padding:.6rem 0;font-size:.85rem;color:#999;border-bottom:1px solid #f0f0ee;">Best Feature</td>
-            <td style="padding:.6rem 0;font-size:.85rem;border-bottom:1px solid #f0f0ee;">${feature || "Not specified"}</td></tr>
-        <tr><td style="padding:.6rem 0;font-size:.85rem;color:#999;border-bottom:1px solid #f0f0ee;">Would Pay?</td>
-            <td style="padding:.6rem 0;font-size:.85rem;border-bottom:1px solid #f0f0ee;">${pay || "Not specified"}</td></tr>
-        <tr><td style="padding:.6rem 0;font-size:.85rem;color:#999;border-bottom:1px solid #f0f0ee;">User Email</td>
-            <td style="padding:.6rem 0;font-size:.85rem;border-bottom:1px solid #f0f0ee;">${email || "Anonymous"}</td></tr>
-        <tr><td style="padding:.6rem 0;font-size:.85rem;color:#999;vertical-align:top;">Improvement</td>
-            <td style="padding:.6rem 0;font-size:.85rem;">${improve || "None provided"}</td></tr>
-      </table>
-    </div>
-    <div style="background:#f8f8f6;padding:1rem;text-align:center;font-size:.75rem;color:#999;">
-      Submitted at ${new Date().toLocaleString("en-GB", {timeZone:"Africa/Lagos"})} WAT
+      <p><strong>Rating:</strong> ${stars} (${rating}/5)</p>
+      <p><strong>Best Feature:</strong> ${feature || "Not specified"}</p>
+      <p><strong>Would Pay:</strong> ${pay || "Not specified"}</p>
+      <p><strong>Email:</strong> ${email || "Anonymous"}</p>
+      <p><strong>Improvement:</strong> ${improve || "None"}</p>
     </div>
   </div>
 </body></html>`;
 
-  try {
-    if (sendgridKey) {
-      await sendSendGrid(ownerEmail, `⭐ GreenCV Feedback — ${stars} from ${email || "Anonymous"}`, html, sendgridKey, fromEmail);
+  if (sgKey) {
+    try {
+      await sendEmail(ownerEmail, `⭐ GreenCV Feedback ${stars}`, html, sgKey, fromEmail);
+    } catch(e) {
+      console.error("Email error:", e.message);
     }
-  } catch(e) {
-    console.error("Email error:", e.message);
   }
 
   return res.status(200).json({ success: true });
