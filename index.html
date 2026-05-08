@@ -608,6 +608,9 @@ async function loadFeedbackFeed() {
       return;
     }
 
+    // Hide static fallback — show live feedback only
+    if (fallback) fallback.classList.add("hidden");
+
     // Show live feedback
     if (grid) {
       grid.innerHTML = data.feedback.slice(0, 6).map((f, i) => {
@@ -634,6 +637,7 @@ async function loadFeedbackFeed() {
     // Show static fallback on error
     if (grid)     grid.classList.add("hidden");
     if (fallback) fallback.classList.remove("hidden");
+    console.log("Feed error:", e.message);
   }
 }
 
