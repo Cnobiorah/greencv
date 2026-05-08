@@ -501,7 +501,7 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
     </div>
 
     <!-- STATIC FALLBACK (shown if no live feedback yet) -->
-    <div class="feed-grid hidden" id="feedFallback">
+    <div class="feed-grid hidden" id="feedFallback" style="display:none;">
       <article class="tcard">
         <div class="tstars">★★★★★</div>
         <p class="ttext">"The job match feature is a game changer. I pasted the job description and instantly saw exactly which keywords I was missing. Got an interview the same week."</p>
@@ -608,8 +608,8 @@ async function loadFeedbackFeed() {
       return;
     }
 
-    // Hide static fallback — show live feedback only
-    if (fallback) fallback.classList.add("hidden");
+    // Hide static fallback permanently when real data exists
+    if (fallback) { fallback.classList.add("hidden"); fallback.style.display = "none"; }
 
     // Show live feedback
     if (grid) {
