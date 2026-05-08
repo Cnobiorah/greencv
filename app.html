@@ -1164,20 +1164,10 @@ function dlPDF() {
 <!-- Keep-warm ping -->
 <script>
 (function() {
-  // Ping all endpoints every 4 minutes to prevent cold starts
-  const endpoints = ["/ping", "/analyze", "/job-match", "/cover-letter", "/linkedin"];
-  
   function ping() {
-    endpoints.forEach(ep => {
-      fetch(ep, { method: "GET" })
-        .catch(() => {}); // silently ignore errors
-    });
+    fetch("/ping").catch(function() {});
   }
-
-  // Ping immediately on page load
   setTimeout(ping, 3000);
-  
-  // Then every 4 minutes
   setInterval(ping, 4 * 60 * 1000);
 })();
 </script>
@@ -1327,27 +1317,6 @@ function saveFullReport() {
 </div>
 <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1500);};<\/script>
 
-<!-- Keep-warm ping -->
-<script>
-(function() {
-  // Ping all endpoints every 4 minutes to prevent cold starts
-  const endpoints = ["/ping", "/analyze", "/job-match", "/cover-letter", "/linkedin"];
-  
-  function ping() {
-    endpoints.forEach(ep => {
-      fetch(ep, { method: "GET" })
-        .catch(() => {}); // silently ignore errors
-    });
-  }
-
-  // Ping immediately on page load
-  setTimeout(ping, 3000);
-  
-  // Then every 4 minutes
-  setInterval(ping, 4 * 60 * 1000);
-})();
-</script>
-
 </body>
 </html>`;
 
@@ -1406,20 +1375,10 @@ render();
 <!-- Keep-warm ping -->
 <script>
 (function() {
-  // Ping all endpoints every 4 minutes to prevent cold starts
-  const endpoints = ["/ping", "/analyze", "/job-match", "/cover-letter", "/linkedin"];
-  
   function ping() {
-    endpoints.forEach(ep => {
-      fetch(ep, { method: "GET" })
-        .catch(() => {}); // silently ignore errors
-    });
+    fetch("/ping").catch(function() {});
   }
-
-  // Ping immediately on page load
   setTimeout(ping, 3000);
-  
-  // Then every 4 minutes
   setInterval(ping, 4 * 60 * 1000);
 })();
 </script>
