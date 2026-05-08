@@ -174,6 +174,23 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
 .footer-links a:hover { color:rgba(255,255,255,.55); }
 .footer-copy { font-size:.72rem; color:rgba(255,255,255,.18); }
 
+/* LIVE FEED */
+.live-badge { display:inline-flex; align-items:center; gap:.4rem; background:rgba(181,232,83,.09); border:1px solid rgba(181,232,83,.18); color:var(--lime); border-radius:99px; padding:.25rem .75rem; font-size:.68rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin-bottom:1rem; }
+.live-dot { width:6px; height:6px; background:var(--lime); border-radius:50%; animation:pulse 2s ease infinite; }
+
+.feed-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem; margin-top:2rem; }
+.feed-card { background:var(--ink); border:1px solid rgba(255,255,255,.06); border-radius:10px; padding:1.4rem; animation:slideIn .5s ease both; }
+@keyframes slideIn { from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);} }
+.feed-stars { color:#f59e0b; font-size:.82rem; margin-bottom:.6rem; letter-spacing:.05em; }
+.feed-text { font-size:.82rem; color:rgba(255,255,255,.5); line-height:1.6; font-style:italic; }
+.feed-author { display:flex; align-items:center; gap:.6rem; margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,.06); }
+.feed-avatar { width:30px; height:30px; border-radius:50%; background:var(--forest); display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:700; color:var(--lime); flex-shrink:0; }
+.feed-name { font-size:.76rem; font-weight:600; color:var(--white); }
+.feed-role { font-size:.68rem; color:var(--muted); margin-top:1px; }
+.feed-feature { display:inline-block; margin-top:.6rem; font-size:.65rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--lime); background:rgba(181,232,83,.08); padding:.2rem .5rem; border-radius:3px; }
+.feed-empty { text-align:center; padding:2rem; color:var(--muted); font-size:.84rem; grid-column:1/-1; }
+.feed-loading { text-align:center; padding:2rem; color:var(--muted); font-size:.82rem; grid-column:1/-1; }
+
 /* ANIMATIONS */
 @keyframes fadeUp { from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);} }
 .reveal { opacity:0; transform:translateY(16px); transition:opacity .55s ease,transform .55s ease; }
@@ -473,29 +490,37 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
   <div class="container">
     <div class="testi-head">
       <span class="section-tag">// What people say</span>
-      <h2 class="section-title reveal">Professionals who landed green roles</h2>
-      <p class="section-sub reveal d1">Join thousands of sustainability professionals who used GreenCV to break into the green economy</p>
+      <div class="live-badge"><div class="live-dot"></div> Live Feedback</div>
+      <h2 class="section-title reveal">Real feedback from green professionals</h2>
+      <p class="section-sub reveal d1">See what users are saying about GreenCV right now</p>
     </div>
-    <div class="testi-grid">
-      <article class="tcard reveal">
+
+    <!-- LIVE FEED -->
+    <div class="feed-grid" id="feedGrid">
+      <div class="feed-loading">Loading latest feedback…</div>
+    </div>
+
+    <!-- STATIC FALLBACK (shown if no live feedback yet) -->
+    <div class="feed-grid hidden" id="feedFallback">
+      <article class="tcard">
         <div class="tstars">★★★★★</div>
-        <p class="ttext">"The job match feature is a game changer. I pasted the job description and instantly saw exactly which keywords I was missing. Updated my CV and got an interview the same week."</p>
+        <p class="ttext">"The job match feature is a game changer. I pasted the job description and instantly saw exactly which keywords I was missing. Got an interview the same week."</p>
         <div class="tauthor">
           <div class="tavatar">A</div>
           <div><div class="tname">Amara O.</div><div class="trole">ESG Analyst, Lagos</div></div>
         </div>
       </article>
-      <article class="tcard reveal d1">
+      <article class="tcard">
         <div class="tstars">★★★★★</div>
-        <p class="ttext">"The cover letter generator saved me hours. It read my CV and wrote a cover letter that actually sounded like me — professional, passionate, and tailored to the sustainability role."</p>
+        <p class="ttext">"The cover letter generator saved me hours. It wrote a cover letter that actually sounded like me — professional and tailored to the sustainability role."</p>
         <div class="tauthor">
           <div class="tavatar">K</div>
           <div><div class="tname">Kwame A.</div><div class="trole">Green Building Consultant, Accra</div></div>
         </div>
       </article>
-      <article class="tcard reveal d2">
+      <article class="tcard">
         <div class="tstars">★★★★★</div>
-        <p class="ttext">"I used the LinkedIn optimizer and my profile views tripled in two weeks. The headline and summary it generated were far better than anything I could write myself."</p>
+        <p class="ttext">"I used the LinkedIn optimizer and my profile views tripled in two weeks. The headline and summary it generated were far better than anything I could write."</p>
         <div class="tauthor">
           <div class="tavatar">F</div>
           <div><div class="tname">Fatima M.</div><div class="trole">Renewable Energy Engineer, Nairobi</div></div>
@@ -566,6 +591,64 @@ const nav = document.querySelector("nav");
 window.addEventListener("scroll", () => {
   nav.style.padding = window.scrollY > 40 ? ".75rem 2.5rem" : "";
 }, { passive:true });
+
+// ── LIVE FEEDBACK FEED ──
+async function loadFeedbackFeed() {
+  const grid     = document.getElementById("feedGrid");
+  const fallback = document.getElementById("feedFallback");
+
+  try {
+    const res  = await fetch("/get-feedback");
+    const data = await res.json();
+
+    if (!data.feedback || data.feedback.length === 0) {
+      // Show static fallback
+      if (grid)     grid.classList.add("hidden");
+      if (fallback) fallback.classList.remove("hidden");
+      return;
+    }
+
+    // Show live feedback
+    if (grid) {
+      grid.innerHTML = data.feedback.slice(0, 6).map((f, i) => {
+        const stars   = "★".repeat(f.rating) + "☆".repeat(5 - f.rating);
+        const initial = (f.email ? f.email[0].toUpperCase() : "U");
+        const name    = f.email ? f.email.split("@")[0] : "Anonymous User";
+        const delay   = i * 0.08;
+        return `<div class="feed-card" style="animation-delay:${delay}s;">
+          <div class="feed-stars">${stars}</div>
+          ${f.improve ? `<p class="feed-text">"${f.improve}"</p>` : `<p class="feed-text">"Great tool for green career professionals!"</p>`}
+          <div class="feed-author">
+            <div class="feed-avatar">${initial}</div>
+            <div>
+              <div class="feed-name">${name}</div>
+              <div class="feed-role">GreenCV User</div>
+            </div>
+          </div>
+          ${f.feature ? `<div class="feed-feature">★ ${f.feature}</div>` : ""}
+        </div>`;
+      }).join("");
+    }
+
+  } catch(e) {
+    // Show static fallback on error
+    if (grid)     grid.classList.add("hidden");
+    if (fallback) fallback.classList.remove("hidden");
+  }
+}
+
+// Load feed when testimonials section is visible
+const feedObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      loadFeedbackFeed();
+      feedObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+const feedSection = document.getElementById("testimonials");
+if (feedSection) feedObserver.observe(feedSection);
 
 // Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a => {

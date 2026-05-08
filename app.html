@@ -200,6 +200,35 @@ textarea.cta::placeholder{color:#c0c0bc;}
 .modal-btns{display:flex;gap:.5rem;margin-top:1.1rem;}
 .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);}
 
+/* FEEDBACK BTN */
+.feedback-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 150;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 99px;
+  padding: .55rem 1.1rem;
+  font-family: 'Figtree', sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  box-shadow: 0 4px 15px rgba(26,107,60,.3);
+  transition: all .18s;
+}
+.feedback-btn:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,107,60,.4); }
+
+/* STAR RATING */
+.stars { display: flex; gap: .35rem; margin-bottom: 1rem; }
+.star { font-size: 1.5rem; cursor: pointer; color: #d0d0cc; transition: color .15s; }
+.star.active { color: #f59e0b; }
+.star:hover { color: #f59e0b; }
+
 /* MISC */
 .hr{height:1px;background:var(--rule);margin-bottom:1.4rem;}
 .hidden{display:none!important;}
@@ -267,6 +296,73 @@ textarea.cta::placeholder{color:#c0c0bc;}
     </div>
   </div>
 </div>
+
+<!-- FEEDBACK MODAL -->
+<div class="modal-overlay hidden" id="feedbackModal">
+  <div class="modal">
+    <h3>💬 Share Your Feedback</h3>
+    <p>Help us improve GreenCV. Takes less than a minute!</p>
+
+    <div class="field" style="margin-top:1rem;">
+      <label class="flbl">How would you rate GreenCV?</label>
+      <div class="stars" id="starRating">
+        <span class="star" onclick="setRating(1)">★</span>
+        <span class="star" onclick="setRating(2)">★</span>
+        <span class="star" onclick="setRating(3)">★</span>
+        <span class="star" onclick="setRating(4)">★</span>
+        <span class="star" onclick="setRating(5)">★</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="flbl">Which feature did you find most useful?</label>
+      <select class="sel" id="fbFeature">
+        <option value="">Select a feature</option>
+        <option>CV Score & Analysis</option>
+        <option>AI CV Rewrite</option>
+        <option>Job Match</option>
+        <option>Cover Letter Generator</option>
+        <option>LinkedIn Optimizer</option>
+        <option>Skill Gap Analysis</option>
+        <option>Score History</option>
+        <option>Email Results</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="flbl">What would you improve?</label>
+      <textarea class="cta" id="fbImprove" placeholder="Tell us what could be better…" rows="3" style="min-height:80px;margin-bottom:0;"></textarea>
+    </div>
+
+    <div class="field">
+      <label class="flbl">Would you pay for GreenCV?</label>
+      <select class="sel" id="fbPay">
+        <option value="">Select an option</option>
+        <option>Yes — I'd pay monthly</option>
+        <option>Yes — I'd pay one-time</option>
+        <option>Maybe — depends on the price</option>
+        <option>No — I prefer it free</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="flbl">Your Email (Optional)</label>
+      <input type="email" class="input" id="fbEmail" placeholder="so we can follow up with you">
+    </div>
+
+    <div class="err-msg" id="fbErr"></div>
+
+    <div class="modal-btns">
+      <button class="btn bg bfull" onclick="submitFeedback()">Send Feedback →</button>
+      <button class="btn bo" onclick="closeFeedbackModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- FEEDBACK BUTTON -->
+<button class="feedback-btn" onclick="openFeedbackModal()">
+  💬 Feedback
+</button>
 
 <div class="shell">
   <aside class="sb" id="sidebar">
@@ -1217,6 +1313,47 @@ function saveFullReport() {
   if (!win) toast("Please allow popups to save the report", "error", 4000);
   else toast("Select 'Save as PDF' in the print dialog", "success", 5000);
   setTimeout(() => URL.revokeObjectURL(url), 15000);
+}
+
+// ── FEEDBACK ──
+let feedbackRating = 0;
+
+function openFeedbackModal()  { document.getElementById("feedbackModal").classList.remove("hidden"); }
+function closeFeedbackModal() { document.getElementById("feedbackModal").classList.add("hidden"); }
+
+function setRating(n) {
+  feedbackRating = n;
+  document.querySelectorAll(".star").forEach((s, i) => {
+    s.classList.toggle("active", i < n);
+  });
+}
+
+async function submitFeedback() {
+  const feature  = document.getElementById("fbFeature")?.value || "";
+  const improve  = document.getElementById("fbImprove")?.value.trim() || "";
+  const pay      = document.getElementById("fbPay")?.value || "";
+  const email    = document.getElementById("fbEmail")?.value.trim() || "";
+  const errEl    = document.getElementById("fbErr");
+
+  if (!feedbackRating) { errEl.textContent = "Please select a star rating."; errEl.classList.add("show"); return; }
+  errEl.classList.remove("show");
+
+  try {
+    await fetch("/send-feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rating: feedbackRating, feature, improve, pay, email }),
+      signal: AbortSignal.timeout(15000),
+    });
+  } catch(e) {
+    // Silently fail — don't block user
+    console.log("Feedback submission error:", e.message);
+  }
+
+  closeFeedbackModal();
+  feedbackRating = 0;
+  document.querySelectorAll(".star").forEach(s => s.classList.remove("active"));
+  toast("Thank you for your feedback! 🙏", "success", 4000);
 }
 
 render();
