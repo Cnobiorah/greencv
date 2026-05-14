@@ -499,6 +499,10 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
     <div class="feed-grid" id="feedGrid">
       <div class="feed-loading">Loading latest feedback…</div>
     </div>
+    <div style="text-align:center;margin-top:1.5rem;">
+      <button id="feedMoreBtn" style="display:none;background:transparent;border:1.5px solid #1a6b3c;color:#1a6b3c;padding:.6rem 1.75rem;border-radius:6px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='#1a6b3c';this.style.color='#fff';" onmouseout="this.style.background='transparent';this.style.color='#1a6b3c';">Load more reviews</button>
+      <p id="feedCount" style="display:none;font-size:.78rem;color:#9a9990;margin-top:.75rem;"></p>
+    </div>
 
     <!-- STATIC FALLBACK (shown if no live feedback yet) -->
     <div class="feed-grid hidden" id="feedFallback" style="display:none;">
@@ -593,48 +597,93 @@ window.addEventListener("scroll", () => {
 }, { passive:true });
 
 // ── LIVE FEEDBACK FEED ──
+const PAGE_SIZE = 6;
+let allFeedback = [];
+let shownCount  = 0;
+
+function renderFeedCard(f, i) {
+  const stars   = "★".repeat(f.rating) + "☆".repeat(5 - f.rating);
+  const initial = (f.email ? f.email[0].toUpperCase() : "U");
+  const name    = f.email ? f.email.split("@")[0] : "Anonymous User";
+  const delay   = (i % PAGE_SIZE) * 0.08;
+  // Use improve text if meaningful, otherwise build a natural sentence from feature
+  let text = "";
+  if (f.improve && f.improve.trim().length > 10) {
+    text = `"${f.improve}"`;
+  } else if (f.feature) {
+    text = `"The ${f.feature.toLowerCase()} feature made a real difference in my job search."`;
+  } else {
+    text = `"Really useful tool for anyone targeting green and sustainability roles."`;
+  }
+  return `<div class="feed-card" style="animation-delay:${delay}s;">
+    <div class="feed-stars">${stars}</div>
+    <p class="feed-text">${text}</p>
+    <div class="feed-author">
+      <div class="feed-avatar">${initial}</div>
+      <div>
+        <div class="feed-name">${name}</div>
+        <div class="feed-role">${f.feature ? f.feature + " user" : "GreenCV User"}</div>
+      </div>
+    </div>
+    ${f.rating === 5 ? `<div class="feed-feature">✓ Verified Review</div>` : ""}
+  </div>`;
+}
+
+function showNextPage() {
+  const grid       = document.getElementById("feedGrid");
+  const moreBtn    = document.getElementById("feedMoreBtn");
+  const countEl    = document.getElementById("feedCount");
+  const nextSlice  = allFeedback.slice(shownCount, shownCount + PAGE_SIZE);
+
+  nextSlice.forEach((f, i) => {
+    const div = document.createElement("div");
+    div.innerHTML = renderFeedCard(f, i);
+    grid.appendChild(div.firstChild);
+  });
+
+  shownCount += nextSlice.length;
+
+  // Update count label
+  if (countEl) {
+    countEl.style.display = "block";
+    countEl.textContent = `Showing ${shownCount} of ${allFeedback.length} reviews`;
+  }
+
+  // Hide button if all shown
+  if (moreBtn) {
+    moreBtn.style.display = shownCount >= allFeedback.length ? "none" : "inline-block";
+  }
+}
+
 async function loadFeedbackFeed() {
   const grid     = document.getElementById("feedGrid");
   const fallback = document.getElementById("feedFallback");
+  const moreBtn  = document.getElementById("feedMoreBtn");
 
   try {
     const res  = await fetch("/get-feedback");
     const data = await res.json();
 
     if (!data.feedback || data.feedback.length === 0) {
-      // Show static fallback
       if (grid)     grid.classList.add("hidden");
       if (fallback) fallback.classList.remove("hidden");
       return;
     }
 
-    // Hide static fallback permanently when real data exists
+    // Hide fallback
     if (fallback) { fallback.classList.add("hidden"); fallback.style.display = "none"; }
 
-    // Show live feedback
-    if (grid) {
-      grid.innerHTML = data.feedback.slice(0, 6).map((f, i) => {
-        const stars   = "★".repeat(f.rating) + "☆".repeat(5 - f.rating);
-        const initial = (f.email ? f.email[0].toUpperCase() : "U");
-        const name    = f.email ? f.email.split("@")[0] : "Anonymous User";
-        const delay   = i * 0.08;
-        return `<div class="feed-card" style="animation-delay:${delay}s;">
-          <div class="feed-stars">${stars}</div>
-          ${f.improve ? `<p class="feed-text">"${f.improve}"</p>` : `<p class="feed-text">"Great tool for green career professionals!"</p>`}
-          <div class="feed-author">
-            <div class="feed-avatar">${initial}</div>
-            <div>
-              <div class="feed-name">${name}</div>
-              <div class="feed-role">GreenCV User</div>
-            </div>
-          </div>
-          ${f.feature ? `<div class="feed-feature">★ ${f.feature}</div>` : ""}
-        </div>`;
-      }).join("");
+    allFeedback = data.feedback;
+    shownCount  = 0;
+    if (grid) grid.innerHTML = ""; // clear loader
+
+    showNextPage();
+
+    if (moreBtn) {
+      moreBtn.addEventListener("click", showNextPage);
     }
 
   } catch(e) {
-    // Show static fallback on error
     if (grid)     grid.classList.add("hidden");
     if (fallback) fallback.classList.remove("hidden");
     console.log("Feed error:", e.message);

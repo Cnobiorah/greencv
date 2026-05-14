@@ -17,7 +17,7 @@ module.exports = async function handler(req, res) {
   return new Promise((resolve) => {
     try {
       const parsed = new URL(supabaseUrl);
-      const path   = "/rest/v1/feedback?rating=gte.4&order=created_at.desc&limit=6&select=rating,feature,improve,email,created_at";
+      const path   = "/rest/v1/feedback?order=created_at.desc&limit=50&select=rating,feature,improve,email,created_at";
 
       const options = {
         hostname: parsed.hostname,
