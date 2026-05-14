@@ -804,13 +804,13 @@ function pgHistory() {
         [...h].reverse().map((item,i) => {
           const col = item.score>=70?"#166534":item.score>=45?"#b45309":"#dc2626";
           const date = new Date(item.date).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
-          return `<div class="hist-item" onclick="loadHistory(${h.length-1-i})">
+          return `<div class="hist-item" onclick="loadHistory(${h.length-1-i})" style="cursor:pointer;">
             <div class="hist-score" style="color:${col}">${item.score}</div>
             <div class="hist-info">
               <div class="hist-role">${esc(item.role)}</div>
               <div class="hist-date">${date} · ATS: ${item.ats}% · Green Skills: ${item.greenSkills}%</div>
             </div>
-            <span style="font-size:.75rem;color:var(--muted);">Load →</span>
+            <span style="font-size:.75rem;color:${item.result ? 'var(--green)' : 'var(--muted)'};">${item.result ? "Restore →" : "No data"}</span>
           </div>`;
         }).join("")
       }
@@ -1003,8 +1003,8 @@ async function doSubmit() {
       S.result = data;
       S.loading = false;
 
-      // Save to history
-      S.history.push({score:data.score,role:ro,ats:data.ats,greenSkills:data.greenSkills,date:new Date().toISOString(),id:Date.now()});
+      // Save to history (full result)
+      S.history.push({score:data.score,role:ro,ats:data.ats,greenSkills:data.greenSkills,date:new Date().toISOString(),id:Date.now(),result:data});
       if (S.history.length > 20) S.history.shift();
       localStorage.setItem("greencv_history", JSON.stringify(S.history));
 
@@ -1077,7 +1077,15 @@ async function runLinkedIn() {
 
 // ── HISTORY ──
 function loadHistory(idx) {
-  toast("History view is read-only. Analyze again for a fresh result.","success",4000);
+  const item = S.history[idx];
+  if (!item || !item.result) {
+    toast("This entry has no saved data. Analyze again to save full results.","error",4000);
+    return;
+  }
+  S.result = item.result;
+  S.page = "dashboard";
+  render();
+  toast("History loaded — all tabs restored.","success",3000);
 }
 function clearHistory() {
   if (!confirm("Clear all history?")) return;
