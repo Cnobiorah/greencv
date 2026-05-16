@@ -496,6 +496,10 @@ function render() {
   if (S.page === "skillgap" && S.result) {
     setTimeout(() => renderPlatforms(S.result.skillGap), 100);
   }
+  // Render teaser pills if on dashboard
+  if (S.page === "dashboard" && S.result) {
+    setTimeout(() => renderTeaserPills(S.result.skillGap), 100);
+  }
 }
 
 // ══════════════════════════════
@@ -612,6 +616,21 @@ function pgDash() {
         </ul>
       </div>
     </div>
+    <!-- LEARNING TEASER -->
+    <div class="card fi d3" style="margin-bottom:1rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <div style="width:40px;height:40px;background:#f0f7f3;border:1px solid #b6dfc8;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">📚</div>
+          <div>
+            <div style="font-size:.85rem;font-weight:600;color:var(--head);">Learning Resources Found</div>
+            <div style="font-size:.76rem;color:var(--muted);margin-top:2px;" id="teaserText">Based on your skill gaps, we found recommended platforms to help you improve</div>
+          </div>
+        </div>
+        <button class="btn bg" onclick="go('skillgap')" style="white-space:nowrap;">View Learning Platforms →</button>
+      </div>
+      <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:.5rem;" id="teaserPills"></div>
+    </div>
+
     <div class="cstrip fi d3">
       <div>
         <h3>Explore your full results</h3>
@@ -729,6 +748,30 @@ const PLATFORM_DB = {
     { name:"EPA Training", desc:"US EPA environmental compliance training", url:"https://www.epa.gov/compliance/compliance-training", icon:"🏛", tag:"Free", cls:"pt-free" },
   ],
 };
+
+function renderTeaserPills(skillGap) {
+  const pills = document.getElementById("teaserPills");
+  const text  = document.getElementById("teaserText");
+  if (!pills) return;
+
+  const weak = [...(skillGap||[])].sort((a,b) => a.current - b.current).slice(0, 3);
+  if (!weak.length) return;
+
+  // Update teaser text
+  if (text) text.textContent = `We found learning resources for your ${weak.length} weakest skills — click to explore`;
+
+  // Show platform names as pills
+  let html = "";
+  weak.forEach(g => {
+    const platforms = PLATFORM_DB[g.skill] || [];
+    platforms.forEach(p => {
+      html += `<span style="display:inline-flex;align-items:center;gap:.3rem;background:var(--off);border:1px solid var(--rule);border-radius:99px;padding:.22rem .65rem;font-size:.72rem;font-weight:500;color:var(--body);">
+        ${p.icon} ${esc(p.name)}
+      </span>`;
+    });
+  });
+  pills.innerHTML = html;
+}
 
 function renderPlatforms(skillGap) {
   const el = document.getElementById("platformsList");
