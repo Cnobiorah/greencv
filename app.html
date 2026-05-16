@@ -492,9 +492,12 @@ function render() {
     case "history":     m.innerHTML = pgHistory(); break;
   }
   bindEvents(); animBars(); window.scrollTo(0,0);
-  // Render learning platforms if on skill gap page
+  // Render learning platforms and tools if on skill gap page
   if (S.page === "skillgap" && S.result) {
-    setTimeout(() => renderPlatforms(S.result.skillGap), 100);
+    setTimeout(() => {
+      renderPlatforms(S.result.skillGap);
+      renderToolTags(S.result.tools);
+    }, 100);
   }
   // Render teaser pills if on dashboard
   if (S.page === "dashboard" && S.result) {
@@ -669,12 +672,7 @@ function pgSG() {
       </div>
       <div class="card fi d1">
         <div class="ch">Tools to Learn</div>
-        <div class="tags">${(r.tools||[]).map(t=>{
-          const name = typeof t === "object" ? t.name : t;
-          const url  = typeof t === "object" ? t.url  : (TOOL_LINKS[t] || \`https://www.google.com/search?q=\${encodeURIComponent(t + " tutorial free")}\`);
-          const why  = typeof t === "object" ? t.why  : "";
-          return \`<a href="\${url}" target="_blank" rel="noopener noreferrer" class="tag tb" style="text-decoration:none;cursor:pointer;" title="\${esc(why) || "Learn " + esc(name)}">\${esc(name)} ↗</a>\`;
-        }).join("")}</div>
+        <div class="tags" id="toolTags"></div>
       </div>
       <div class="card fi d2">
         <div class="ch">Certifications</div>
@@ -782,6 +780,17 @@ const PLATFORM_DB = {
     { name:"EPA Training", desc:"US EPA environmental compliance training", url:"https://www.epa.gov/compliance/compliance-training", icon:"🏛", tag:"Free", cls:"pt-free" },
   ],
 };
+
+function renderToolTags(tools) {
+  const el = document.getElementById("toolTags");
+  if (!el) return;
+  el.innerHTML = (tools||[]).map(t => {
+    const name = typeof t === "object" ? t.name : t;
+    const url  = typeof t === "object" ? t.url  : (TOOL_LINKS[name] || "https://www.google.com/search?q=" + encodeURIComponent(name + " tutorial free"));
+    const why  = typeof t === "object" ? t.why  : "";
+    return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="tag tb" style="text-decoration:none;cursor:pointer;" title="' + esc(why || "Learn " + name) + '">' + esc(name) + ' ↗</a>';
+  }).join("");
+}
 
 function renderTeaserPills(skillGap) {
   const pills = document.getElementById("teaserPills");
