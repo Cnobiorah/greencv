@@ -675,9 +675,18 @@ function pgSG() {
       ${(r.actionPlan||[]).map(a=>`
         <div class="ap"><div class="apph">${esc(a.phase)}</div><div>${esc(a.action)}</div></div>`).join("")}
     </div>
+    <div class="card g1 fi d4">
+      <div class="ch">📚 Recommended Learning Platforms</div>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:1rem;line-height:1.5;">Based on your weakest skills — click any platform to start learning</p>
+      <div id="platformsList"><div class="platforms-loading">⏳ Loading recommendations…</div></div>
+    </div>
+
+    <div style="text-align:center;padding:.5rem 0 1rem;" class="fi d4">
+      <button class="btn bo" onclick="go('upload')">↑ Analyze Another CV</button>
+    </div>
   </div></div>`; }
 
-// ── LEARNING PLATFORMS ──
+//─ LEARNING PLATFORMS ──
 const PLATFORM_DB = {
   "Carbon Accounting":       [
     { name:"edX", desc:"Carbon Accounting & GHG Protocol courses", url:"https://www.edx.org/search?q=carbon+accounting", icon:"🎓", tag:"Free & Paid", cls:"pt-mixed" },
@@ -905,7 +914,7 @@ function pgHistory() {
               <div class="hist-role">${esc(item.role)}</div>
               <div class="hist-date">${date} · ATS: ${item.ats}% · Green Skills: ${item.greenSkills}%</div>
             </div>
-            <span style="font-size:.75rem;color:var(--muted);">Load →</span>
+            <span style="font-size:.75rem;color:var(--accent);font-weight:600;">View Dashboard →</span>
           </div>`;
         }).join("")
       }
@@ -1098,8 +1107,16 @@ async function doSubmit() {
       S.result = data;
       S.loading = false;
 
-      // Save to history
-      S.history.push({score:data.score,role:ro,ats:data.ats,greenSkills:data.greenSkills,date:new Date().toISOString(),id:Date.now()});
+      // Save to history with full result for reload
+      S.history.push({
+        score:       data.score,
+        role:        ro,
+        ats:         data.ats,
+        greenSkills: data.greenSkills,
+        date:        new Date().toISOString(),
+        id:          Date.now(),
+        fullResult:  data,
+      });
       if (S.history.length > 20) S.history.shift();
       localStorage.setItem("greencv_history", JSON.stringify(S.history));
 
@@ -1173,7 +1190,21 @@ async function runLinkedIn() {
 
 // ── HISTORY ──
 function loadHistory(idx) {
-  toast("History view is read-only. Analyze again for a fresh result.","success",4000);
+  const item = S.history[idx];
+  if (!item) { toast("Could not load this analysis","error"); return; }
+
+  // If full result is saved, load it
+  if (item.fullResult) {
+    S.result = item.fullResult;
+    S.result.role = item.role;
+    S.page = "dashboard";
+    render();
+    toast("Analysis loaded from history ✅","success");
+    return;
+  }
+
+  // Otherwise show a message - only score summary was saved
+  toast("Only the score summary was saved for this analysis. Analyze your CV again for full results.","success",5000);
 }
 function clearHistory() {
   if (!confirm("Clear all history?")) return;
