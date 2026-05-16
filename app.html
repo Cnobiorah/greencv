@@ -669,7 +669,12 @@ function pgSG() {
       </div>
       <div class="card fi d1">
         <div class="ch">Tools to Learn</div>
-        <div class="tags">${(r.tools||[]).map(t=>`<span class="tag tb">${esc(t)}</span>`).join("")}</div>
+        <div class="tags">${(r.tools||[]).map(t=>{
+          const name = typeof t === "object" ? t.name : t;
+          const url  = typeof t === "object" ? t.url  : (TOOL_LINKS[t] || \`https://www.google.com/search?q=\${encodeURIComponent(t + " tutorial free")}\`);
+          const why  = typeof t === "object" ? t.why  : "";
+          return \`<a href="\${url}" target="_blank" rel="noopener noreferrer" class="tag tb" style="text-decoration:none;cursor:pointer;" title="\${esc(why) || "Learn " + esc(name)}">\${esc(name)} ↗</a>\`;
+        }).join("")}</div>
       </div>
       <div class="card fi d2">
         <div class="ch">Certifications</div>
@@ -705,7 +710,36 @@ function pgSG() {
     </div>
   </div></div>`; }
 
-//─ LEARNING PLATFORMS ──
+// ─ TOOL LINKS ──
+const TOOL_LINKS = {
+  "EnergyPlus":"https://energyplus.net/",
+  "OpenStudio":"https://openstudio.net/",
+  "SimScale":"https://www.simscale.com/",
+  "Revit":"https://www.autodesk.com/products/revit/",
+  "AutoCAD":"https://www.autodesk.com/products/autocad/",
+  "DesignBuilder":"https://designbuilder.co.uk/",
+  "IES VE":"https://www.iesve.com/",
+  "SimaPro":"https://simapro.com/",
+  "One Click LCA":"https://www.oneclicklca.com/",
+  "GHG Protocol":"https://ghgprotocol.org/",
+  "Plan A":"https://plana.earth/",
+  "Persefoni":"https://persefoni.com/",
+  "Tableau":"https://www.tableau.com/learn/training",
+  "Power BI":"https://learn.microsoft.com/en-us/power-bi/",
+  "Python":"https://www.python.org/about/gettingstarted/",
+  "Excel":"https://support.microsoft.com/en-us/excel",
+  "ArcGIS":"https://www.esri.com/en-us/arcgis/products/arcgis-online/overview",
+  "QGIS":"https://qgis.org/en/site/forusers/download.html",
+  "MS Project":"https://www.microsoft.com/en-us/microsoft-365/project/",
+  "Asana":"https://asana.com/",
+  "PVsyst":"https://www.pvsyst.com/",
+  "SAM":"https://sam.nrel.gov/",
+  "Homer Energy":"https://www.homerenergy.com/",
+  "RETScreen":"https://natural-resources.canada.ca/maps-tools-and-publications/tools/modelling-tools/retscreen/7465",
+  "Watershed":"https://watershed.com/",
+};
+
+// ─ LEARNING PLATFORMS ──
 const PLATFORM_DB = {
   "Carbon Accounting":       [
     { name:"edX", desc:"Carbon Accounting & GHG Protocol courses", url:"https://www.edx.org/search?q=carbon+accounting", icon:"🎓", tag:"Free & Paid", cls:"pt-mixed" },
@@ -754,21 +788,33 @@ function renderTeaserPills(skillGap) {
   const text  = document.getElementById("teaserText");
   if (!pills) return;
 
-  const weak = [...(skillGap||[])].sort((a,b) => a.current - b.current).slice(0, 3);
-  if (!weak.length) return;
+  const r = S.result;
+  let allPlatforms = [];
 
-  // Update teaser text
-  if (text) text.textContent = `We found learning resources for your ${weak.length} weakest skills — click to explore`;
-
-  // Show platform names as pills
-  let html = "";
-  weak.forEach(g => {
-    const platforms = PLATFORM_DB[g.skill] || [];
-    platforms.forEach(p => {
-      html += `<span style="display:inline-flex;align-items:center;gap:.3rem;background:var(--off);border:1px solid var(--rule);border-radius:99px;padding:.22rem .65rem;font-size:.72rem;font-weight:500;color:var(--body);">
-        ${p.icon} ${esc(p.name)}
-      </span>`;
+  // Use AI-generated platforms if available
+  if (r && r.learningPlatforms && r.learningPlatforms.length > 0) {
+    r.learningPlatforms.forEach(item => {
+      (item.platforms || []).forEach(p => allPlatforms.push(p));
     });
+    if (text) text.textContent = `We found ${allPlatforms.length} learning resources based on your skill gaps — click to explore`;
+  } else {
+    // Fallback to static DB
+    const weak = [...(skillGap||[])].sort((a,b) => a.current - b.current).slice(0, 3);
+    weak.forEach(g => { (PLATFORM_DB[g.skill]||[]).forEach(p => allPlatforms.push(p)); });
+    if (text) text.textContent = `We found learning resources for your weakest skills — click to explore`;
+  }
+
+  if (!allPlatforms.length) return;
+
+  // Show unique platform names as pills
+  const seen = new Set();
+  let html = "";
+  allPlatforms.forEach(p => {
+    if (seen.has(p.name)) return;
+    seen.add(p.name);
+    html += `<span style="display:inline-flex;align-items:center;gap:.3rem;background:var(--off);border:1px solid var(--rule);border-radius:99px;padding:.22rem .65rem;font-size:.72rem;font-weight:500;color:var(--body);">
+      ${p.free !== undefined ? (p.free ? "🆓" : "💳") : (p.icon || "📚")} ${esc(p.name)}
+    </span>`;
   });
   pills.innerHTML = html;
 }
@@ -777,7 +823,34 @@ function renderPlatforms(skillGap) {
   const el = document.getElementById("platformsList");
   if (!el) return;
 
-  // Get top 3 weakest skills
+  const r = S.result;
+
+  // Use AI-generated learning platforms if available
+  if (r && r.learningPlatforms && r.learningPlatforms.length > 0) {
+    let html = "";
+    r.learningPlatforms.forEach(item => {
+      const platforms = item.platforms || [];
+      if (!platforms.length) return;
+      html += `<div style="margin-bottom:1.1rem;">
+        <div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;padding-bottom:.4rem;border-bottom:1px solid var(--rule);">
+          ${esc(item.skill)}
+        </div>
+        ${platforms.map(p=>`
+          <a class="platform-card" href="${p.url}" target="_blank" rel="noopener noreferrer">
+            <div class="platform-icon">${p.free ? "🆓" : "💳"}</div>
+            <div class="platform-info">
+              <div class="platform-name">${esc(p.name)}</div>
+              <div class="platform-desc">${esc(p.desc)}</div>
+            </div>
+            <span class="platform-tag ${p.free ? "pt-free" : "pt-paid"}">${p.free ? "Free" : "Paid"}</span>
+          </a>`).join("")}
+      </div>`;
+    });
+    el.innerHTML = html || '<div class="platforms-loading">No recommendations available.</div>';
+    return;
+  }
+
+  // Fallback to static PLATFORM_DB if AI didn't return learningPlatforms
   const weak = [...(skillGap||[])]
     .sort((a,b) => a.current - b.current)
     .slice(0, 3);

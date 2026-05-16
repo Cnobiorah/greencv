@@ -93,7 +93,30 @@ Respond ONLY with a valid JSON object. No markdown, no backticks, no text outsid
     {"skill":"Green Finance","current":<0-100>},
     {"skill":"Environmental Compliance","current":<0-100>}
   ],
-  "tools": ["<tool1>","<tool2>","<tool3>","<tool4>","<tool5>"],
+  "tools": [
+    {"name":"<specific tool/software name>","url":"<official website or best learning URL for this tool>","why":"<one sentence why this user needs it based on their CV>"},
+    {"name":"<tool2>","url":"<url2>","why":"<why2>"},
+    {"name":"<tool3>","url":"<url3>","why":"<why3>"},
+    {"name":"<tool4>","url":"<url4>","why":"<why4>"},
+    {"name":"<tool5>","url":"<url5>","why":"<why5>"}
+  ],
+  "learningPlatforms": [
+    {"skill":"<skill from this user's top 3 weakest areas>","platforms":[
+      {"name":"<platform name e.g. Coursera>","url":"<direct URL to relevant course or search>","desc":"<one sentence course description>","free":true},
+      {"name":"<platform2>","url":"<url2>","desc":"<desc2>","free":false},
+      {"name":"<platform3>","url":"<url3>","desc":"<desc3>","free":true}
+    ]},
+    {"skill":"<user's 2nd weakest skill>","platforms":[
+      {"name":"<platform>","url":"<url>","desc":"<desc>","free":true},
+      {"name":"<platform2>","url":"<url2>","desc":"<desc2>","free":false},
+      {"name":"<platform3>","url":"<url3>","desc":"<desc3>","free":true}
+    ]},
+    {"skill":"<user's 3rd weakest skill>","platforms":[
+      {"name":"<platform>","url":"<url>","desc":"<desc>","free":true},
+      {"name":"<platform2>","url":"<url2>","desc":"<desc2>","free":false},
+      {"name":"<platform3>","url":"<url3>","desc":"<desc3>","free":true}
+    ]}
+  ],
   "certs": [
     {"name":"<certification>","why":"<one sentence relevance to ${role}>"},
     {"name":"<certification>","why":"<one sentence>"},
@@ -140,6 +163,40 @@ module.exports = async function handler(req, res) {
     catch { const m = clean.match(/\{[\s\S]*\}/); result = JSON.parse(m[0]); }
 
     result.role = role;
+
+    // Save analysis to Supabase
+    const sbUrl = process.env.SUPABASE_URL;
+    const sbKey = process.env.SUPABASE_ANON_KEY;
+    if (sbUrl && sbKey) {
+      try {
+        const parsed  = new URL(sbUrl);
+        const payload = JSON.stringify({
+          role:         role,
+          score:        result.score || 0,
+          ats:          result.ats || 0,
+          green_skills: result.greenSkills || 0,
+          exp_impact:   result.expImpact || 0,
+          email:        null,
+        });
+        const https2 = require("https");
+        const reqSb  = https2.request({
+          hostname: parsed.hostname,
+          path:     "/rest/v1/analyses",
+          method:   "POST",
+          headers: {
+            "Content-Type":   "application/json",
+            "Content-Length": Buffer.byteLength(payload),
+            "apikey":         sbKey,
+            "Authorization":  `Bearer ${sbKey}`,
+            "Prefer":         "return=minimal",
+          },
+        }, () => {});
+        reqSb.on("error", () => {});
+        reqSb.write(payload);
+        reqSb.end();
+      } catch(e) { /* silent fail */ }
+    }
+
     return res.status(200).json(result);
   } catch (e) {
     return res.status(502).json({ error: "AI analysis failed: " + e.message });
