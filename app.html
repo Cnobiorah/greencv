@@ -822,7 +822,7 @@ function renderTeaserPills(skillGap) {
     if (seen.has(p.name)) return;
     seen.add(p.name);
     html += `<span style="display:inline-flex;align-items:center;gap:.3rem;background:var(--off);border:1px solid var(--rule);border-radius:99px;padding:.22rem .65rem;font-size:.72rem;font-weight:500;color:var(--body);">
-      ${p.free !== undefined ? (p.free ? "🆓" : "💳") : (p.icon || "📚")} ${esc(p.name)}
+      ${(p.free === true || p.free === "yes") ? "🆓" : (p.free === false || p.free === "no") ? "💳" : (p.icon || "📚")} ${esc(p.name)}
     </span>`;
   });
   pills.innerHTML = html;
@@ -846,12 +846,12 @@ function renderPlatforms(skillGap) {
         </div>
         ${platforms.map(p=>`
           <a class="platform-card" href="${p.url}" target="_blank" rel="noopener noreferrer">
-            <div class="platform-icon">${p.free ? "🆓" : "💳"}</div>
+            <div class="platform-icon">${(p.free === true || p.free === "yes") ? "🆓" : "💳"}</div>
             <div class="platform-info">
               <div class="platform-name">${esc(p.name)}</div>
               <div class="platform-desc">${esc(p.desc)}</div>
             </div>
-            <span class="platform-tag ${p.free ? "pt-free" : "pt-paid"}">${p.free ? "Free" : "Paid"}</span>
+            <span class="platform-tag ${(p.free === true || p.free === "yes") ? "pt-free" : "pt-paid"}">${(p.free === true || p.free === "yes") ? "Free" : "Paid"}</span>
           </a>`).join("")}
       </div>`;
     });
