@@ -223,6 +223,19 @@ textarea.cta::placeholder{color:#c0c0bc;}
 }
 .feedback-btn:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,107,60,.4); }
 
+/* LEARNING PLATFORMS */
+.platform-card { display:flex; align-items:center; gap:.85rem; padding:.85rem; border:1px solid var(--rule); border-radius:7px; margin-bottom:.65rem; text-decoration:none; transition:all .15s; background:var(--white); }
+.platform-card:hover { border-color:var(--accent); background:#f8fdf9; transform:translateX(3px); }
+.platform-icon { width:40px; height:40px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; background:var(--off); }
+.platform-info { flex:1; }
+.platform-name { font-size:.83rem; font-weight:600; color:var(--head); }
+.platform-desc { font-size:.74rem; color:var(--muted); margin-top:2px; }
+.platform-tag { font-size:.68rem; font-weight:600; padding:.2rem .5rem; border-radius:3px; }
+.pt-free { background:#f0f7f3; color:var(--accent); }
+.pt-paid { background:#fffbeb; color:var(--warn); }
+.pt-mixed { background:#eff6ff; color:#1d4ed8; }
+.platforms-loading { text-align:center; padding:1.5rem; color:var(--muted); font-size:.8rem; }
+
 /* STAR RATING */
 .stars { display: flex; gap: .35rem; margin-bottom: 1rem; }
 .star { font-size: 1.5rem; cursor: pointer; color: #d0d0cc; transition: color .15s; }
@@ -479,6 +492,10 @@ function render() {
     case "history":     m.innerHTML = pgHistory(); break;
   }
   bindEvents(); animBars(); window.scrollTo(0,0);
+  // Render learning platforms if on skill gap page
+  if (S.page === "skillgap" && S.result) {
+    setTimeout(() => renderPlatforms(S.result.skillGap), 100);
+  }
 }
 
 // ══════════════════════════════
@@ -495,7 +512,7 @@ function pgUpload() { return `
           <input type="file" id="ufi" accept=".txt,.doc,.docx,.pdf,.jpg,.jpeg,.png,.webp">
           <div class="dz-icon">📄</div>
           <h3 id="dzTitle">Drop your CV here</h3>
-          <p id="dzSub">or click to browse - PDF, DOCX, DOC, TXT, JPG, PNG</p>
+          <p id="dzSub">or click to browse — PDF, DOCX, DOC, TXT, JPG, PNG</p>
           <div id="dzOk" class="fok hidden"></div>
         </div>
         <div class="orline"><span>or paste your CV text</span></div>
@@ -514,7 +531,7 @@ function pgUpload() { return `
         <div class="err-msg" id="errMsg"></div>
         <button class="btn bd blg bfull" onclick="doSubmit()">Analyze My CV →</button>
         <p style="text-align:center;font-size:.7rem;color:var(--muted);margin-top:.65rem;">
-          Processed securely - your CV is never stored
+          Processed securely — your CV is never stored
         </p>
       </div>
     </div>
@@ -660,6 +677,84 @@ function pgSG() {
     </div>
   </div></div>`; }
 
+// ── LEARNING PLATFORMS ──
+const PLATFORM_DB = {
+  "Carbon Accounting":       [
+    { name:"edX", desc:"Carbon Accounting & GHG Protocol courses", url:"https://www.edx.org/search?q=carbon+accounting", icon:"🎓", tag:"Free & Paid", cls:"pt-mixed" },
+    { name:"Coursera", desc:"Climate Change & Sustainability courses", url:"https://www.coursera.org/search?query=carbon+accounting", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"GHG Protocol", desc:"Official GHG accounting standards & training", url:"https://ghgprotocol.org/training", icon:"🌍", tag:"Free", cls:"pt-free" },
+  ],
+  "ESG Reporting":           [
+    { name:"GRI Academy", desc:"Official GRI sustainability reporting courses", url:"https://www.grilearning.com", icon:"📊", tag:"Paid", cls:"pt-paid" },
+    { name:"Coursera", desc:"ESG Investing & Reporting Fundamentals", url:"https://www.coursera.org/search?query=ESG+reporting", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"CFA Institute", desc:"ESG Investing Certificate", url:"https://www.cfainstitute.org/en/programs/esg-investing", icon:"💼", tag:"Paid", cls:"pt-paid" },
+  ],
+  "Life Cycle Assessment":   [
+    { name:"Coursera", desc:"Life Cycle Assessment (LCA) courses", url:"https://www.coursera.org/search?query=life+cycle+assessment", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"PE International", desc:"LCA training & SimaPro software", url:"https://www.thinkstep.com/training", icon:"🔬", tag:"Paid", cls:"pt-paid" },
+    { name:"YouTube", desc:"Free LCA tutorials and case studies", url:"https://www.youtube.com/results?search_query=life+cycle+assessment+tutorial", icon:"▶️", tag:"Free", cls:"pt-free" },
+  ],
+  "Renewable Energy Systems":[ 
+    { name:"Coursera", desc:"Renewable Energy & Green Building courses — Duke University", url:"https://www.coursera.org/learn/renewable-energy", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"edX", desc:"Solar Energy Engineering & Wind Energy courses", url:"https://www.edx.org/search?q=renewable+energy", icon:"🎓", tag:"Free & Paid", cls:"pt-mixed" },
+    { name:"IRENA", desc:"International Renewable Energy Agency training", url:"https://www.irena.org/energytransition/Capacity-Building", icon:"⚡", tag:"Free", cls:"pt-free" },
+  ],
+  "LEED / BREEAM":           [
+    { name:"USGBC", desc:"Official LEED exam prep & training", url:"https://www.usgbc.org/credentials", icon:"🏗", tag:"Paid", cls:"pt-paid" },
+    { name:"BRE Academy", desc:"Official BREEAM training & certification", url:"https://www.bregroup.com/academy", icon:"🏛", tag:"Paid", cls:"pt-paid" },
+    { name:"Coursera", desc:"Sustainable Building Design courses", url:"https://www.coursera.org/search?query=LEED+green+building", icon:"📚", tag:"Free audit", cls:"pt-free" },
+  ],
+  "Climate Policy":          [
+    { name:"Coursera", desc:"Climate Change Policy & International Law", url:"https://www.coursera.org/search?query=climate+policy", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"edX", desc:"Climate Policy & Diplomacy courses — MIT", url:"https://www.edx.org/search?q=climate+policy", icon:"🎓", tag:"Free & Paid", cls:"pt-mixed" },
+    { name:"UNFCCC", desc:"Official UN climate training resources", url:"https://unfccc.int/topics/education-and-outreach", icon:"🌐", tag:"Free", cls:"pt-free" },
+  ],
+  "Green Finance":           [
+    { name:"Coursera", desc:"Sustainable Finance & Green Bonds", url:"https://www.coursera.org/search?query=green+finance", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"CFA Institute", desc:"ESG & Sustainable Investing Certificate", url:"https://www.cfainstitute.org/en/programs/esg-investing", icon:"💰", tag:"Paid", cls:"pt-paid" },
+    { name:"GARP", desc:"Sustainability & Climate Risk (SCR) Certificate", url:"https://www.garp.org/scr", icon:"📈", tag:"Paid", cls:"pt-paid" },
+  ],
+  "Environmental Compliance":[ 
+    { name:"Coursera", desc:"Environmental Law & Policy courses", url:"https://www.coursera.org/search?query=environmental+compliance", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"IEMA", desc:"Institute of Environmental Management training", url:"https://www.iema.net/professional-development", icon:"🌿", tag:"Paid", cls:"pt-paid" },
+    { name:"EPA Training", desc:"US EPA environmental compliance training", url:"https://www.epa.gov/compliance/compliance-training", icon:"🏛", tag:"Free", cls:"pt-free" },
+  ],
+};
+
+function renderPlatforms(skillGap) {
+  const el = document.getElementById("platformsList");
+  if (!el) return;
+
+  // Get top 3 weakest skills
+  const weak = [...(skillGap||[])]
+    .sort((a,b) => a.current - b.current)
+    .slice(0, 3);
+
+  if (!weak.length) { el.innerHTML = '<div class="platforms-loading">No skill gaps detected.</div>'; return; }
+
+  let html = "";
+  weak.forEach(g => {
+    const platforms = PLATFORM_DB[g.skill] || [];
+    if (!platforms.length) return;
+    html += `<div style="margin-bottom:1.1rem;">
+      <div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;padding-bottom:.4rem;border-bottom:1px solid var(--rule);">
+        ${esc(g.skill)} — ${g.current}% proficiency
+      </div>
+      ${platforms.map(p=>`
+        <a class="platform-card" href="${p.url}" target="_blank" rel="noopener noreferrer">
+          <div class="platform-icon">${p.icon}</div>
+          <div class="platform-info">
+            <div class="platform-name">${esc(p.name)}</div>
+            <div class="platform-desc">${esc(p.desc)}</div>
+          </div>
+          <span class="platform-tag ${p.cls}">${p.tag}</span>
+        </a>`).join("")}
+    </div>`;
+  });
+
+  el.innerHTML = html || '<div class="platforms-loading">No recommendations available.</div>';
+}
+
 // ── JOB MATCH ──
 function pgJobMatch() {
   const r = S.result;
@@ -804,13 +899,13 @@ function pgHistory() {
         [...h].reverse().map((item,i) => {
           const col = item.score>=70?"#166534":item.score>=45?"#b45309":"#dc2626";
           const date = new Date(item.date).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
-          return `<div class="hist-item" onclick="loadHistory(${h.length-1-i})" style="cursor:pointer;">
+          return `<div class="hist-item" onclick="loadHistory(${h.length-1-i})">
             <div class="hist-score" style="color:${col}">${item.score}</div>
             <div class="hist-info">
               <div class="hist-role">${esc(item.role)}</div>
               <div class="hist-date">${date} · ATS: ${item.ats}% · Green Skills: ${item.greenSkills}%</div>
             </div>
-            <span style="font-size:.75rem;color:${item.result ? 'var(--green)' : 'var(--muted)'};">${item.result ? "Restore →" : "No data"}</span>
+            <span style="font-size:.75rem;color:var(--muted);">Load →</span>
           </div>`;
         }).join("")
       }
@@ -1003,8 +1098,8 @@ async function doSubmit() {
       S.result = data;
       S.loading = false;
 
-      // Save to history (full result)
-      S.history.push({score:data.score,role:ro,ats:data.ats,greenSkills:data.greenSkills,date:new Date().toISOString(),id:Date.now(),result:data});
+      // Save to history
+      S.history.push({score:data.score,role:ro,ats:data.ats,greenSkills:data.greenSkills,date:new Date().toISOString(),id:Date.now()});
       if (S.history.length > 20) S.history.shift();
       localStorage.setItem("greencv_history", JSON.stringify(S.history));
 
@@ -1029,6 +1124,84 @@ async function doSubmit() {
     : lastError?.message || "Analysis failed. Please try again.";
   toast(msg, "error", 7000);
   showErr(msg);
+}
+
+// ── LEARNING PLATFORMS ──
+const PLATFORM_DB = {
+  "Carbon Accounting":       [
+    { name:"edX", desc:"Carbon Accounting & GHG Protocol courses", url:"https://www.edx.org/search?q=carbon+accounting", icon:"🎓", tag:"Free & Paid", cls:"pt-mixed" },
+    { name:"Coursera", desc:"Climate Change & Sustainability courses", url:"https://www.coursera.org/search?query=carbon+accounting", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"GHG Protocol", desc:"Official GHG accounting standards & training", url:"https://ghgprotocol.org/training", icon:"🌍", tag:"Free", cls:"pt-free" },
+  ],
+  "ESG Reporting":           [
+    { name:"GRI Academy", desc:"Official GRI sustainability reporting courses", url:"https://www.grilearning.com", icon:"📊", tag:"Paid", cls:"pt-paid" },
+    { name:"Coursera", desc:"ESG Investing & Reporting Fundamentals", url:"https://www.coursera.org/search?query=ESG+reporting", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"CFA Institute", desc:"ESG Investing Certificate", url:"https://www.cfainstitute.org/en/programs/esg-investing", icon:"💼", tag:"Paid", cls:"pt-paid" },
+  ],
+  "Life Cycle Assessment":   [
+    { name:"Coursera", desc:"Life Cycle Assessment (LCA) courses", url:"https://www.coursera.org/search?query=life+cycle+assessment", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"PE International", desc:"LCA training & SimaPro software", url:"https://www.thinkstep.com/training", icon:"🔬", tag:"Paid", cls:"pt-paid" },
+    { name:"YouTube", desc:"Free LCA tutorials and case studies", url:"https://www.youtube.com/results?search_query=life+cycle+assessment+tutorial", icon:"▶️", tag:"Free", cls:"pt-free" },
+  ],
+  "Renewable Energy Systems":[ 
+    { name:"Coursera", desc:"Renewable Energy & Green Building courses — Duke University", url:"https://www.coursera.org/learn/renewable-energy", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"edX", desc:"Solar Energy Engineering & Wind Energy courses", url:"https://www.edx.org/search?q=renewable+energy", icon:"🎓", tag:"Free & Paid", cls:"pt-mixed" },
+    { name:"IRENA", desc:"International Renewable Energy Agency training", url:"https://www.irena.org/energytransition/Capacity-Building", icon:"⚡", tag:"Free", cls:"pt-free" },
+  ],
+  "LEED / BREEAM":           [
+    { name:"USGBC", desc:"Official LEED exam prep & training", url:"https://www.usgbc.org/credentials", icon:"🏗", tag:"Paid", cls:"pt-paid" },
+    { name:"BRE Academy", desc:"Official BREEAM training & certification", url:"https://www.bregroup.com/academy", icon:"🏛", tag:"Paid", cls:"pt-paid" },
+    { name:"Coursera", desc:"Sustainable Building Design courses", url:"https://www.coursera.org/search?query=LEED+green+building", icon:"📚", tag:"Free audit", cls:"pt-free" },
+  ],
+  "Climate Policy":          [
+    { name:"Coursera", desc:"Climate Change Policy & International Law", url:"https://www.coursera.org/search?query=climate+policy", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"edX", desc:"Climate Policy & Diplomacy courses — MIT", url:"https://www.edx.org/search?q=climate+policy", icon:"🎓", tag:"Free & Paid", cls:"pt-mixed" },
+    { name:"UNFCCC", desc:"Official UN climate training resources", url:"https://unfccc.int/topics/education-and-outreach", icon:"🌐", tag:"Free", cls:"pt-free" },
+  ],
+  "Green Finance":           [
+    { name:"Coursera", desc:"Sustainable Finance & Green Bonds", url:"https://www.coursera.org/search?query=green+finance", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"CFA Institute", desc:"ESG & Sustainable Investing Certificate", url:"https://www.cfainstitute.org/en/programs/esg-investing", icon:"💰", tag:"Paid", cls:"pt-paid" },
+    { name:"GARP", desc:"Sustainability & Climate Risk (SCR) Certificate", url:"https://www.garp.org/scr", icon:"📈", tag:"Paid", cls:"pt-paid" },
+  ],
+  "Environmental Compliance":[ 
+    { name:"Coursera", desc:"Environmental Law & Policy courses", url:"https://www.coursera.org/search?query=environmental+compliance", icon:"📚", tag:"Free audit", cls:"pt-free" },
+    { name:"IEMA", desc:"Institute of Environmental Management training", url:"https://www.iema.net/professional-development", icon:"🌿", tag:"Paid", cls:"pt-paid" },
+    { name:"EPA Training", desc:"US EPA environmental compliance training", url:"https://www.epa.gov/compliance/compliance-training", icon:"🏛", tag:"Free", cls:"pt-free" },
+  ],
+};
+
+function renderPlatforms(skillGap) {
+  const el = document.getElementById("platformsList");
+  if (!el) return;
+
+  // Get top 3 weakest skills
+  const weak = [...(skillGap||[])]
+    .sort((a,b) => a.current - b.current)
+    .slice(0, 3);
+
+  if (!weak.length) { el.innerHTML = '<div class="platforms-loading">No skill gaps detected.</div>'; return; }
+
+  let html = "";
+  weak.forEach(g => {
+    const platforms = PLATFORM_DB[g.skill] || [];
+    if (!platforms.length) return;
+    html += `<div style="margin-bottom:1.1rem;">
+      <div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;padding-bottom:.4rem;border-bottom:1px solid var(--rule);">
+        ${esc(g.skill)} — ${g.current}% proficiency
+      </div>
+      ${platforms.map(p=>`
+        <a class="platform-card" href="${p.url}" target="_blank" rel="noopener noreferrer">
+          <div class="platform-icon">${p.icon}</div>
+          <div class="platform-info">
+            <div class="platform-name">${esc(p.name)}</div>
+            <div class="platform-desc">${esc(p.desc)}</div>
+          </div>
+          <span class="platform-tag ${p.cls}">${p.tag}</span>
+        </a>`).join("")}
+    </div>`;
+  });
+
+  el.innerHTML = html || '<div class="platforms-loading">No recommendations available.</div>';
 }
 
 // ── JOB MATCH ──
@@ -1077,15 +1250,7 @@ async function runLinkedIn() {
 
 // ── HISTORY ──
 function loadHistory(idx) {
-  const item = S.history[idx];
-  if (!item || !item.result) {
-    toast("This entry has no saved data. Analyze again to save full results.","error",4000);
-    return;
-  }
-  S.result = item.result;
-  S.page = "dashboard";
-  render();
-  toast("History loaded — all tabs restored.","success",3000);
+  toast("History view is read-only. Analyze again for a fresh result.","success",4000);
 }
 function clearHistory() {
   if (!confirm("Clear all history?")) return;
