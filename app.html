@@ -785,10 +785,9 @@ function renderToolTags(tools) {
   const el = document.getElementById("toolTags");
   if (!el) return;
   el.innerHTML = (tools||[]).map(t => {
-    const name = typeof t === "object" ? t.name : t;
-    const url  = typeof t === "object" ? t.url  : (TOOL_LINKS[name] || "https://www.google.com/search?q=" + encodeURIComponent(name + " tutorial free"));
-    const why  = typeof t === "object" ? t.why  : "";
-    return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="tag tb" style="text-decoration:none;cursor:pointer;" title="' + esc(why || "Learn " + name) + '">' + esc(name) + ' ↗</a>';
+    const name = typeof t === "object" ? t.name : String(t);
+    const url  = TOOL_LINKS[name] || "https://www.google.com/search?q=" + encodeURIComponent(name + " tutorial free");
+    return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="tag tb" style="text-decoration:none;cursor:pointer;" title="Learn ' + esc(name) + '">' + esc(name) + ' ↗</a>';
   }).join("");
 }
 
@@ -800,18 +799,10 @@ function renderTeaserPills(skillGap) {
   const r = S.result;
   let allPlatforms = [];
 
-  // Use AI-generated platforms if available
-  if (r && r.learningPlatforms && r.learningPlatforms.length > 0) {
-    r.learningPlatforms.forEach(item => {
-      (item.platforms || []).forEach(p => allPlatforms.push(p));
-    });
-    if (text) text.textContent = `We found ${allPlatforms.length} learning resources based on your skill gaps — click to explore`;
-  } else {
-    // Fallback to static DB
-    const weak = [...(skillGap||[])].sort((a,b) => a.current - b.current).slice(0, 3);
-    weak.forEach(g => { (PLATFORM_DB[g.skill]||[]).forEach(p => allPlatforms.push(p)); });
-    if (text) text.textContent = `We found learning resources for your weakest skills — click to explore`;
-  }
+  // Use PLATFORM_DB based on user's weakest skills
+  const weak = [...(skillGap||[])].sort((a,b) => a.current - b.current).slice(0, 3);
+  weak.forEach(g => { (PLATFORM_DB[g.skill]||[]).forEach(p => allPlatforms.push(p)); });
+  if (text) text.textContent = `We found learning resources for your weakest skills — click to explore`;
 
   if (!allPlatforms.length) return;
 
@@ -834,32 +825,7 @@ function renderPlatforms(skillGap) {
 
   const r = S.result;
 
-  // Use AI-generated learning platforms if available
-  if (r && r.learningPlatforms && r.learningPlatforms.length > 0) {
-    let html = "";
-    r.learningPlatforms.forEach(item => {
-      const platforms = item.platforms || [];
-      if (!platforms.length) return;
-      html += `<div style="margin-bottom:1.1rem;">
-        <div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;padding-bottom:.4rem;border-bottom:1px solid var(--rule);">
-          ${esc(item.skill)}
-        </div>
-        ${platforms.map(p=>`
-          <a class="platform-card" href="${p.url}" target="_blank" rel="noopener noreferrer">
-            <div class="platform-icon">${(p.free === true || p.free === "yes") ? "🆓" : "💳"}</div>
-            <div class="platform-info">
-              <div class="platform-name">${esc(p.name)}</div>
-              <div class="platform-desc">${esc(p.desc)}</div>
-            </div>
-            <span class="platform-tag ${(p.free === true || p.free === "yes") ? "pt-free" : "pt-paid"}">${(p.free === true || p.free === "yes") ? "Free" : "Paid"}</span>
-          </a>`).join("")}
-      </div>`;
-    });
-    el.innerHTML = html || '<div class="platforms-loading">No recommendations available.</div>';
-    return;
-  }
-
-  // Fallback to static PLATFORM_DB if AI didn't return learningPlatforms
+  // Use PLATFORM_DB based on user's weakest skills
   const weak = [...(skillGap||[])]
     .sort((a,b) => a.current - b.current)
     .slice(0, 3);

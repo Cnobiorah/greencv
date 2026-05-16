@@ -93,30 +93,7 @@ Respond ONLY with a valid JSON object. No markdown, no backticks, no text outsid
     {"skill":"Green Finance","current":<0-100>},
     {"skill":"Environmental Compliance","current":<0-100>}
   ],
-  "tools": [
-    {"name":"<specific tool this user needs>","url":"<official website URL>","why":"<one sentence why>"},
-    {"name":"<tool2>","url":"<url2>","why":"<why2>"},
-    {"name":"<tool3>","url":"<url3>","why":"<why3>"},
-    {"name":"<tool4>","url":"<url4>","why":"<why4>"},
-    {"name":"<tool5>","url":"<url5>","why":"<why5>"}
-  ],
-  "learningPlatforms": [
-    {"skill":"<this user weakest skill 1>","platforms":[
-      {"name":"<platform>","url":"<direct course URL>","desc":"<one sentence>","free":"yes"},
-      {"name":"<platform2>","url":"<url2>","desc":"<desc2>","free":"no"},
-      {"name":"<platform3>","url":"<url3>","desc":"<desc3>","free":"yes"}
-    ]},
-    {"skill":"<weakest skill 2>","platforms":[
-      {"name":"<platform>","url":"<url>","desc":"<desc>","free":"yes"},
-      {"name":"<platform2>","url":"<url2>","desc":"<desc2>","free":"no"},
-      {"name":"<platform3>","url":"<url3>","desc":"<desc3>","free":"yes"}
-    ]},
-    {"skill":"<weakest skill 3>","platforms":[
-      {"name":"<platform>","url":"<url>","desc":"<desc>","free":"yes"},
-      {"name":"<platform2>","url":"<url2>","desc":"<desc2>","free":"no"},
-      {"name":"<platform3>","url":"<url3>","desc":"<desc3>","free":"yes"}
-    ]}
-  ],
+  "tools": ["<specific tool this user needs based on CV and role>","<tool2>","<tool3>","<tool4>","<tool5>"],
   "certs": [
     {"name":"<certification>","why":"<one sentence relevance to ${role}>"},
     {"name":"<certification>","why":"<one sentence>"},
