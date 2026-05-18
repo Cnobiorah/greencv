@@ -141,7 +141,8 @@ module.exports = async function handler(req, res) {
 
     result.role = role;
 
-    // Save analysis to Supabase
+    // Save analysis to Supabase — must be awaited before responding,
+    // otherwise Vercel terminates the function before the write completes.
     const sbUrl = process.env.SUPABASE_URL;
     const sbKey = process.env.SUPABASE_ANON_KEY;
     if (sbUrl && sbKey) {
@@ -155,31 +156,34 @@ module.exports = async function handler(req, res) {
           exp_impact:   result.expImpact || 0,
           email:        null,
         });
-        const reqSb = https.request({
-          hostname: parsed.hostname,
-          path:     "/rest/v1/analyses",
-          method:   "POST",
-          headers: {
-            "Content-Type":   "application/json",
-            "Content-Length": Buffer.byteLength(payload),
-            "apikey":         sbKey,
-            "Authorization":  `Bearer ${sbKey}`,
-            "Prefer":         "return=minimal",
-          },
-        }, (r) => {
-          let body = "";
-          r.on("data", c => body += c);
-          r.on("end", () => {
-            if (r.statusCode >= 300) {
-              console.error("[Supabase insert] status:", r.statusCode, "body:", body);
-            } else {
-              console.log("[Supabase insert] success");
-            }
+        await new Promise((resolve) => {
+          const reqSb = https.request({
+            hostname: parsed.hostname,
+            path:     "/rest/v1/analyses",
+            method:   "POST",
+            headers: {
+              "Content-Type":   "application/json",
+              "Content-Length": Buffer.byteLength(payload),
+              "apikey":         sbKey,
+              "Authorization":  `Bearer ${sbKey}`,
+              "Prefer":         "return=minimal",
+            },
+          }, (r) => {
+            let body = "";
+            r.on("data", c => body += c);
+            r.on("end", () => {
+              if (r.statusCode >= 300) {
+                console.error("[Supabase insert] status:", r.statusCode, "body:", body);
+              } else {
+                console.log("[Supabase insert] success");
+              }
+              resolve();
+            });
           });
+          reqSb.on("error", (e) => { console.error("[Supabase insert] error:", e.message); resolve(); });
+          reqSb.write(payload);
+          reqSb.end();
         });
-        reqSb.on("error", (e) => console.error("[Supabase insert] error:", e.message));
-        reqSb.write(payload);
-        reqSb.end();
       } catch(e) { console.error("[Supabase insert] exception:", e.message); }
     } else {
       console.error("[Supabase insert] missing env vars");
