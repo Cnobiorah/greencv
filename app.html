@@ -379,8 +379,17 @@ textarea.cta::placeholder{color:#c0c0bc;}
 
 <div class="shell">
   <aside class="sb" id="sidebar">
-    <div class="brand">
-      <a href="/"><div class="leaf">G</div><span class="bname">GreenCV</span></a>
+    <div class="brand" style="padding:1rem 1.25rem;">
+      <a href="/" style="display:flex;align-items:center;text-decoration:none;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 90" height="32">
+          <rect x="0" y="5" width="72" height="72" rx="15" fill="#1a6b3c"/>
+          <path d="M36 60 C19 48 17 29 36 18 C55 29 53 48 36 60Z" fill="#b5e853"/>
+          <path d="M36 60 L36 18" stroke="#0a1a0d" stroke-width="1.6" fill="none" opacity="0.38"/>
+          <circle cx="54" cy="56" r="13" fill="#0e4a28"/>
+          <path d="M47 56 L52 61 L61 50" stroke="#b5e853" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="88" y="48" font-family="Georgia, serif" font-size="32" font-weight="700" fill="white" letter-spacing="-0.8">Green<tspan fill="#b5e853">CV</tspan></text>
+        </svg>
+      </a>
     </div>
     <nav class="nav" id="nav"></nav>
     <div class="sbfoot">AI-powered CV analysis for sustainability &amp; energy professionals</div>
@@ -539,6 +548,9 @@ function pgUpload() { return `
         <button class="btn bd blg bfull" onclick="doSubmit()">Analyze My CV →</button>
         <p style="text-align:center;font-size:.7rem;color:var(--muted);margin-top:.65rem;">
           Processed securely — your CV is never stored
+        </p>
+        <p style="text-align:center;font-size:.72rem;color:var(--warn);margin-top:.4rem;padding:.45rem .75rem;background:#fffbeb;border:1px solid #fde68a;border-radius:5px;line-height:1.5;">
+          💡 GreenCV works best with CVs written in English. CVs in other languages will be analyzed but results will be returned in English.
         </p>
       </div>
     </div>

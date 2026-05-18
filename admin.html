@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>GreenCV Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --white:#fff; --off:#f8f8f6; --rule:#e8e8e4; --muted:#9a9990;
+  --body:#2c2c28; --head:#111110; --accent:#1a6b3c; --accent2:#0e4a28;
+  --danger:#b91c1c; --warn:#b45309; --good:#166534;
+}
+body { font-family:'Figtree',sans-serif; background:var(--off); color:var(--body); -webkit-font-smoothing:antialiased; }
+
+/* LOGIN */
+.login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; }
+.login-card { background:var(--white); border:1px solid var(--rule); border-radius:10px; padding:2.5rem; width:100%; max-width:380px; }
+.login-logo { display:flex; align-items:center; gap:.55rem; margin-bottom:2rem; }
+.login-leaf { width:28px; height:28px; background:var(--accent); border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700; color:#fff; }
+.login-name { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--head); }
+.login-card h2 { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--head); margin-bottom:.35rem; }
+.login-card p { font-size:.82rem; color:var(--muted); margin-bottom:1.5rem; }
+.field { margin-bottom:1rem; }
+.flbl { display:block; font-size:.66rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin-bottom:.4rem; }
+.input { width:100%; padding:.6rem .85rem; border:1px solid var(--rule); border-radius:6px; font-family:'Figtree',sans-serif; font-size:.875rem; background:#fff; color:var(--body); outline:none; transition:border-color .15s; }
+.input:focus { border-color:var(--accent); }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; padding:.6rem 1.1rem; border-radius:5px; font-family:'Figtree',sans-serif; font-weight:600; font-size:.82rem; cursor:pointer; border:1px solid transparent; transition:all .14s; width:100%; }
+.bd { background:var(--head); color:#fff; border-color:var(--head); }
+.bd:hover { background:#222; }
+.err { font-size:.76rem; color:var(--danger); margin-top:.5rem; display:none; }
+.err.show { display:block; }
+
+/* DASHBOARD */
+.dash { display:none; }
+.topbar { background:var(--head); padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+.topbar-logo { display:flex; align-items:center; gap:.55rem; }
+.topbar-leaf { width:24px; height:24px; background:var(--accent); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; color:#fff; }
+.topbar-name { font-family:'Playfair Display',serif; font-size:.95rem; color:#fff; }
+.topbar-right { display:flex; align-items:center; gap:1rem; }
+.topbar-tag { font-size:.72rem; color:rgba(255,255,255,.4); }
+.logout-btn { background:none; border:1px solid rgba(255,255,255,.15); color:rgba(255,255,255,.6); padding:.35rem .75rem; border-radius:5px; font-size:.75rem; cursor:pointer; font-family:'Figtree',sans-serif; transition:all .14s; }
+.logout-btn:hover { border-color:rgba(255,255,255,.4); color:#fff; }
+
+.content { padding:2rem; max-width:1200px; margin:0 auto; }
+
+/* STATS GRID */
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.5rem; }
+.stat-card { background:var(--white); border:1px solid var(--rule); border-radius:8px; padding:1.25rem; }
+.stat-label { font-size:.65rem; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin-bottom:.5rem; }
+.stat-value { font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; color:var(--head); line-height:1; }
+.stat-sub { font-size:.72rem; color:var(--muted); margin-top:.35rem; }
+.stat-good { color:var(--good); }
+.stat-warn { color:var(--warn); }
+
+/* TABS */
+.tabs { display:flex; gap:0; border-bottom:1px solid var(--rule); margin-bottom:1.5rem; }
+.tab { padding:.65rem 1.25rem; font-size:.82rem; font-weight:600; cursor:pointer; border:none; background:none; color:var(--muted); border-bottom:2px solid transparent; transition:all .15s; font-family:'Figtree',sans-serif; }
+.tab:hover { color:var(--body); }
+.tab.on { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* TABLE */
+.table-wrap { background:var(--white); border:1px solid var(--rule); border-radius:8px; overflow:hidden; }
+.table-header { padding:1rem 1.25rem; border-bottom:1px solid var(--rule); display:flex; align-items:center; justify-content:space-between; }
+.table-title { font-size:.75rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.table-count { font-size:.75rem; color:var(--muted); background:var(--off); padding:.2rem .6rem; border-radius:99px; }
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; padding:.65rem 1.25rem; font-size:.65rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--rule); background:var(--off); }
+td { padding:.7rem 1.25rem; font-size:.8rem; border-bottom:1px solid var(--rule); color:var(--body); }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:#fafafa; }
+.badge { padding:.2rem .55rem; border-radius:3px; font-size:.7rem; font-weight:600; }
+.badge-g { background:#f0f7f3; color:var(--accent); }
+.badge-w { background:#fffbeb; color:var(--warn); }
+.badge-r { background:#fef2f2; color:var(--danger); }
+.stars { color:#f59e0b; font-size:.8rem; }
+
+/* SECTION HEADER */
+.section-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
+.section-head h2 { font-family:'Playfair Display',serif; font-size:1.1rem; color:var(--head); }
+
+/* LOADING */
+.loading { text-align:center; padding:3rem; color:var(--muted); font-size:.84rem; }
+.spinner { width:28px; height:28px; border:2px solid var(--rule); border-top-color:var(--accent); border-radius:50%; animation:spin .65s linear infinite; margin:0 auto 1rem; }
+@keyframes spin { to{transform:rotate(360deg);} }
+
+/* REFRESH */
+.refresh-btn { background:transparent; border:1px solid var(--rule); color:var(--muted); padding:.4rem .85rem; border-radius:5px; font-size:.75rem; cursor:pointer; font-family:'Figtree',sans-serif; transition:all .14s; }
+.refresh-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+/* EMPTY */
+.empty { text-align:center; padding:2.5rem; color:var(--muted); font-size:.82rem; }
+
+/* RESPONSIVE */
+@media(max-width:768px) {
+  .stats-grid { grid-template-columns:repeat(2,1fr); }
+  .content { padding:1rem; }
+  td,th { padding:.6rem .75rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-leaf">G</div>
+      <span class="login-name">GreenCV</span>
+    </div>
+    <h2>Admin Dashboard</h2>
+    <p>Enter your admin key to access the dashboard</p>
+    <div class="field">
+      <label class="flbl">Admin Key</label>
+      <input type="password" class="input" id="adminKey" placeholder="Enter your secret key" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <div class="err" id="loginErr">Invalid admin key. Please try again.</div>
+    <button class="btn bd" onclick="login()">Access Dashboard →</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dash" id="dashboard">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-leaf">G</div>
+      <span class="topbar-name">GreenCV Admin</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-tag" id="lastUpdated"></span>
+      <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="stat-label">Total Analyses</div><div class="stat-value" id="sTotalAnalyses">—</div><div class="stat-sub">CVs analyzed</div></div>
+      <div class="stat-card"><div class="stat-label">Total Feedback</div><div class="stat-value" id="sTotalFeedback">—</div><div class="stat-sub">Reviews submitted</div></div>
+      <div class="stat-card"><div class="stat-label">Avg Rating</div><div class="stat-value stat-good" id="sAvgRating">—</div><div class="stat-sub">Out of 5 stars</div></div>
+      <div class="stat-card"><div class="stat-label">Would Pay</div><div class="stat-value stat-warn" id="sWouldPay">—</div><div class="stat-sub">Of feedback users</div></div>
+    </div>
+
+    <!-- EXTRA STATS -->
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+      <div class="stat-card"><div class="stat-label">Avg CV Score</div><div class="stat-value" id="sAvgScore">—</div><div class="stat-sub">Average score given</div></div>
+      <div class="stat-card"><div class="stat-label">Top Role</div><div class="stat-value" style="font-size:1rem;margin-top:.25rem;" id="sTopRole">—</div><div class="stat-sub">Most analyzed role</div></div>
+      <div class="stat-card"><div class="stat-label">Would Pay %</div><div class="stat-value stat-good" id="sWouldPayPct">—</div><div class="stat-sub">Ready to pay</div></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab on" onclick="showTab('analyses')">📊 Analyses</button>
+      <button class="tab" onclick="showTab('feedback')">💬 Feedback</button>
+    </div>
+
+    <!-- ANALYSES TABLE -->
+    <div id="tabAnalyses">
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title">All CV Analyses</span>
+          <span class="table-count" id="analysesCount">0</span>
+        </div>
+        <div id="analysesBody"><div class="loading"><div class="spinner"></div>Loading analyses…</div></div>
+      </div>
+    </div>
+
+    <!-- FEEDBACK TABLE -->
+    <div id="tabFeedback" style="display:none;">
+      <div class="table-wrap">
+        <div class="table-header">
+          <span class="table-title">All Feedback</span>
+          <span class="table-count" id="feedbackCount">0</span>
+        </div>
+        <div id="feedbackBody"><div class="loading"><div class="spinner"></div>Loading feedback…</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+"use strict";
+
+let adminKey = "";
+let dashData = null;
+
+// ── LOGIN ──
+function login() {
+  const key = document.getElementById("adminKey").value.trim();
+  if (!key) return;
+  adminKey = key;
+  loadData();
+}
+
+function logout() {
+  adminKey = "";
+  dashData = null;
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("loginWrap").style.display = "flex";
+  document.getElementById("adminKey").value = "";
+}
+
+// ── LOAD DATA ──
+async function loadData() {
+  try {
+    const res = await fetch("/admin-data", {
+      headers: { "x-admin-key": adminKey }
+    });
+
+    if (res.status === 401) {
+      document.getElementById("loginErr").classList.add("show");
+      return;
+    }
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    dashData = data;
+    document.getElementById("loginErr").classList.remove("show");
+    document.getElementById("loginWrap").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+
+    renderStats(data.stats);
+    renderAnalyses(data.analyses);
+    renderFeedback(data.feedback);
+
+    const now = new Date().toLocaleTimeString("en-GB");
+    document.getElementById("lastUpdated").textContent = `Last updated: ${now}`;
+
+  } catch(e) {
+    document.getElementById("loginErr").textContent = "Error: " + e.message;
+    document.getElementById("loginErr").classList.add("show");
+  }
+}
+
+// ── RENDER STATS ──
+function renderStats(s) {
+  document.getElementById("sTotalAnalyses").textContent = s.totalAnalyses || 0;
+  document.getElementById("sTotalFeedback").textContent = s.totalFeedback || 0;
+  document.getElementById("sAvgRating").textContent     = s.avgRating ? s.avgRating + " ★" : "—";
+  document.getElementById("sWouldPay").textContent      = s.wouldPay || 0;
+  document.getElementById("sAvgScore").textContent      = s.avgScore || "—";
+  document.getElementById("sTopRole").textContent       = s.topRole || "—";
+  document.getElementById("sWouldPayPct").textContent   = s.wouldPayPct ? s.wouldPayPct + "%" : "—";
+}
+
+// ── RENDER ANALYSES ──
+function renderAnalyses(analyses) {
+  const count = document.getElementById("analysesCount");
+  const body  = document.getElementById("analysesBody");
+  count.textContent = analyses.length;
+
+  if (!analyses.length) {
+    body.innerHTML = '<div class="empty">No analyses yet. Share GreenCV to get your first users!</div>';
+    return;
+  }
+
+  body.innerHTML = `<table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Role</th>
+        <th>Score</th>
+        <th>ATS</th>
+        <th>Green Skills</th>
+        <th>Email</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${analyses.map((a, i) => {
+        const score = a.score || 0;
+        const badgeCls = score>=70?"badge-g":score>=45?"badge-w":"badge-r";
+        const date = a.created_at ? new Date(a.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) : "—";
+        return `<tr>
+          <td style="color:var(--muted)">${analyses.length - i}</td>
+          <td style="font-weight:500">${esc(a.role || "—")}</td>
+          <td><span class="badge ${badgeCls}">${score}</span></td>
+          <td>${a.ats || "—"}%</td>
+          <td>${a.green_skills || "—"}%</td>
+          <td style="color:var(--muted)">${esc(a.email || "Anonymous")}</td>
+          <td style="color:var(--muted)">${date}</td>
+        </tr>`;
+      }).join("")}
+    </tbody>
+  </table>`;
+}
+
+// ── RENDER FEEDBACK ──
+function renderFeedback(feedback) {
+  const count = document.getElementById("feedbackCount");
+  const body  = document.getElementById("feedbackBody");
+  count.textContent = feedback.length;
+
+  if (!feedback.length) {
+    body.innerHTML = '<div class="empty">No feedback yet.</div>';
+    return;
+  }
+
+  body.innerHTML = `<table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Rating</th>
+        <th>Best Feature</th>
+        <th>Would Pay</th>
+        <th>Comment</th>
+        <th>Email</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${feedback.map((f, i) => {
+        const stars = "★".repeat(f.rating || 0) + "☆".repeat(5-(f.rating||0));
+        const date  = f.created_at ? new Date(f.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}) : "—";
+        const payBadge = f.pay?.startsWith("Yes") ? "badge-g" : f.pay?.startsWith("Maybe") ? "badge-w" : "badge-r";
+        return `<tr>
+          <td style="color:var(--muted)">${feedback.length - i}</td>
+          <td><span class="stars">${stars}</span></td>
+          <td>${esc(f.feature || "—")}</td>
+          <td><span class="badge ${payBadge}">${esc(f.pay || "—")}</span></td>
+          <td style="max-width:250px;color:var(--muted)">${esc(f.improve || "—")}</td>
+          <td style="color:var(--muted)">${esc(f.email || "Anonymous")}</td>
+          <td style="color:var(--muted)">${date}</td>
+        </tr>`;
+      }).join("")}
+    </tbody>
+  </table>`;
+}
+
+// ── TABS ──
+function showTab(tab) {
+  document.getElementById("tabAnalyses").style.display = tab === "analyses" ? "block" : "none";
+  document.getElementById("tabFeedback").style.display = tab === "feedback" ? "block" : "none";
+  document.querySelectorAll(".tab").forEach((t, i) => {
+    t.classList.toggle("on", (i===0&&tab==="analyses")||(i===1&&tab==="feedback"));
+  });
+}
+
+function esc(s="") {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+</script>
+</body>
+</html>
