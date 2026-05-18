@@ -238,16 +238,17 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="/" aria-label="GreenCV home">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 44" height="34">
-      <rect x="0" y="2" width="38" height="38" rx="8" fill="#1a6b3c"/>
-      <path d="M19 32 C10 26 9 15 19 9 C29 15 28 26 19 32Z" fill="#b5e853"/>
-      <path d="M19 32 L19 9" stroke="#0a1a0d" stroke-width="1.2" fill="none" opacity="0.35"/>
-      <circle cx="29" cy="30" r="7" fill="#0e4a28"/>
-      <path d="M25 30 L28 33 L33 26" stroke="#b5e853" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <text x="46" y="26" font-family="Georgia, serif" font-size="17" font-weight="700" fill="white" letter-spacing="-0.3">Green<tspan fill="#b5e853">CV</tspan></text>
-      <text x="46" y="38" font-family="Arial, sans-serif" font-size="6" fill="white" opacity="0.35" letter-spacing="1.5">AI FOR GREEN CAREERS</text>
-    </svg>
+  <a class="nav-logo" href="/" aria-label="GreenCV home" style="display:flex;align-items:center;gap:.6rem;text-decoration:none;">
+    <div style="width:32px;height:32px;background:#1a6b3c;border-radius:7px;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;">
+      <svg width="18" height="20" viewBox="0 0 18 20" fill="none">
+        <path d="M9 19 C2 14 1 6 9 1 C17 6 16 14 9 19Z" fill="#b5e853"/>
+        <path d="M9 19 L9 1" stroke="#0a1a0d" stroke-width="1.2" opacity="0.4"/>
+      </svg>
+      <div style="position:absolute;bottom:-3px;right:-3px;width:12px;height:12px;background:#0e4a28;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid #1a6b3c;">
+        <svg width="7" height="6" viewBox="0 0 7 6"><path d="M1 3 L3 5 L6 1" stroke="#b5e853" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:-.2px;">Green<span style="color:#b5e853;">CV</span></span>
   </a>
   <div class="nav-links">
     <a href="#how">How it works</a>
@@ -559,12 +560,13 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
 
 <!-- FOOTER -->
 <footer>
-  <a class="footer-logo" href="/">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 36" height="28">
-      <rect x="0" y="2" width="30" height="30" rx="6" fill="#1a6b3c" opacity="0.6"/>
-      <path d="M15 26 C8 21 7 12 15 7 C23 12 22 21 15 26Z" fill="#b5e853" opacity="0.7"/>
-      <text x="38" y="22" font-family="Georgia, serif" font-size="14" font-weight="700" fill="white" opacity="0.4" letter-spacing="-0.3">Green<tspan fill="#b5e853" opacity="0.7">CV</tspan></text>
-    </svg>
+  <a class="footer-logo" href="/" style="display:flex;align-items:center;gap:.5rem;text-decoration:none;">
+    <div style="width:24px;height:24px;background:#1a6b3c;border-radius:5px;display:flex;align-items:center;justify-content:center;opacity:.7;">
+      <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
+        <path d="M6 13 C1 9 1 4 6 1 C11 4 11 9 6 13Z" fill="#b5e853"/>
+      </svg>
+    </div>
+    <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:.95rem;font-weight:700;color:rgba(255,255,255,.4);">Green<span style="color:rgba(181,232,83,.7);">CV</span></span>
   </a>
   <nav class="footer-links">
     <a href="#how">How it works</a>
