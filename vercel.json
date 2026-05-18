@@ -8,7 +8,9 @@
     { "source": "/send-email",     "destination": "/api/send-email" },
     { "source": "/send-feedback",  "destination": "/api/send-feedback" },
     { "source": "/get-feedback",   "destination": "/api/get-feedback" },
+    { "source": "/admin-data",     "destination": "/api/admin" },
     { "source": "/ping",           "destination": "/api/ping" },
+    { "source": "/admin",          "destination": "/admin.html" },
     { "source": "/app",            "destination": "/app.html" },
     { "source": "/",               "destination": "/index.html" }
   ]
