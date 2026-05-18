@@ -14,7 +14,7 @@ function isValidRole(role) {
   return false;
 }
 
-function callAnthropic(messages, apiKey, maxTokens = 4000) {
+function callAnthropic(messages, apiKey, maxTokens = 8000) {
   return new Promise((resolve, reject) => {
     const payload = JSON.stringify({
       model: "claude-haiku-4-5",
