@@ -26,10 +26,10 @@ body { font-family:'Figtree',sans-serif; background:var(--ink); color:var(--crea
 .skip-link:focus { top:0; }
 
 /* NAV */
-nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1.1rem 2.5rem; background:rgba(13,13,11,.88); backdrop-filter:blur(14px); border-bottom:1px solid var(--rule); transition:padding .2s; }
-.nav-logo { display:flex; align-items:center; gap:.55rem; text-decoration:none; }
-.nav-leaf { width:27px; height:27px; background:var(--moss); border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:.78rem; font-weight:700; color:#fff; flex-shrink:0; }
-.nav-name { font-family:'Cormorant Garamond',serif; font-size:1.15rem; font-weight:700; color:var(--white); }
+nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:1rem 2.5rem; background:rgba(13,13,11,.95); backdrop-filter:blur(14px); border-bottom:1px solid var(--rule); transition:padding .2s; } border-bottom:1px solid var(--rule); transition:all .2s; min-height:68px; overflow:visible; }
+.nav-logo { display:flex; align-items:center; gap:.6rem; text-decoration:none; }
+.nav-leaf { width:34px; height:34px; background:#1a6b3c; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 2px 8px rgba(26,107,60,.35); }
+.nav-name { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:700; color:#ffffff; letter-spacing:-.2px; }
 .nav-links { display:flex; align-items:center; gap:1.75rem; }
 .nav-links a { text-decoration:none; font-size:.8rem; color:rgba(255,255,255,.45); font-weight:500; transition:color .15s; }
 .nav-links a:hover { color:var(--white); }
@@ -44,7 +44,7 @@ nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-i
 .mobile-menu .nav-cta { margin-top:.5rem; text-align:center; }
 
 /* HERO */
-.hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:8rem 2rem 5rem; position:relative; overflow:hidden; }
+.hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:9rem 2rem 5rem; position:relative; overflow:hidden; }
 .hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px); background-size:64px 64px; mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%); pointer-events:none; }
 .hero-glow { position:absolute; width:700px; height:700px; background:radial-gradient(circle,rgba(26,107,60,.22) 0%,transparent 70%); top:50%; left:50%; transform:translate(-50%,-56%); pointer-events:none; }
 .hero-badge { display:inline-flex; align-items:center; gap:.5rem; background:rgba(181,232,83,.09); border:1px solid rgba(181,232,83,.18); color:var(--lime); border-radius:99px; padding:.32rem .9rem; font-size:.73rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin-bottom:1.75rem; position:relative; z-index:1; animation:fadeUp .6s ease both; }
@@ -238,17 +238,44 @@ footer { background:var(--ink); border-top:1px solid var(--rule); padding:2.25re
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="/" aria-label="GreenCV home" style="display:flex;align-items:center;gap:.6rem;text-decoration:none;">
-    <div style="width:32px;height:32px;background:#1a6b3c;border-radius:7px;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;">
-      <svg width="18" height="20" viewBox="0 0 18 20" fill="none">
-        <path d="M9 19 C2 14 1 6 9 1 C17 6 16 14 9 19Z" fill="#b5e853"/>
-        <path d="M9 19 L9 1" stroke="#0a1a0d" stroke-width="1.2" opacity="0.4"/>
-      </svg>
-      <div style="position:absolute;bottom:-3px;right:-3px;width:12px;height:12px;background:#0e4a28;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid #1a6b3c;">
-        <svg width="7" height="6" viewBox="0 0 7 6"><path d="M1 3 L3 5 L6 1" stroke="#b5e853" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-    </div>
-    <span style="font-family:'Cormorant Garamond',Georgia,serif;font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:-.2px;">Green<span style="color:#b5e853;">CV</span></span>
+  <a class="nav-logo" href="/" style="display:flex;align-items:center;text-decoration:none;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 90" height="38" width="auto">
+  <defs>
+    <linearGradient id="boxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#111110"/>
+      <stop offset="100%" style="stop-color:#1a3d28"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c8f566"/>
+      <stop offset="100%" style="stop-color:#8bc34a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon box -->
+  <rect x="0" y="5" width="72" height="72" rx="15" fill="url(#boxGrad)"/>
+
+  <!-- Leaf -->
+  <path d="M36 60 C19 48 17 29 36 18 C55 29 53 48 36 60Z" fill="url(#leafGrad)"/>
+  <path d="M36 60 L36 18" stroke="#0a1a0d" stroke-width="1.6" fill="none" opacity="0.38"/>
+  <path d="M36 40 C27 34 21 28 18 23" stroke="#0a1a0d" stroke-width="1" fill="none" opacity="0.28"/>
+  <path d="M36 40 C45 34 51 28 54 23" stroke="#0a1a0d" stroke-width="1" fill="none" opacity="0.28"/>
+  <path d="M36 51 C30 46 25 42 22 38" stroke="#0a1a0d" stroke-width="0.9" fill="none" opacity="0.2"/>
+  <path d="M36 51 C42 46 47 42 50 38" stroke="#0a1a0d" stroke-width="0.9" fill="none" opacity="0.2"/>
+
+  <!-- Check badge -->
+  <circle cx="54" cy="56" r="13" fill="#1a6b3c"/>
+  <circle cx="54" cy="56" r="13" fill="none" stroke="#b5e853" stroke-width="1.2" opacity="0.5"/>
+  <path d="M47 56 L52 61 L61 50" stroke="#b5e853" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Wordmark -->
+  <text x="88" y="48" font-family="'Playfair Display', Georgia, 'Times New Roman', serif" font-size="32" font-weight="700" fill="#ffffff" letter-spacing="-0.8">Green<tspan fill="#b5e853">CV</tspan></text>
+
+  <!-- Tagline -->
+  <text x="89" y="66" font-family="'Arial', sans-serif" font-size="10.5" fill="#999999" letter-spacing="2.8" font-weight="400">AI FOR GREEN CAREERS</text>
+
+  <!-- Lime underline accent -->
+  
+</svg>
   </a>
   <div class="nav-links">
     <a href="#how">How it works</a>
