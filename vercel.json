@@ -1,4 +1,11 @@
 {
+  "functions": {
+    "api/analyze.js":       { "maxDuration": 60 },
+    "api/analyze-image.js": { "maxDuration": 60 },
+    "api/job-match.js":     { "maxDuration": 60 },
+    "api/cover-letter.js":  { "maxDuration": 60 },
+    "api/linkedin.js":      { "maxDuration": 60 }
+  },
   "rewrites": [
     { "source": "/analyze",        "destination": "/api/analyze" },
     { "source": "/analyze-image",  "destination": "/api/analyze-image" },
