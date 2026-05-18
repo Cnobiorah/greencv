@@ -155,40 +155,34 @@ module.exports = async function handler(req, res) {
           exp_impact:   result.expImpact || 0,
           email:        null,
         });
-        await new Promise((resolve) => {
-          const reqSb = https.request({
-            hostname: parsed.hostname,
-            path:     "/rest/v1/analyses",
-            method:   "POST",
-            headers: {
-              "Content-Type":   "application/json",
-              "Content-Length": Buffer.byteLength(payload),
-              "apikey":         sbKey,
-              "Authorization":  `Bearer ${sbKey}`,
-              "Prefer":         "return=minimal",
-            },
-          }, (r) => {
-            let body = "";
-            r.on("data", c => body += c);
-            r.on("end", () => {
-              if (r.statusCode >= 300) {
-                console.error("[Supabase insert] status:", r.statusCode, "body:", body);
-              }
-              resolve();
-            });
+        const reqSb = https.request({
+          hostname: parsed.hostname,
+          path:     "/rest/v1/analyses",
+          method:   "POST",
+          headers: {
+            "Content-Type":   "application/json",
+            "Content-Length": Buffer.byteLength(payload),
+            "apikey":         sbKey,
+            "Authorization":  `Bearer ${sbKey}`,
+            "Prefer":         "return=minimal",
+          },
+        }, (r) => {
+          let body = "";
+          r.on("data", c => body += c);
+          r.on("end", () => {
+            if (r.statusCode >= 300) {
+              console.error("[Supabase insert] status:", r.statusCode, "body:", body);
+            } else {
+              console.log("[Supabase insert] success");
+            }
           });
-          reqSb.on("error", (e) => {
-            console.error("[Supabase insert] network error:", e.message);
-            resolve();
-          });
-          reqSb.write(payload);
-          reqSb.end();
         });
-      } catch(e) {
-        console.error("[Supabase insert] exception:", e.message);
-      }
+        reqSb.on("error", (e) => console.error("[Supabase insert] error:", e.message));
+        reqSb.write(payload);
+        reqSb.end();
+      } catch(e) { console.error("[Supabase insert] exception:", e.message); }
     } else {
-      console.error("[Supabase insert] missing env vars — SUPABASE_URL or SUPABASE_ANON_KEY not set");
+      console.error("[Supabase insert] missing env vars");
     }
 
     return res.status(200).json(result);
