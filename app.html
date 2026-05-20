@@ -242,6 +242,23 @@ textarea.cta::placeholder{color:#c0c0bc;}
 .star.active { color: #f59e0b; }
 .star:hover { color: #f59e0b; }
 
+/* STRUCTURED CV */
+.cv-card { padding: 1.75rem 2rem; }
+.cv-structured { max-width: 760px; }
+.cv-header { text-align: center; padding-bottom: 1.25rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--accent); }
+.cv-name { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--head); line-height: 1.2; margin-bottom: .35rem; }
+.cv-contact { font-size: .78rem; color: var(--muted); line-height: 1.6; }
+.cv-section { margin-bottom: 1.4rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--rule); }
+.cv-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.cv-sec-head { font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: .75rem; padding-bottom: .45rem; border-bottom: 1.5px solid #d4eddf; }
+.cv-sec-body { display: flex; flex-direction: column; gap: .28rem; }
+.cv-sub-head { font-size: .85rem; font-weight: 700; color: var(--head); margin-top: .55rem; margin-bottom: .1rem; }
+.cv-sub-head:first-child { margin-top: 0; }
+.cv-job-line { font-size: .8rem; font-weight: 600; color: var(--body); padding: .18rem 0; border-left: 2px solid var(--accent); padding-left: .65rem; background: #f8fdf9; border-radius: 0 3px 3px 0; margin: .25rem 0; }
+.cv-para { font-size: .81rem; color: var(--body); line-height: 1.65; }
+.cv-bullet { display: flex; align-items: flex-start; gap: .5rem; font-size: .81rem; color: var(--body); line-height: 1.6; }
+.cv-dot { color: var(--accent); font-size: .6rem; margin-top: .32rem; flex-shrink: 0; }
+
 /* MISC */
 .hr{height:1px;background:var(--rule);margin-bottom:1.4rem;}
 .hidden{display:none!important;}
@@ -659,6 +676,105 @@ function pgDash() {
     </div>
   </div></div>`; }
 
+function parseCV(text) {
+  // Split into lines, trim trailing whitespace
+  const lines = text.split(/\r?\n/).map(l => l.trimEnd());
+  const sections = [];
+  let current = null;
+
+  // Heuristics: a line is a SECTION HEADING if it's ALL CAPS, or matches known keywords,
+  // or is a short line (≤50 chars) with no sentence-ending punctuation followed by a blank/bullet line.
+  const HEADING_RE = /^(SUMMARY|PROFILE|OBJECTIVE|EXPERIENCE|WORK EXPERIENCE|EMPLOYMENT|EDUCATION|SKILLS|TECHNICAL SKILLS|KEY SKILLS|COMPETENCIES|CERTIFICATIONS?|COURSES?|TRAINING|ACHIEVEMENTS?|AWARDS?|PROJECTS?|PUBLICATIONS?|LANGUAGES?|INTERESTS?|HOBBIES|REFERENCES?|CONTACT|PERSONAL DETAILS?|PROFESSIONAL SUMMARY|CAREER SUMMARY|QUALIFICATIONS?|VOLUNTEERING?|EXTRA.CURRICULAR|MEMBERSHIPS?)\b/i;
+  const isAllCaps = l => l.length > 1 && l === l.toUpperCase() && /[A-Z]/.test(l);
+  const isBullet  = l => /^[\u2022\-\*•▸▹►→]\s/.test(l.trim());
+  const isEmpty   = l => l.trim() === "";
+
+  function flushCurrent() {
+    if (current) sections.push(current);
+  }
+
+  // First non-empty lines may be the person's name & contact — detect header block
+  let headerLines = [];
+  let bodyStart = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i].trim();
+    if (isEmpty(lines[i])) { if (headerLines.length) { bodyStart = i + 1; break; } continue; }
+    // If we've collected at least 1 header line and hit a section heading, stop
+    if (headerLines.length >= 1 && (HEADING_RE.test(l) || isAllCaps(l))) { bodyStart = i; break; }
+    headerLines.push(lines[i]);
+    bodyStart = i + 1;
+  }
+
+  // Parse body into sections
+  for (let i = bodyStart; i < lines.length; i++) {
+    const raw = lines[i];
+    const l   = raw.trim();
+    if (isEmpty(raw)) continue; // skip blank lines
+
+    const isHeading = HEADING_RE.test(l) || (isAllCaps(l) && l.length <= 60 && !isBullet(l));
+
+    if (isHeading) {
+      flushCurrent();
+      current = { heading: l, items: [] };
+    } else {
+      if (!current) { current = { heading: "", items: [] }; }
+      current.items.push(raw);
+    }
+  }
+  flushCurrent();
+
+  return { headerLines, sections };
+}
+
+function renderCVStructured(text) {
+  const { headerLines, sections } = parseCV(text);
+  let html = "";
+
+  // ── HEADER (name + contact) ──
+  if (headerLines.length) {
+    const name = headerLines[0].trim();
+    const rest = headerLines.slice(1);
+    html += `<div class="cv-header">
+      <div class="cv-name">${esc(name)}</div>
+      ${rest.length ? `<div class="cv-contact">${rest.map(l => esc(l.trim())).join(" &nbsp;·&nbsp; ")}</div>` : ""}
+    </div>`;
+  }
+
+  // ── SECTIONS ──
+  sections.forEach(sec => {
+    if (sec.heading) {
+      html += `<div class="cv-section">
+        <div class="cv-sec-head">${esc(sec.heading)}</div>
+        <div class="cv-sec-body">`;
+    } else {
+      html += `<div class="cv-section"><div class="cv-sec-body">`;
+    }
+
+    sec.items.forEach(line => {
+      const l = line.trim();
+      if (!l) return;
+      const isBullet = /^[\u2022\-\*•▸▹►→]\s+/.test(l);
+      const isSubHead = /^[A-Z][^.!?]{2,49}$/.test(l) && !isBullet && l.split(" ").length <= 8;
+      const isDate    = /\b(19|20)\d{2}\b/.test(l) && l.length < 60 && !isBullet;
+
+      if (isBullet) {
+        const content = l.replace(/^[\u2022\-\*•▸▹►→]\s+/, "");
+        html += `<div class="cv-bullet"><span class="cv-dot">▸</span><span>${esc(content)}</span></div>`;
+      } else if (isSubHead && isDate) {
+        html += `<div class="cv-job-line">${esc(l)}</div>`;
+      } else if (isSubHead) {
+        html += `<div class="cv-sub-head">${esc(l)}</div>`;
+      } else {
+        html += `<div class="cv-para">${esc(l)}</div>`;
+      }
+    });
+
+    html += `</div></div>`;
+  });
+
+  return html;
+}
+
 function pgRW() {
   const r = S.result;
   return `
@@ -668,8 +784,10 @@ function pgRW() {
      <button class="btn bo" onclick="dlCV()">Download .txt</button>
      <button class="btn bd" onclick="dlPDF()">Download PDF</button>`)}
   <div class="scroll"><div class="page">
-    <div class="hr"></div>
-    <div class="card fi"><div class="cvbody">${esc(r.rewrittenCV)}</div></div>
+    <div class="card fi cv-card">
+      <div style="font-size:.76rem;color:var(--muted);line-height:1.5;margin-bottom:1.25rem;">AI-optimised and formatted for <strong>${esc(r.role)}</strong> roles in the green energy sector.</div>
+      <div class="cv-structured">${renderCVStructured(r.rewrittenCV)}</div>
+    </div>
   </div></div>`; }
 
 function pgSG() {
@@ -1382,16 +1500,95 @@ function dlText(content, filename) {
 function dlPDF() {
   if (!S.result) return;
   const cv = S.result.rewrittenCV;
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>GreenCV</title>
-  <style>body{font-family:Georgia,serif;font-size:11pt;line-height:1.7;color:#1a1a1a;padding:2cm;max-width:21cm;margin:0 auto;}
-  pre{white-space:pre-wrap;word-wrap:break-word;font-family:Georgia,serif;font-size:11pt;line-height:1.7;}
-  .footer{margin-top:1.5cm;font-size:8pt;color:#999;text-align:center;border-top:1px solid #eee;padding-top:6px;}
-  @media print{body{padding:0;}}</style></head>
-  <body><pre>${cv.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</pre>
-  <div class="footer">Generated by GreenCV — AI CV Analysis for Green Professionals</div>
-  <script>window.onload=function(){window.print();setTimeout(function(){window.close();},1000);};<\/script>
-  
+  const role = S.result.role;
+
+  // Build structured HTML using same parser logic (inline for PDF context)
+  function pdfParseCV(text) {
+    const lines = text.split(/\r?\n/).map(l => l.trimEnd());
+    const HEADING_RE = /^(SUMMARY|PROFILE|OBJECTIVE|EXPERIENCE|WORK EXPERIENCE|EMPLOYMENT|EDUCATION|SKILLS|TECHNICAL SKILLS|KEY SKILLS|COMPETENCIES|CERTIFICATIONS?|COURSES?|TRAINING|ACHIEVEMENTS?|AWARDS?|PROJECTS?|PUBLICATIONS?|LANGUAGES?|INTERESTS?|HOBBIES|REFERENCES?|CONTACT|PERSONAL DETAILS?|PROFESSIONAL SUMMARY|CAREER SUMMARY|QUALIFICATIONS?|VOLUNTEERING?|EXTRA.CURRICULAR|MEMBERSHIPS?)\b/i;
+    const isAllCaps = l => l.length > 1 && l === l.toUpperCase() && /[A-Z]/.test(l);
+    const isEmpty   = l => l.trim() === "";
+    const esc2 = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+    let headerLines = [], bodyStart = 0;
+    for (let i = 0; i < lines.length; i++) {
+      const l = lines[i].trim();
+      if (isEmpty(lines[i])) { if (headerLines.length) { bodyStart = i+1; break; } continue; }
+      if (headerLines.length >= 1 && (HEADING_RE.test(l) || isAllCaps(l))) { bodyStart = i; break; }
+      headerLines.push(lines[i]);
+      bodyStart = i + 1;
+    }
+
+    const sections = [];
+    let current = null;
+    for (let i = bodyStart; i < lines.length; i++) {
+      const raw = lines[i]; const l = raw.trim();
+      if (isEmpty(raw)) continue;
+      const isHeading = HEADING_RE.test(l) || (isAllCaps(l) && l.length <= 60 && !/^[\u2022\-\*•▸▹►→]\s/.test(l));
+      if (isHeading) { if (current) sections.push(current); current = { heading: l, items: [] }; }
+      else { if (!current) current = { heading: "", items: [] }; current.items.push(raw); }
+    }
+    if (current) sections.push(current);
+
+    let html = "";
+    if (headerLines.length) {
+      const name = headerLines[0].trim();
+      const rest = headerLines.slice(1);
+      html += `<div class="cv-header"><div class="cv-name">${esc2(name)}</div>`;
+      if (rest.length) html += `<div class="cv-contact">${rest.map(l=>esc2(l.trim())).join(" &nbsp;·&nbsp; ")}</div>`;
+      html += `</div>`;
+    }
+    sections.forEach(sec => {
+      html += `<div class="cv-section">`;
+      if (sec.heading) html += `<div class="cv-sec-head">${esc2(sec.heading)}</div>`;
+      html += `<div class="cv-sec-body">`;
+      sec.items.forEach(line => {
+        const l = line.trim(); if (!l) return;
+        const isBullet = /^[\u2022\-\*•▸▹►→]\s+/.test(l);
+        const isSubHead = /^[A-Z][^.!?]{2,49}$/.test(l) && !isBullet && l.split(" ").length <= 8;
+        const isDate    = /\b(19|20)\d{2}\b/.test(l) && l.length < 60 && !isBullet;
+        if (isBullet) {
+          html += `<div class="cv-bullet">▸ ${esc2(l.replace(/^[\u2022\-\*•▸▹►→]\s+/, ""))}</div>`;
+        } else if (isSubHead && isDate) {
+          html += `<div class="cv-job-line">${esc2(l)}</div>`;
+        } else if (isSubHead) {
+          html += `<div class="cv-sub-head">${esc2(l)}</div>`;
+        } else {
+          html += `<div class="cv-para">${esc2(l)}</div>`;
+        }
+      });
+      html += `</div></div>`;
+    });
+    return html;
+  }
+
+  const bodyHTML = pdfParseCV(cv);
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>GreenCV — ${role}</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Georgia,serif;font-size:11pt;line-height:1.65;color:#1a1a1a;background:#fff;}
+.page{max-width:21cm;margin:0 auto;padding:2cm 2.2cm;}
+.cv-header{text-align:center;padding-bottom:1rem;margin-bottom:1.4rem;border-bottom:2px solid #1a6b3c;}
+.cv-name{font-size:1.6rem;font-weight:700;color:#111;margin-bottom:.3rem;}
+.cv-contact{font-size:.8rem;color:#666;line-height:1.7;}
+.cv-section{margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid #e8e8e4;}
+.cv-section:last-child{border-bottom:none;}
+.cv-sec-head{font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#1a6b3c;margin-bottom:.6rem;padding-bottom:.4rem;border-bottom:1.5px solid #d4eddf;}
+.cv-sec-body{display:flex;flex-direction:column;gap:.25rem;}
+.cv-sub-head{font-size:.9rem;font-weight:700;color:#111;margin-top:.5rem;margin-bottom:.05rem;}
+.cv-job-line{font-size:.85rem;font-weight:600;color:#222;padding:.15rem 0 .15rem .6rem;border-left:2px solid #1a6b3c;background:#f8fdf9;margin:.2rem 0;}
+.cv-para{font-size:.85rem;color:#222;line-height:1.65;}
+.cv-bullet{font-size:.85rem;color:#222;line-height:1.6;padding-left:.9rem;text-indent:-.9rem;}
+.footer{margin-top:1.5cm;padding-top:.5rem;border-top:1px solid #e8e8e4;font-size:.68rem;color:#aaa;text-align:center;}
+@media print{body{padding:0;}.page{padding:1.5cm 1.8cm;}}
+</style></head>
+<body><div class="page">
+${bodyHTML}
+<div class="footer">Generated by GreenCV · AI CV Analysis for Green &amp; Energy Professionals</div>
+</div>
+<script>window.onload=function(){window.print();setTimeout(function(){window.close();},1000);};<\/script>
 </body></html>`;
+
   const blob=new Blob([html],{type:"text/html"});
   const url=URL.createObjectURL(blob);
   const win=window.open(url,"_blank");
